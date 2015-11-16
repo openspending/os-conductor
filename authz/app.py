@@ -3,11 +3,18 @@ from flask.ext.cors import CORS
 from .blueprints import datastore
 
 
-# Create application
-app = Flask('service', static_folder=None)
+def create():
+    """Create application.
+    """
 
-# CORS support
-CORS(app)
+    # Create application
+    app = Flask('service', static_folder=None)
 
-# Register bluprints
-app.register_blueprint(datastore.blueprint, url_prefix='/datastore')
+    # CORS support
+    CORS(app)
+
+    # Register bluprints
+    app.register_blueprint(datastore.create(), url_prefix='/datastore')
+
+    # Return application
+    return app
