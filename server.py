@@ -9,6 +9,7 @@ app = authz.create()
 port = int(authz.config.PORT)
 if len(sys.argv) > 1:
     port = int(sys.argv[1])
+console.log(port)
 
 # Debug mode flag
 debug = authz.config.DEBUG
