@@ -2,6 +2,10 @@
 
 A simple service to allow whitelisted users to load data to the OpenSpending Datastore.
 
+The service is based on `Flask` microframework running on `Python 3` interpreter. 
+Development environment is based on `npm/gulp` as interface for developers to interact with project.
+Deployment process is `CI/CD` based on `Shippable` and `Heroku` services.
+
 ## Development
 
 To start development process clone repository,
@@ -16,7 +20,7 @@ npm run develop
 ```
 Webapp will be opened in the browser.
 
-Before pushing changes check code style and tests:
+**Before pushing changes back check code style and tests**:
 
 ```
 npm run check
@@ -67,3 +71,13 @@ Deployment to Heroku will be done only on master branch on green builds.
 
 To tweak the process use `shippable.yml` ([reference](http://docs.shippable.com/yml_reference/))
 file in the root of the project.
+
+> Initial deployment configuration:
+  - create an application on Heroku
+  - add environment variables to the application on Heroku:
+    - OPENSPENDING_ACCESS_KEY_ID
+    - OPENSPENDING_SECRET_ACCESS_KEY
+    - OPENSPENDING_STORAGE_BUCKET_NAME
+    - API_KEY_WHITELIST
+  - check/create corresponding S3 bucket on AWS
+  - set buildpack `heroku buildpacks:set -a $APPNAME heroku/python`
