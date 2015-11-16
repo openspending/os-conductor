@@ -6,6 +6,8 @@ The service is based on `Flask` microframework running on `Python 3` interpreter
 Development environment is based on `npm/gulp` as interface for developers to interact with project.
 Deployment process is `CI/CD` based on `Shippable` and `Heroku` services.
 
+[![Shippable](https://img.shields.io/shippable/5649a3971895ca447423925b.svg)](https://app.shippable.com/projects/5649a3971895ca447423925b)
+
 ## Development
 
 To start development process clone repository,
