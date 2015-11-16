@@ -19,7 +19,7 @@ script:
   - nosetests tests --with-coverage --cover-package authz --with-xunit --xunit-file shippable/testresults/nosetests.xml
 
 after_script:
-  - coverage xml -o shippable/coverage/coverage.xml
+  - coverage xml -o shippable/codecoverage/coverage.xml
 
 after_success:
   - git push -f git@heroku.com:${APPNAME}.git master
