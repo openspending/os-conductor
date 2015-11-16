@@ -1,0 +1,10 @@
+# Base
+flask
+flask-cors
+pyyaml
+boto
+
+# Dev
+nose
+pylama
+coverage

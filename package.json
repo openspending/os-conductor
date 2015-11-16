@@ -1,0 +1,27 @@
+{
+  "name": "os-authz-service",
+  "description": "A simple service to allow whitelisted users to load data to the OpenSpending Datastore.",
+  "repository": "https://github.com/openspending/os-authz-service",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": "^4.1.0",
+    "npm": "^2.14.0"
+  },
+  "scripts": {
+    "check": "npm run review && npm run test",
+    "config": "less config.yml",
+    "develop": "gulp develop",
+    "gulp": "./node_modules/.bin/gulp",
+    "review": "pylama authz",
+    "start": "gulp start",
+    "test": "nosetests tests --with-coverage --cover-package authz"
+  },
+  "dependencies": {
+    "browser-sync": "^2.10.0",
+    "gulp": "^3.9.0",
+    "js-yaml": "^3.4.3",
+    "lodash": "^3.10.1",
+    "shelljs": "^0.5.3"
+  }
+}
