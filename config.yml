@@ -1,4 +1,5 @@
 # General
+port: 5000
 debug: false
 api_key_whitelist: ''
 openspending_access_key_id: ''
@@ -8,10 +9,6 @@ aws_s3_custom_domain: 'https://storage.openspending.org'
 aws_s3_secure_urls: true
 aws_querysting_auth: false
 access_key_expires_in: 259200 # 3 days
-
-# Server
-server:
-  port: 5000
 
 # Browsersync
 browsersync:

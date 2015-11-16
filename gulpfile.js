@@ -35,7 +35,7 @@ gulp.task('develop', function(callback) {
         process.exit();
     });
     browsersync.init(_.merge(config.browsersync, {
-        proxy: 'localhost:' + config.server.port,
+        proxy: 'localhost:' + config.port,
     }));
     callback();
 });
