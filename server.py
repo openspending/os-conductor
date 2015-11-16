@@ -14,4 +14,4 @@ if len(sys.argv) > 1:
 debug = authz.config.DEBUG
 
 # Run application
-app.run(port=port, debug=debug)
+app.run(host='0.0.0.0', port=port, debug=debug)
