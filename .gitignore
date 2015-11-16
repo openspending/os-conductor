@@ -58,3 +58,6 @@ target/
 
 # Node
 node_modules/
+
+# Shippable
+shippable/

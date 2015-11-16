@@ -16,10 +16,10 @@ before_script:
 
 script:
   - pylama authz
-  - nosetests tests --with-coverage --cover-package authz
+  - nosetests tests --with-coverage --cover-package authz --with-xunit --xunit-file shippable/testresults/nosetests.xml
 
-# after_script:
-  # - node_modules/.bin/istanbul report cobertura --dir shippable/codecoverage/
+after_script:
+  - coverage xml -o shippable/coverage/coverage.xml
 
 after_success:
   - git push -f git@heroku.com:${APPNAME}.git master
