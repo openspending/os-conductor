@@ -5,6 +5,7 @@ python:
   - '3.4'
 
 env:
+  - APPNAME=test-openspending
   - XUNIT_FILE=shippable/testresults/result.xml
 
 before_script:
@@ -20,7 +21,7 @@ script:
   # - node_modules/.bin/istanbul report cobertura --dir shippable/codecoverage/
 
 after_success:
-  - git push -f git@heroku.com:test-openspending.git master
+  - git push -f git@heroku.com:${APPNAME}.git master
 
 notifications:
   email:
