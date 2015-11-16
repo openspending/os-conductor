@@ -5,8 +5,9 @@ python:
   - '3.4'
 
 env:
-  - APPNAME=test-openspending
-  - XUNIT_FILE=shippable/testresults/result.xml
+  global:
+    - APPNAME=test-openspending
+    - XUNIT_FILE=shippable/testresults/result.xml
 
 before_script:
   - mkdir -p shippable/testresults
