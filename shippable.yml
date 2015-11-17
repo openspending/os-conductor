@@ -20,6 +20,7 @@ script:
 
 after_script:
   - coverage xml -o shippable/codecoverage/coverage.xml
+  - coveralls
 
 after_success:
   - git push -f git@heroku.com:${APPNAME}.git master
