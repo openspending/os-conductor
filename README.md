@@ -1,15 +1,15 @@
 # os-authz-service
 
+[![Shippable](https://img.shields.io/shippable/5649a3971895ca447423925b.svg)](https://app.shippable.com/projects/5649a3971895ca447423925b)
+[![Coveralls](http://img.shields.io/coveralls/roll/os-authz-service/master.svg)](https://coveralls.io/r/roll/os-authz-service)
+
 A simple service to allow whitelisted users to load data to the OpenSpending Datastore.
 
 The service is based on `Flask` microframework running on `Python 3` interpreter.
 Development environment is based on `npm/gulp` as interface for developers to interact with project.
 Deployment process is `CI/CD` based on `Shippable` and `Heroku` services.
 
-[![Shippable](https://img.shields.io/shippable/5649a3971895ca447423925b.svg)](https://app.shippable.com/projects/5649a3971895ca447423925b)
-[![Coveralls](http://img.shields.io/coveralls/roll/os-authz-service/master.svg)](https://coveralls.io/r/roll/os-authz-service)
-
-## Activation
+## Getting Started
 
 To start development process clone repository,
 go to repository dir and then install development dependencies
