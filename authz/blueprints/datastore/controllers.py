@@ -12,17 +12,13 @@ class Authorize:
 
     # Public
 
-    def __init__(self, bucket=None):
-
-        # S3 bucket
-        if not bucket:
-            connection = boto.connect_s3(
-                    config.OPENSPENDING_ACCESS_KEY_ID,
-                    config.OPENSPENDING_SECRET_ACCESS_KEY,
-                    host='s3.amazonaws.com')
-            bucket = connection.get_bucket(
-                    config.OPENSPENDING_STORAGE_BUCKET_NAME)
-        self.bucket = bucket
+    def __init__(self):
+        self.__connection = boto.connect_s3(
+                config.OPENSPENDING_ACCESS_KEY_ID,
+                config.OPENSPENDING_SECRET_ACCESS_KEY,
+                host='s3.amazonaws.com')
+        self.__bucket = self.__connection.get_bucket(
+                config.OPENSPENDING_STORAGE_BUCKET_NAME)
 
     def __call__(self):
 
@@ -50,7 +46,7 @@ class Authorize:
                     'Content-Length': file['length'],
                     'Content-MD5': file['md5'],
                 }
-                s3key = self.bucket.new_key(s3path)
+                s3key = self.__bucket.new_key(s3path)
                 s3url = s3key.generate_url(
                         config.ACCESS_KEY_EXPIRES_IN, 'PUT',
                         headers=s3headers, force_http=True)
