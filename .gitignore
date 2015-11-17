@@ -59,5 +59,8 @@ target/
 # Node
 node_modules/
 
+# Virtualenv
+venv/
+
 # Shippable
 shippable/

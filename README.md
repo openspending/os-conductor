@@ -8,19 +8,30 @@ Deployment process is `CI/CD` based on `Shippable` and `Heroku` services.
 
 [![Shippable](https://img.shields.io/shippable/5649a3971895ca447423925b.svg)](https://app.shippable.com/projects/5649a3971895ca447423925b)
 
-## Development
+## Preparation
 
 To start development process clone repository,
-go to repository dir and then:
+go to repository dir and then install development dependencies
+into virtual environments with command:
+
 ```
-nvm use 4
-npm install
-virtualenv venv
-source venv/bin/activate
-pip install -r requirements.txt
+source install.sh
+```
+
+To activate virtual environments without installing dependencies:
+
+```
+source activate.sh
+```
+
+## Development
+
+To start development server.
+Webapp will be opened in the browser.
+
+```
 npm run develop
 ```
-Webapp will be opened in the browser.
 
 **Before pushing changes back check code style and tests**:
 
