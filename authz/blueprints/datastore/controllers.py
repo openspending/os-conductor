@@ -32,15 +32,15 @@ class Authorize:
 
         try:
 
-            # Get response data
-            req_data = json.loads(request.data.decode())
+            # Get request payload
+            req_payload = json.loads(request.data.decode())
 
-            # Make request data
-            res_data = {'filedata': {}}
-            for path, file in req_data['filedata'].items():
+            # Make response payload
+            res_payload = {'filedata': {}}
+            for path, file in req_payload['filedata'].items():
                 s3path = '{0}/{1}/{2}'.format(
-                        req_data['metadata']['owner'],
-                        req_data['metadata']['name'],
+                        req_payload['metadata']['owner'],
+                        req_payload['metadata']['name'],
                         file['name'])
                 s3headers = {
                     'Content-Length': file['length'],
@@ -61,10 +61,10 @@ class Authorize:
                     'upload_url': upload_url,
                     'upload_query': upload_query,
                 }
-                res_data['filedata'][path] = filedata
+                res_payload['filedata'][path] = filedata
 
-            # Return response data
-            return json.dumps(res_data)
+            # Return response payload
+            return json.dumps(res_payload)
 
         except Exception as exception:
 

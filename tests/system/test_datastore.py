@@ -17,9 +17,9 @@ class datastoreTest(unittest.TestCase):
         self.connect_s3().get_bucket().new_key().generate_url = Mock(
                 return_value='http://test.com?key=value')
 
-        # App and data
+        # App and payload
         self.app = authz.create().test_client()
-        self.data = {
+        self.payload = {
             'metadata': {
                 'owner': 'owner',
                 'name': 'name',
@@ -38,7 +38,7 @@ class datastoreTest(unittest.TestCase):
     def test_not_authorized(self):
         res = self.app.post(
                 '/datastore/',
-                data=json.dumps(self.data))
+                data=json.dumps(self.payload))
         self.assertEqual(res.status, '401 UNAUTHORIZED')
 
     def test_bad_request(self):
@@ -54,7 +54,7 @@ class datastoreTest(unittest.TestCase):
         res = self.app.post(
                 '/datastore/',
                 headers={'API-Key': 'key1'},
-                data=json.dumps(self.data))
+                data=json.dumps(self.payload))
         self.assertEqual(json.loads(res.data.decode('utf-8')), {
             'filedata': {
                 'file1': {
