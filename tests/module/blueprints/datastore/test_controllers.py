@@ -40,7 +40,7 @@ class AuthorizeTest(unittest.TestCase):
 
     # Tests
 
-    def test___call___not_verified(self):
+    def test___call___not_authorized(self):
         authorize = module.Authorize()
         self.services.verify = Mock(return_value=False)
         self.assertEqual(authorize().status, '401 UNAUTHORIZED')
