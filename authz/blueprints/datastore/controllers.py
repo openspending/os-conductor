@@ -41,7 +41,7 @@ class Authorize:
                 s3path = '{0}/{1}/{2}'.format(
                         req_payload['metadata']['owner'],
                         req_payload['metadata']['name'],
-                        file['name'])
+                        path)
                 s3headers = {
                     'Content-Length': file['length'],
                     'Content-MD5': file['md5'],

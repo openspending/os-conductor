@@ -22,7 +22,7 @@ class AuthorizeTest(unittest.TestCase):
                 'name': 'name',
             },
             'filedata': {
-                'file1': {
+                'data/file1': {
                     'name': 'file1',
                     'length': 100,
                     'md5': 'aaa',
@@ -56,7 +56,7 @@ class AuthorizeTest(unittest.TestCase):
         authorize = module.Authorize()
         self.assertEqual(json.loads(authorize()), {
             'filedata': {
-                'file1': {
+                'data/file1': {
                     'name': 'file1',
                     'length': 100,
                     'md5': 'aaa',
@@ -65,4 +65,4 @@ class AuthorizeTest(unittest.TestCase):
                 },
             },
         })
-        self.bucket.new_key.assert_called_with('owner/name/file1')
+        self.bucket.new_key.assert_called_with('owner/name/data/file1')
