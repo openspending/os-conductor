@@ -1,7 +1,7 @@
 # os-authz-service
 
 
-[![Travis](https://img.shields.io/travis/openspending/os-authz-service.svg)](https://travis-ci.org/openspending/os-datastore-cli)
+[![Travis](https://img.shields.io/travis/openspending/os-authz-service.svg)](https://travis-ci.org/openspending/os-authz-service)
 [![Coveralls](http://img.shields.io/coveralls/openspending/os-authz-service/master.svg)](https://coveralls.io/r/openspending/os-authz-service)
 
 A simple service to allow whitelisted users to load data to the OpenSpending Datastore.
