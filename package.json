@@ -1,8 +1,10 @@
 {
+
   "name": "os-authz-service",
   "description": "A simple service to allow whitelisted users to load data to the OpenSpending Datastore.",
   "repository": "https://github.com/openspending/os-authz-service",
   "license": "MIT",
+
   "private": true,
   "engines": {
     "node": "^4.1.0",
@@ -24,4 +26,5 @@
     "lodash": "^3.10.1",
     "shelljs": "^0.5.3"
   }
+
 }

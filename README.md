@@ -6,17 +6,18 @@
 A simple service to allow whitelisted users to load data to the OpenSpending Datastore.
 
 The service is based on `Flask` microframework running on `Python 3` interpreter.
-Development environment is based on `npm/gulp` as interface for developers to interact with project.
+Development environment is based on `npm/gulp` to serve app usnig `browsersync`.
 Deployment process is `CI/CD` based on `Shippable` and `Heroku` services.
 
 ## Getting Started
 
 To start development process clone repository,
 go to repository dir and then install development dependencies
-into virtual environments with command:
+into virtual environments, add pre-commit hook and activate `run`
+tool with command:
 
 ```
-source activate.sh
+$ source activate.sh
 ```
 
 ## Development
@@ -25,13 +26,7 @@ To start development server.
 Webapp will be opened in the browser.
 
 ```
-npm run develop
-```
-
-**Before pushing changes back check code style and tests**:
-
-```
-npm run check
+$ run develop
 ```
 
 ## Configuration
@@ -45,7 +40,7 @@ From low priority (static) to high priority (environ).
 
 To see the current configuration:
 ```
-$ npm run config
+$ run config
 ```
 
 ## Reviewing
@@ -56,13 +51,13 @@ The project follow the next style guides:
 
 To check the project against Python style guide:
 ```
-$ npm run review
+$ run review
 ```
 ## Testing
 
 To run tests with coverage check:
 ```
-$ npm run test
+$ run test
 ```
 Coverage data will be in the `.coverage` file.
 
