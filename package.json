@@ -17,7 +17,7 @@
     "gulp": "./node_modules/.bin/gulp",
     "review": "pylama authz",
     "start": "gulp start",
-    "test": "nosetests tests --with-coverage --cover-package authz"
+    "test": "nosetests tests -sv --with-coverage --cover-package authz"
   },
   "dependencies": {
     "browser-sync": "^2.10.0",

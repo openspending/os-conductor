@@ -5,12 +5,12 @@ python:
   - 3.4
 
 install:
-  - pip install --upgrade -r requirements.txt
+  -
   - pip install --upgrade -r requirements.dev.txt
 
 script:
-  - python run.py review
-  - python run.py test
+  - pylama authz
+  - nosetests tests -sv --with-coverage --cover-package authz
 
 after_success:
   - coveralls
