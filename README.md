@@ -1,13 +1,14 @@
 # os-authz-service
 
-[![Shippable](https://img.shields.io/shippable/5649a3971895ca447423925b.svg)](https://app.shippable.com/projects/5649a3971895ca447423925b)
-[![Coveralls](http://img.shields.io/coveralls/roll/os-authz-service/master.svg)](https://coveralls.io/r/roll/os-authz-service)
+
+[![Travis](https://img.shields.io/travis/openspending/os-authz-service.svg)](https://travis-ci.org/openspending/os-datastore-cli)
+[![Coveralls](http://img.shields.io/coveralls/openspending/os-authz-service/master.svg)](https://coveralls.io/r/openspending/os-authz-service)
 
 A simple service to allow whitelisted users to load data to the OpenSpending Datastore.
 
 The service is based on `Flask` microframework running on `Python 3` interpreter.
 Development environment is based on `npm/gulp` to serve app usnig `browsersync`.
-Deployment process is `CI/CD` based on `Shippable` and `Heroku` services.
+Deployment process is `CI/CD` based on `Travis` and `Heroku` services.
 
 ## Getting Started
 
@@ -72,7 +73,7 @@ To deploy you only have to push your changes to Github:
 
 Deployment to Heroku will be done only on master branch on green builds.
 
-To tweak the process use `shippable.yml` ([reference](http://docs.shippable.com/yml_reference/))
+To tweak the process use `.travis.yml` ([reference](http://docs.travis-ci.com/user/customizing-the-build/))
 file in the root of the project.
 
 > Initial deployment configuration:
@@ -84,4 +85,4 @@ file in the root of the project.
     - API_KEY_WHITELIST
   - check/create corresponding S3 bucket on AWS
   - set buildpack `heroku buildpacks:set -a $APPNAME heroku/python`
-  - add access key from [Shippable](https://app.shippable.com/subscriptions/54340a9a7a7fb11eaa649fb3/subscriptionsSettings) to [Heroku](https://dashboard.heroku.com/account)
+  - run `travis setup heroku` to add encrypted key into `.travis.yml`
