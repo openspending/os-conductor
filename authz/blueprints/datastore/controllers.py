@@ -1,5 +1,6 @@
 import json
 import boto
+from boto.s3.connection import OrdinaryCallingFormat
 from urllib.parse import urlparse, parse_qs
 from flask import request, Response
 from ... import config
@@ -16,7 +17,8 @@ class Authorize:
         self.__connection = boto.connect_s3(
                 config.OPENSPENDING_ACCESS_KEY_ID,
                 config.OPENSPENDING_SECRET_ACCESS_KEY,
-                host='s3.amazonaws.com')
+                host='s3.amazonaws.com',
+                calling_format=OrdinaryCallingFormat())
         self.__bucket = self.__connection.get_bucket(
                 config.OPENSPENDING_STORAGE_BUCKET_NAME)
 
