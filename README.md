@@ -1,16 +1,29 @@
-# os-authz-service
+# os-conductor
 
+[![Travis](https://img.shields.io/travis/openspending/os-conductor.svg)](https://travis-ci.org/openspending/os-conductor)
+[![Coveralls](http://img.shields.io/coveralls/openspending/os-conductor/master.svg)](https://coveralls.io/r/openspending/os-conductor)
 
-[![Travis](https://img.shields.io/travis/openspending/os-authz-service.svg)](https://travis-ci.org/openspending/os-authz-service)
-[![Coveralls](http://img.shields.io/coveralls/openspending/os-authz-service/master.svg)](https://coveralls.io/r/openspending/os-authz-service)
+OS Conductor is a set of integration web services of OpenSpending Next, responsible for identity, notification, and access control.
 
-A simple service to allow whitelisted users to load data to the OpenSpending Datastore.
+## Usage
+
+This section is intended to be used by end-users of the library.
+
+### Example
+
+Client for `authz` service example - [python](https://github.com/openspending/os-cli/blob/master/oscli/actions/upload.py).
+
+## Development
+
+This section is intended to be used by tech users collaborating on this project.
+
+### Overview
 
 The service is based on `Flask` microframework running on `Python 3` interpreter.
 Development environment is based on `npm/gulp` to serve app usnig `browsersync`.
 Deployment process is `CI/CD` based on `Travis` and `Heroku` services.
 
-## Getting Started
+### Getting Started
 
 To start development process clone repository,
 go to repository dir and then install development dependencies
@@ -30,7 +43,7 @@ Webapp will be opened in the browser.
 $ run develop
 ```
 
-## Configuration
+### Configuration
 
 The config system uses 3 sources of settings:
 - `config.yml` (static)
@@ -44,7 +57,7 @@ To see the current configuration:
 $ run config
 ```
 
-## Reviewing
+### Reviewing
 
 The project follow the next style guides:
 - [Open Knowledge Coding Standards and Style Guide](https://github.com/okfn/coding-standards)
@@ -54,7 +67,7 @@ To check the project against Python style guide:
 ```
 $ run review
 ```
-## Testing
+### Testing
 
 To run tests with coverage check:
 ```
@@ -62,7 +75,7 @@ $ run test
 ```
 Coverage data will be in the `.coverage` file.
 
-## Deployment
+### Deployment
 
 The project uses continous integration and deployment (CI/CD) approach.
 
