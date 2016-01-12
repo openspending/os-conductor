@@ -66,7 +66,7 @@ class Authorize:
                     'upload_query': upload_query,
                 }
                 if 'type' in file:
-                    filedata['type'] = file['type']       
+                    filedata['type'] = file['type']
                 res_payload['filedata'][path] = filedata
 
             # Return response payload
