@@ -48,6 +48,8 @@ class Authorize:
                     'Content-Length': file['length'],
                     'Content-MD5': file['md5'],
                 }
+                if 'type' in file:
+                    s3headers['Content-Type'] = file['type']
                 s3key = self.__bucket.new_key(s3path)
                 s3url = s3key.generate_url(
                         config.ACCESS_KEY_EXPIRES_IN, 'PUT',
@@ -63,6 +65,8 @@ class Authorize:
                     'upload_url': upload_url,
                     'upload_query': upload_query,
                 }
+                if 'type' in file:
+                    filedata['type'] = file['type']
                 res_payload['filedata'][path] = filedata
 
             # Return response payload
