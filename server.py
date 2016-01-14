@@ -1,17 +1,17 @@
 import os
 import sys
-import authz
+import conductor
 
 # Create application
-app = authz.create()
+app = conductor.create()
 
 # Port to listen
-port = int(authz.config.PORT)
+port = int(conductor.config.PORT)
 if len(sys.argv) > 1:
     port = int(sys.argv[1])
 
 # Debug mode flag
-debug = authz.config.DEBUG
+debug = conductor.config.DEBUG
 
 # Run application
 app.run(host='0.0.0.0', port=port, debug=debug)

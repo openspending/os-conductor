@@ -1,8 +1,11 @@
 import json
 import unittest
-from unittest.mock import Mock, patch
+try:
+    from unittest.mock import Mock, patch
+except ImportError:
+    from mock import Mock, patch
 from importlib import import_module
-module = import_module('authz.blueprints.datastore.controllers')
+module = import_module('conductor.blueprints.datastore.controllers')
 
 
 class AuthorizeTest(unittest.TestCase):

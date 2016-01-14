@@ -17,7 +17,7 @@ gulp.task('default', function(callback) {
 
 // Develop
 gulp.task('develop', function(callback) {
-    var sources = ['authz/**', 'config.yml'];
+    var sources = ['conductor/**', 'config.yml'];
     var command = 'DEBUG=1 python server.py';
     var server = helpers.spawn(command);
     setInterval(function () {

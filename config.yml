@@ -1,6 +1,6 @@
 # General
 port: 5000
-debug: false
+debug: true
 api_key_whitelist: ''
 openspending_access_key_id: ''
 openspending_secret_access_key: ''

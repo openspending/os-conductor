@@ -1,8 +1,11 @@
 import boto
 import json
 import unittest
-from unittest.mock import Mock, patch
-import authz
+try:
+    from unittest.mock import Mock, patch
+except ImportError:
+    from mock import Mock, patch
+import conductor
 
 
 class datastoreTest(unittest.TestCase):
@@ -18,7 +21,7 @@ class datastoreTest(unittest.TestCase):
                 return_value='http://test.com?key=value')
 
         # App and payload
-        self.app = authz.create().test_client()
+        self.app = conductor.create().test_client()
         self.payload = {
             'metadata': {
                 'owner': 'owner',
@@ -42,7 +45,7 @@ class datastoreTest(unittest.TestCase):
         self.assertEqual(res.status, '401 UNAUTHORIZED')
 
     def test_bad_request(self):
-        patch('authz.config.API_KEY_WHITELIST', 'key1,key2').start()
+        patch('conductor.config.API_KEY_WHITELIST', 'key1,key2').start()
         res = self.app.post(
                 '/datastore/',
                 headers={'API-Key': 'key1'},
@@ -50,7 +53,7 @@ class datastoreTest(unittest.TestCase):
         self.assertEqual(res.status, '400 BAD REQUEST')
 
     def test_good_request(self):
-        patch('authz.config.API_KEY_WHITELIST', 'key1,key2').start()
+        patch('conductor.config.API_KEY_WHITELIST', 'key1,key2').start()
         res = self.app.post(
                 '/datastore/',
                 headers={'API-Key': 'key1'},

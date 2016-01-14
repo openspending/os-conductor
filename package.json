@@ -1,8 +1,8 @@
 {
 
-  "name": "os-authz-service",
-  "description": "A simple service to allow whitelisted users to load data to the OpenSpending Datastore.",
-  "repository": "https://github.com/openspending/os-authz-service",
+  "name": "os-conductor-service",
+  "description": "OpenSpending orchestration service - includes authorization, authentication adn webhooks",
+  "repository": "https://github.com/openspending/os-conductor",
   "license": "MIT",
 
   "private": true,
@@ -15,9 +15,9 @@
     "config": "less config.yml",
     "develop": "gulp develop",
     "gulp": "./node_modules/.bin/gulp",
-    "review": "pylama authz",
+    "review": "pylama conductor",
     "start": "gulp start",
-    "test": "nosetests tests -sv --with-coverage --cover-package authz"
+    "test": "nosetests tests -sv --with-coverage --cover-package conductor"
   },
   "dependencies": {
     "browser-sync": "^2.10.0",

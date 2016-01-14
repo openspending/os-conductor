@@ -1,7 +1,10 @@
 import json
 import boto
 from boto.s3.connection import OrdinaryCallingFormat
-from urllib.parse import urlparse, parse_qs
+try:
+    from urllib.parse import urlparse, parse_qs
+except ImportError:
+    from urlparse import urlparse, parse_qs
 from flask import request, Response
 from ... import config
 from . import services

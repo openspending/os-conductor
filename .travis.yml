@@ -8,8 +8,8 @@ install:
   - pip install --upgrade -r requirements.dev.txt
 
 script:
-  - pylama authz
-  - nosetests tests -sv --with-coverage --cover-package authz
+  - pylama conductor
+  - nosetests tests -sv --with-coverage --cover-package conductor
 
 after_success:
   - coveralls

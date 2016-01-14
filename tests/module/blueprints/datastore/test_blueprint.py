@@ -1,7 +1,10 @@
 import unittest
-from unittest.mock import Mock, patch
+try:
+    from unittest.mock import Mock, patch
+except ImportError:
+    from mock import Mock, patch
 from importlib import import_module
-module = import_module('authz.blueprints.datastore.blueprint')
+module = import_module('conductor.blueprints.datastore.blueprint')
 
 
 class createTest(unittest.TestCase):
