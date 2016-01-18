@@ -9,6 +9,7 @@ def create():
 
     # Create application
     app = Flask('service', static_folder=None)
+    app.config['DEBUG'] = True
 
     # CORS support
     CORS(app)
