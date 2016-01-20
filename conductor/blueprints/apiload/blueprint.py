@@ -15,7 +15,7 @@ def create():
     blueprint.add_url_rule(
         'api', 'poll', controllers.ApiPoll(), methods=['GET'])
     blueprint.add_url_rule(
-        'api', 'callback', controllers.ApiCallback(), methods=['GET'])
+        'callback', 'callback', controllers.ApiCallback(), methods=['GET'])
 
     # Return blueprint
     return blueprint

@@ -14,7 +14,7 @@ def create():
     # CORS support
     CORS(app)
 
-    # Register bluprints
+    # Register blueprints
     app.register_blueprint(datastore.create(), url_prefix='/datastore')
     app.register_blueprint(apiload.create(), url_prefix='/hooks/load/')
 

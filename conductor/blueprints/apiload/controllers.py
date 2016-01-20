@@ -28,7 +28,6 @@ class ApiLoad:
             'package': datapackage,
             'callback': 'http://'+os_conductor+url_for('apiload.callback')
         }
-        print(params)
         load_url = 'http://'+os_api+'/api/3/loader/'
         response = requests.get(load_url, params=params)
         if response.status_code == 200:
@@ -73,12 +72,17 @@ class ApiCallback:
         datapackage = request.values.get('package')
         status = request.values.get('status')
         error = request.values.get('error')
+        progress = request.values.get('progress')
         if datapackage is not None and status is not None:
             key = 'os-conductor:apiload:'+datapackage
-            ret = {
-                'status': status,
-                'progress': 0
-            }
+            ret = cache.get(key)
+            if ret is None:
+                ret = {
+                        'status': status,
+                        'progress': 0
+                }
+            if progress is not None:
+                ret['progress'] = progress
             if status == 'fail' and error is not None:
                 ret['error'] = error
             cache.set(key, ret, 600)
