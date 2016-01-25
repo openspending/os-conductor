@@ -9,9 +9,17 @@ OS Conductor is a set of integration web services of OpenSpending Next, responsi
 
 This section is intended to be used by end-users of the library.
 
+### API Endpoints:
+ - `/hooks/load/api` 
+    - `POST` to initiate loading of an FDP to the OS API
+    - `GET` to get the status for loading of an FDP to the OS API
+ -  `/hooks/load/callback` - internal api for the OS API server to report on FDP loading status
+  - `/datastore/authorize` - get authorized upload URL
+     
+
 ### Example
 
-Client for `authz` service example - [python](https://github.com/openspending/os-cli/blob/master/oscli/actions/upload.py).
+Client for `conductor` service example - [python](https://github.com/openspending/os-cli/blob/master/oscli/actions/upload.py).
 
 ## Development
 
@@ -47,7 +55,7 @@ $ run develop
 
 The config system uses 3 sources of settings:
 - `config.yml` (static)
-- `authz/config.py` (runtime)
+- `conductor/config.py` (runtime)
 - `environment variables` (environ)
 
 From low priority (static) to high priority (environ).
