@@ -1,6 +1,11 @@
 flask
 flask-cors
+flask-session
 flask-jsonpify
+flask-oauthlib
 pyyaml
 boto
 requests
+pyjwt
+sqlalchemy
+psycopg2

@@ -4,6 +4,12 @@ language:
 python:
   - 3.4
 
+addons:
+    postgresql: "9.4"
+
+env:
+    - OS_CONDUCTOR_ENGINE=postgresql://postgres@/os
+
 install:
   - pip install --upgrade -r requirements.dev.txt
 
