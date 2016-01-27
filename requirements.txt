@@ -9,3 +9,4 @@ requests
 pyjwt
 sqlalchemy
 psycopg2
+cryptography

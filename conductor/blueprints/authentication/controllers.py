@@ -9,18 +9,26 @@ except ImportError:
     import urlparse
 import jwt
 
-from flask import request, url_for, redirect, send_from_directory
+from flask import request, url_for, redirect
 from flask.ext.jsonpify import jsonpify
 from flask_oauthlib.client import OAuth, OAuthException
 
 from .models import create_or_get_user, get_user
 
-oauth = OAuth()
 
-SECRET = 'super secret password'
-GOOGLE_DEV_KEY = '791676150192-441k9uar5nca2245hv82161saorrc090.' \
-                 'apps.googleusercontent.com'
-GOOGLE_DEV_SECRET = '5uOZ1v-Rifg7zZVXPQ3ZwLk4'
+def readfile_or_default(filename, default):
+    try:
+        return open(filename).read().strip()
+    except IOError:
+        return default
+os_conductor = os.environ.get('OS_EXTERNAL_ADDRESS')
+
+PRIVATE_KEY = readfile_or_default('/secrets/private.pem', 'private key stub')
+GOOGLE_KEY = readfile_or_default('/secrets/google.key', 'google consumer key')
+GOOGLE_SECRET = readfile_or_default('/secrets/google.secret.key',
+                                    'google consumer secret')
+
+oauth = OAuth()
 
 
 def google_remote_app():
@@ -36,8 +44,8 @@ def google_remote_app():
             },
             access_token_url='https://accounts.google.com/o/oauth2/token',
             access_token_method='POST',
-            consumer_key=GOOGLE_DEV_KEY,
-            consumer_secret=GOOGLE_DEV_SECRET)
+            consumer_key=GOOGLE_KEY,
+            consumer_secret=GOOGLE_SECRET)
     return oauth.google
 
 
@@ -62,7 +70,7 @@ class Check:
         token = request.values.get('jwt')
         if token is not None:
             try:
-                token = jwt.decode(token, SECRET)
+                token = jwt.decode(token, PRIVATE_KEY)
             except jwt.InvalidTokenError:
                 token = None
 
@@ -81,7 +89,7 @@ class Check:
                     return jsonpify(ret)
 
         # Otherwise - not authenticated
-        callback = 'http://conductor.dev.openspending.org'+url_for('.callback')
+        callback = 'http://'+os_conductor+url_for('.callback')
         next = request.args.get('next', None)
         provider = 'google'
         state = {
@@ -90,7 +98,7 @@ class Check:
             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=10),
             'nbf': datetime.datetime.utcnow()
         }
-        state = jwt.encode(state, SECRET)
+        state = jwt.encode(state, PRIVATE_KEY)
         google_login_url = google_remote_app()\
             .authorize(callback=callback, state=state).headers['Location']
 
@@ -118,7 +126,7 @@ class Callback:
 
         state = request.args.get('state')
         try:
-            state = jwt.decode(state, SECRET)
+            state = jwt.decode(state, PRIVATE_KEY)
         except jwt.InvalidTokenError:
             state = None
 
@@ -143,7 +151,7 @@ class Callback:
                     'exp': (datetime.datetime.utcnow() +
                             datetime.timedelta(minutes=5))
                 }
-                client_token = jwt.encode(token, SECRET)
+                client_token = jwt.encode(token, PRIVATE_KEY)
             if client_token is not None:
                 # Add client token to redirect url
                 url_parts = list(urlparse.urlparse(next_url))
@@ -155,11 +163,3 @@ class Callback:
                 next_url = urlparse.urlunparse(url_parts)
 
         return redirect(next_url)
-
-
-class Sample:
-
-    def __call__(self, path):
-        return send_from_directory(
-                        os.path.join(os.path.dirname(__file__), 'lib'),
-                        path)

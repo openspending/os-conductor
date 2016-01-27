@@ -2,7 +2,7 @@ from flask import Flask
 from flask.ext.cors import CORS
 from flask.ext.session import Session
 
-from .blueprints import datastore, apiload, authentication
+from .blueprints import datastore, apiload, authentication, authorization
 
 
 def create():
@@ -26,6 +26,7 @@ def create():
     app.register_blueprint(datastore.create(), url_prefix='/datastore')
     app.register_blueprint(apiload.create(), url_prefix='/hooks/load/')
     app.register_blueprint(authentication.create(), url_prefix='/oauth/')
+    app.register_blueprint(authorization.create(), url_prefix='/permit/')
 
     # Return application
     return app
