@@ -42,15 +42,20 @@ class Check:
 
             if token is not None:
                 userid = token['userid']
-                permissions = get_permission(userid, service)
-                if permissions is not None:
-                    ret = {
-                        'permissions': permissions
-                    }
-                    token = jwt.encode(ret, PRIVATE_KEY, algorithm='RS256')\
-                               .decode('ascii')
-                    ret['token'] = token
-                    return jsonpify(ret)
+                user_permissions = get_permission(userid, service)
+                service_permissions = get_permission('*', service)
+                permissions = {}
+                if user_permissions is not None:
+                    permissions.update(user_permissions)
+                if service_permissions is not None:
+                    permissions.update(service_permissions)
+                ret = {
+                    'permissions': permissions
+                }
+                token = jwt.encode(ret, PRIVATE_KEY, algorithm='RS256')\
+                           .decode('ascii')
+                ret['token'] = token
+                return jsonpify(ret)
 
         ret = {
             'permissions': {}

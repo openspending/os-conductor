@@ -53,3 +53,10 @@ if get_permission('google:109637468373886238649', 'sample') is None:
                       permissions='{"moshe":[1,2,3]}')
     session.add(user)
     session.commit()
+if get_permission('*', 'sample') is None:
+    session = _session()
+    glob = Permission(userid='*',
+                      service='sample',
+                      permissions='{"david":[4,5,6]}')
+    session.add(glob)
+    session.commit()
