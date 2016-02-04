@@ -68,3 +68,6 @@ shippable/
 # IntelliJ
 /.idea/
 *.iml
+
+# flask
+flask_session/
