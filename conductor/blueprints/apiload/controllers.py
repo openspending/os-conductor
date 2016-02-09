@@ -85,5 +85,6 @@ class ApiCallback:
                 ret['progress'] = progress
             if status == 'fail' and error is not None:
                 ret['error'] = error
+            ret['status'] = status
             cache.set(key, ret, 600)
         return ""
