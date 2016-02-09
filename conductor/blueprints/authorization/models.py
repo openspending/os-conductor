@@ -60,3 +60,10 @@ if get_permission('*', 'sample') is None:
                       permissions='{"david":[4,5,6]}')
     session.add(glob)
     session.commit()
+if get_permission('*', 'os.datastore') is None:
+    session = _session()
+    glob = Permission(userid='*',
+                      service='os.datastore',
+                      permissions='{"datapackage-upload":true}')
+    session.add(glob)
+    session.commit()

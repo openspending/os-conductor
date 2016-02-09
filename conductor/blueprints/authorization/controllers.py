@@ -42,13 +42,13 @@ class Check:
 
             if token is not None:
                 userid = token['userid']
-                user_permissions = get_permission(userid, service)
                 service_permissions = get_permission('*', service)
+                user_permissions = get_permission(userid, service)
                 permissions = {}
-                if user_permissions is not None:
-                    permissions.update(user_permissions)
                 if service_permissions is not None:
                     permissions.update(service_permissions)
+                if user_permissions is not None:
+                    permissions.update(user_permissions)
                 ret = {
                     'permissions': permissions
                 }
