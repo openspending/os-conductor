@@ -1,7 +1,6 @@
 # General
 port: 5000
 debug: true
-api_key_whitelist: ''
 openspending_access_key_id: ''
 openspending_secret_access_key: ''
 openspending_storage_bucket_name: ''

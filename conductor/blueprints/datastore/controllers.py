@@ -34,24 +34,24 @@ class Authorize:
 
         # Verify client, deny access if not verified
         is_verified = False
-        api_key = request.headers.get('API-Key')
-        if api_key:
-            is_verified = services.verify(api_key)
-        if not is_verified:
-            return Response(status=401)
+        auth_token = request.headers.get('Auth-Token')
 
         try:
-
             # Get request payload
             req_payload = json.loads(request.data.decode())
+            owner = req_payload.get('metadata', {}).get('owner')
+            dataset_name = req_payload.get('metadata', {}).get('name')
+            if owner is None or dataset_name is None:
+                return Response(status=400)
+            if auth_token:
+                is_verified = services.verify(auth_token, owner)
+            if not is_verified:
+                return Response(status=401)
 
             # Make response payload
             res_payload = {'filedata': {}}
             for path, file in req_payload['filedata'].items():
-                s3path = '{0}/{1}/{2}'.format(
-                        req_payload['metadata']['owner'],
-                        req_payload['metadata']['name'],
-                        path)
+                s3path = '{0}/{1}/{2}'.format(owner, dataset_name, path)
                 s3headers = {
                     'Content-Length': file['length'],
                     'Content-MD5': file['md5'],
