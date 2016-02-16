@@ -33,7 +33,6 @@ class Authorize:
     def __call__(self):
 
         # Verify client, deny access if not verified
-        is_verified = False
         auth_token = request.headers.get('Auth-Token')
 
         try:
@@ -43,9 +42,7 @@ class Authorize:
             dataset_name = req_payload.get('metadata', {}).get('name')
             if owner is None or dataset_name is None:
                 return Response(status=400)
-            if auth_token:
-                is_verified = services.verify(auth_token, owner)
-            if not is_verified:
+            if not services.verify(auth_token, owner):
                 return Response(status=401)
 
             # Make response payload

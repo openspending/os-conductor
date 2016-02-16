@@ -10,6 +10,8 @@ def verify(auth_token, owner):
     :param auth_token: Authentication token to verify
     :param owner: dataset owner
     """
+    if not auth_token:
+        return False
     if auth_token == 'testing-token' and owner == '__tests':
         return True
     global public_key
