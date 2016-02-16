@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os
 import requests
 import datetime
@@ -110,6 +109,7 @@ class Check:
                 }
             }
         }
+
         return jsonpify(ret)
 
 

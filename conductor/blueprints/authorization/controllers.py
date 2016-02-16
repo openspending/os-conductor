@@ -1,6 +1,4 @@
-from __future__ import print_function
 import os
-import requests
 
 try:
     import urllib.parse as urlparse
@@ -8,7 +6,7 @@ except ImportError:
     import urlparse  # silence pyflakes
 import jwt
 
-from flask import request, url_for, send_from_directory
+from flask import request, make_response
 from flask.ext.jsonpify import jsonpify
 
 from .models import get_permission
@@ -23,6 +21,10 @@ os_conductor = os.environ.get('OS_EXTERNAL_ADDRESS')
 
 PUBLIC_KEY = readfile_or_default('/secrets/public.pem', 'public key stub')
 PRIVATE_KEY = readfile_or_default('/secrets/private.pem', 'private key stub')
+LIBJS = readfile_or_default(os.path.join(os.path.dirname(__file__),
+                                         'lib',
+                                         'lib.js'),
+                            'alert("error");')
 
 
 class Check:
@@ -50,7 +52,8 @@ class Check:
                 if user_permissions is not None:
                     permissions.update(user_permissions)
                 ret = {
-                    'permissions': permissions
+                    'permissions': permissions,
+                    'service': service
                 }
                 token = jwt.encode(ret, PRIVATE_KEY, algorithm='RS256')\
                            .decode('ascii')
@@ -69,21 +72,9 @@ class PublicKey:
         return PUBLIC_KEY
 
 
-class Sample:
-
-    def __call__(self, path):
-        return send_from_directory(
-                        os.path.join(os.path.dirname(__file__), 'sample'),
-                        path)
-
-
-class SampleService:
+class Lib:
 
     def __call__(self):
-        url = 'http://localhost:8000'+url_for('.public-key')
-        public_key = requests.get(url).text
-        token = request.values.get('jwt')
-        token = jwt.decode(token.encode('ascii'),
-                           public_key,
-                           algorithm='RS256')
-        return jsonpify(token['permissions'])
+        resp = make_response(LIBJS)
+        resp.headers['Content-Type'] = 'text/javascript'
+        return resp

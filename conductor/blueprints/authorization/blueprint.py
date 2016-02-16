@@ -15,9 +15,7 @@ def create():
     blueprint.add_url_rule(
         'public-key', 'public-key', controllers.PublicKey(), methods=['GET'])
     blueprint.add_url_rule(
-        'sample/<path:path>', 'sample', controllers.Sample(), methods=['GET'])
-    blueprint.add_url_rule(
-        'sample', 'service', controllers.SampleService(), methods=['POST'])
+        'lib', 'lib', controllers.Lib(), methods=['GET'])
 
     # Return blueprint
     return blueprint
