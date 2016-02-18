@@ -131,9 +131,10 @@ class Callback:
             state = None
 
         next_url = '/'
-        if state is not None and resp is not None:
-            provider = state['provider']
-            next_url = state['next']
+        if state is not None:
+            provider = state.get('provider')
+            next_url = state.get('next', next_url)
+        if resp is not None and provider is not None:
             access_token = resp['access_token']
             profile = None
             client_token = None
@@ -149,7 +150,7 @@ class Callback:
                 token = {
                     'userid': user.id,
                     'exp': (datetime.datetime.utcnow() +
-                            datetime.timedelta(minutes=5))
+                            datetime.timedelta(days=14))
                 }
                 client_token = jwt.encode(token, PRIVATE_KEY)
             if client_token is not None:
