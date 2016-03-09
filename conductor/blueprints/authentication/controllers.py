@@ -122,6 +122,7 @@ class Callback:
     def __call__(self):
         resp = google_remote_app().authorized_response()
         if isinstance(resp, OAuthException):
+            print(resp)
             resp = None
 
         state = request.args.get('state')
@@ -131,6 +132,7 @@ class Callback:
             state = None
 
         next_url = '/'
+        provider = None
         if state is not None:
             provider = state.get('provider')
             next_url = state.get('next', next_url)
