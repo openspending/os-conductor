@@ -30,14 +30,11 @@ class Authorize:
         self.__bucket = self.__connection.get_bucket(
                 config.OPENSPENDING_STORAGE_BUCKET_NAME)
 
-    def __call__(self):
-
+    def __call__(self, auth_token, req_payload):
         # Verify client, deny access if not verified
-        auth_token = request.headers.get('Auth-Token')
 
         try:
             # Get request payload
-            req_payload = json.loads(request.data.decode())
             owner = req_payload.get('metadata', {}).get('owner')
             dataset_name = req_payload.get('metadata', {}).get('name')
             if owner is None or dataset_name is None:
@@ -79,6 +76,7 @@ class Authorize:
 
         except Exception as exception:
 
+            raise
             # TODO: use logger
             # Log bad request exception
             print('Bad request: {0}'.format(exception))

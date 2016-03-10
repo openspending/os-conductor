@@ -7,8 +7,23 @@ except ImportError:
 from importlib import import_module
 module = import_module('conductor.blueprints.datastore.controllers')
 
+AUTH_TOKEN = "token"
+PAYLOAD = {
+    'metadata': {
+        'owner': 'owner',
+        'name': 'name',
+    },
+    'filedata': {
+        'data/file1': {
+            'name': 'file1',
+            'length': 100,
+            'md5': 'aaa',
+        },
+    },
+}
 
-class AuthorizeTest(unittest.TestCase):
+
+class DataStoreTest(unittest.TestCase):
 
     # Actions
 
@@ -19,19 +34,6 @@ class AuthorizeTest(unittest.TestCase):
 
         # Request patch
         self.request = patch.object(module, 'request').start()
-        self.request.data.decode = Mock(return_value=json.dumps({
-            'metadata': {
-                'owner': 'owner',
-                'name': 'name',
-            },
-            'filedata': {
-                'data/file1': {
-                    'name': 'file1',
-                    'length': 100,
-                    'md5': 'aaa',
-                },
-            },
-        }))
 
         # Various patches
         self.services = patch.object(module, 'services').start()
@@ -39,25 +41,27 @@ class AuthorizeTest(unittest.TestCase):
         self.boto = patch.object(module, 'boto').start()
         self.bucket = self.boto.connect_s3().get_bucket()
         self.bucket.new_key().generate_url = Mock(
-                return_value='http://test.com?key=value')
+                    return_value='http://test.com?key=value')
 
     # Tests
 
     def test___call___not_authorized(self):
         authorize = module.Authorize()
         self.services.verify = Mock(return_value=False)
-        self.assertEqual(authorize().status, '401 UNAUTHORIZED')
+        self.assertEqual(authorize(AUTH_TOKEN, PAYLOAD).status, '401 UNAUTHORIZED')
 
     def test___call___bad_request(self):
         authorize = module.Authorize()
-        self.request.data.decode = Mock(return_value=json.dumps({
+        self.assertEqual(authorize(AUTH_TOKEN, {
             'bad': 'data',
-        }))
-        self.assertEqual(authorize().status, '400 BAD REQUEST')
+        }).status, '400 BAD REQUEST')
 
     def test___call___good_request(self):
+        self.services.verify = Mock(return_value=True)
         authorize = module.Authorize()
-        self.assertEqual(json.loads(authorize()), {
+        ret = authorize(AUTH_TOKEN, PAYLOAD)
+        self.assertIs(type(ret),str)
+        self.assertEqual(json.loads(ret), {
             'filedata': {
                 'data/file1': {
                     'name': 'file1',
