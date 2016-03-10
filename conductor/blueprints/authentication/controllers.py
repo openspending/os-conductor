@@ -1,4 +1,3 @@
-import os
 import requests
 import datetime
 
@@ -8,8 +7,7 @@ except ImportError:
     import urlparse
 import jwt
 
-from flask import request, url_for, redirect
-from flask.ext.jsonpify import jsonpify
+from flask import request, redirect
 from flask_oauthlib.client import OAuth, OAuthException
 
 from .models import create_or_get_user, get_user
@@ -20,7 +18,6 @@ def readfile_or_default(filename, default):
         return open(filename).read().strip()
     except IOError:
         return default
-os_conductor = os.environ.get('OS_EXTERNAL_ADDRESS')
 
 PRIVATE_KEY = readfile_or_default('/secrets/private.pem', 'private key stub')
 GOOGLE_KEY = readfile_or_default('/secrets/google.key', 'google consumer key')
@@ -65,8 +62,7 @@ class Check:
 
     # Public
 
-    def __call__(self):
-        token = request.values.get('jwt')
+    def __call__(self, token, next, callback_url):
         if token is not None:
             try:
                 token = jwt.decode(token, PRIVATE_KEY)
@@ -85,11 +81,9 @@ class Check:
                             'avatar_url': user.avatar_url
                         }
                     }
-                    return jsonpify(ret)
+                    return ret
 
         # Otherwise - not authenticated
-        callback = 'http://'+os_conductor+url_for('.callback')
-        next = request.args.get('next', None)
         provider = 'google'
         state = {
             'next': next,
@@ -99,7 +93,7 @@ class Check:
         }
         state = jwt.encode(state, PRIVATE_KEY)
         google_login_url = google_remote_app()\
-            .authorize(callback=callback, state=state).headers['Location']
+            .authorize(callback=callback_url, state=state).headers['Location']
 
         ret = {
             'authenticated': False,
@@ -110,7 +104,7 @@ class Check:
             }
         }
 
-        return jsonpify(ret)
+        return ret
 
 
 class Callback:
@@ -119,13 +113,12 @@ class Callback:
 
     # Public
 
-    def __call__(self):
+    def __call__(self, state):
         resp = google_remote_app().authorized_response()
         if isinstance(resp, OAuthException):
             print(resp)
             resp = None
 
-        state = request.args.get('state')
         try:
             state = jwt.decode(state, PRIVATE_KEY)
         except jwt.InvalidTokenError:
