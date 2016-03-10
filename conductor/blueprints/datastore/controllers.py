@@ -18,6 +18,10 @@ class Authorize:
 
     def __init__(self):
         fake_s3 = '.' not in config.OPENSPENDING_S3_HOSTNAME
+        print(fake_s3, config.OPENSPENDING_ACCESS_KEY_ID,
+              config.OPENSPENDING_SECRET_ACCESS_KEY,
+              config.OPENSPENDING_S3_HOSTNAME,
+              config.OPENSPENDING_STORAGE_BUCKET_NAME)
         self.__connection = boto.connect_s3(
                 config.OPENSPENDING_ACCESS_KEY_ID,
                 config.OPENSPENDING_SECRET_ACCESS_KEY,
