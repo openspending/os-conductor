@@ -1,5 +1,6 @@
-# os-conductor
+# OS Conductor
 
+[![Gitter](https://img.shields.io/gitter/room/openspending/chat.svg)](https://gitter.im/openspending/chat)
 [![Travis](https://img.shields.io/travis/openspending/os-conductor.svg)](https://travis-ci.org/openspending/os-conductor)
 [![Coveralls](http://img.shields.io/coveralls/openspending/os-conductor/master.svg)](https://coveralls.io/r/openspending/os-conductor)
 
