@@ -1,5 +1,6 @@
 import requests
 import datetime
+import logging
 
 try:
     import urllib.parse as urlparse
@@ -7,7 +8,7 @@ except ImportError:
     import urlparse
 import jwt
 
-from flask import request, redirect
+from flask import redirect
 from flask_oauthlib.client import OAuth, OAuthException
 
 from .models import create_or_get_user, get_user
@@ -116,7 +117,7 @@ class Callback:
     def __call__(self, state):
         resp = google_remote_app().authorized_response()
         if isinstance(resp, OAuthException):
-            print(resp)
+            logging.log(logging.WARN, "OAuthException: %r" % resp)
             resp = None
 
         try:

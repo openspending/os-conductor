@@ -20,9 +20,9 @@ def create():
 
     def check():
         token = request.values.get('jwt')
-        next = request.args.get('next', None)
+        next_url = request.args.get('next', None)
         callback_url = 'http://'+os_conductor+url_for('.callback')
-        return jsonpify(check_controller(token, next, callback_url))
+        return jsonpify(check_controller(token, next_url, callback_url))
 
     def callback():
         state = request.args.get('state')
