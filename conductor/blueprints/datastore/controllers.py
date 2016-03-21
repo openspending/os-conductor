@@ -17,18 +17,18 @@ class Authorize:
     # Public
 
     def __init__(self):
-        fake_s3 = '.' not in config.OPENSPENDING_S3_HOSTNAME
+        fake_s3 = '.' not in config.OS_S3_HOSTNAME
         self.__connection = boto.connect_s3(
-                config.OPENSPENDING_ACCESS_KEY_ID,
-                config.OPENSPENDING_SECRET_ACCESS_KEY,
-                host=config.OPENSPENDING_S3_HOSTNAME,
+                config.OS_ACCESS_KEY_ID,
+                config.OS_SECRET_ACCESS_KEY,
+                host=config.OS_S3_HOSTNAME,
                 calling_format=OrdinaryCallingFormat(),
                 is_secure=not fake_s3)
         if fake_s3:
-            bucket_name = config.OPENSPENDING_STORAGE_BUCKET_NAME
+            bucket_name = config.OS_STORAGE_BUCKET_NAME
             self.__connection.create_bucket(bucket_name)
         self.__bucket = self.__connection.get_bucket(
-                config.OPENSPENDING_STORAGE_BUCKET_NAME)
+                config.OS_STORAGE_BUCKET_NAME)
 
     def __call__(self, auth_token, req_payload):
         # Verify client, deny access if not verified
