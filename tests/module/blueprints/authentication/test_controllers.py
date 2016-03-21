@@ -4,6 +4,7 @@ import flask
 import jwt
 import datetime
 from collections import namedtuple
+from hashlib import md5
 
 try:
     from unittest.mock import Mock, patch
@@ -14,6 +15,9 @@ module = import_module('conductor.blueprints.authentication.controllers')
 
 
 class AuthenticationTest(unittest.TestCase):
+
+    USERID = 'userid'
+    IDHASH = md5(USERID.encode('utf8')).hexdigest()
 
     # Actions
 
@@ -40,6 +44,7 @@ class AuthenticationTest(unittest.TestCase):
         module.get_user_profile = Mock(
             return_value={
                 'id': 'userid',
+                'idhash': self.IDHASH,
                 'name': 'Moshe',
                 'email': 'email@moshe.com',
                 'picture': 'http://moshe.com/picture'
@@ -63,7 +68,7 @@ class AuthenticationTest(unittest.TestCase):
             return_value=None
         )
         token = {
-            'userid': 'userid',
+            'userid': self.IDHASH,
             'exp': (datetime.datetime.utcnow() +
                     datetime.timedelta(days=14))
         }
@@ -74,7 +79,7 @@ class AuthenticationTest(unittest.TestCase):
 
     def test___check___expired_jwt(self):
         token = {
-            'userid': 'userid',
+            'userid': self.IDHASH,
             'exp': (datetime.datetime.utcnow() -
                     datetime.timedelta(days=1))
         }
@@ -85,7 +90,7 @@ class AuthenticationTest(unittest.TestCase):
 
     def test___check___good_jwt(self):
         token = {
-            'userid': 'userid',
+            'userid': self.IDHASH,
             'exp': (datetime.datetime.utcnow() +
                     datetime.timedelta(days=14))
         }
@@ -93,9 +98,9 @@ class AuthenticationTest(unittest.TestCase):
         ret = module.Check()(client_token, 'next', 'callback')
         self.assertTrue(ret.get('authenticated'))
         self.assertIsNotNone(ret.get('profile'))
-        self.assertEquals(ret['profile']['email'],'email@moshe.com')
-        self.assertEquals(ret['profile']['avatar_url'],'http://google.com')
-        self.assertEquals(ret['profile']['name'],'moshe')
+        self.assertEquals(ret['profile'].email,'email@moshe.com')
+        self.assertEquals(ret['profile'].avatar_url,'http://google.com')
+        self.assertEquals(ret['profile'].name,'moshe')
 
     def test___callback___good_response(self):
         token = {
@@ -108,6 +113,21 @@ class AuthenticationTest(unittest.TestCase):
         ret = module.Callback()(state)
         self.assertEqual(ret.status_code, 302)
         print(ret.headers['Location'])
+        self.assertTrue('jwt' in ret.headers['Location'])
+
+    def test___callback___good_response_double(self):
+        token = {
+            'next': 'http://next.com/',
+            'provider': 'dummy',
+            'exp': (datetime.datetime.utcnow() +
+                    datetime.timedelta(days=14))
+        }
+        state = jwt.encode(token, 'private key stub')
+        ret = module.Callback()(state)
+        self.assertEqual(ret.status_code, 302)
+        self.assertTrue('jwt' in ret.headers['Location'])
+        ret = module.Callback()(state)
+        self.assertEqual(ret.status_code, 302)
         self.assertTrue('jwt' in ret.headers['Location'])
 
     def test___callback___bad_response(self):

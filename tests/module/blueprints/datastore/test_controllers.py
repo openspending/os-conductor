@@ -46,19 +46,19 @@ class DataStoreTest(unittest.TestCase):
     # Tests
 
     def test___call___not_authorized(self):
-        authorize = module.Authorize()
+        authorize = module.AuthorizeUpload()
         self.services.verify = Mock(return_value=False)
         self.assertEqual(authorize(AUTH_TOKEN, PAYLOAD).status, '401 UNAUTHORIZED')
 
     def test___call___bad_request(self):
-        authorize = module.Authorize()
+        authorize = module.AuthorizeUpload()
         self.assertEqual(authorize(AUTH_TOKEN, {
             'bad': 'data',
         }).status, '400 BAD REQUEST')
 
     def test___call___good_request(self):
         self.services.verify = Mock(return_value=True)
-        authorize = module.Authorize()
+        authorize = module.AuthorizeUpload()
         ret = authorize(AUTH_TOKEN, PAYLOAD)
         self.assertIs(type(ret),str)
         self.assertEqual(json.loads(ret), {

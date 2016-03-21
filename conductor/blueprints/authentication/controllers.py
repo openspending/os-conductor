@@ -76,11 +76,7 @@ class Check:
                 if user is not None:
                     ret = {
                         'authenticated': True,
-                        'profile': {
-                            'name': user.name,
-                            'email': user.email,
-                            'avatar_url': user.avatar_url
-                        }
+                        'profile': user
                     }
                     return ret
 
@@ -144,7 +140,7 @@ class Callback:
                 userid = '%s:%s' % (provider, provider_id)
                 user = create_or_get_user(userid, name, email, avatar_url)
                 token = {
-                    'userid': user.id,
+                    'userid': user['idhash'],
                     'exp': (datetime.datetime.utcnow() +
                             datetime.timedelta(days=14))
                 }

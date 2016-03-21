@@ -10,7 +10,7 @@ from ... import config
 from . import services
 
 
-class Authorize:
+class AuthorizeUpload:
     """Autorize a client for the file uploading.
     """
 
