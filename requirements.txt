@@ -10,3 +10,5 @@ pyjwt
 sqlalchemy
 psycopg2
 cryptography
+elasticsearch
+

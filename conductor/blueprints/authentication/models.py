@@ -1,48 +1,46 @@
 import os
+from hashlib import md5
 
-from sqlalchemy.ext.declarative import declarative_base
+from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import NotFoundError
 
-from sqlalchemy import Column, Unicode, String, create_engine
-from sqlalchemy.orm import sessionmaker
-
-Base = declarative_base()
-
-
-class User(Base):
-    __tablename__ = 'users'
-    id = Column(Unicode, primary_key=True)
-    name = Column(Unicode)
-    email = Column(Unicode)
-    avatar_url = Column(String)
-
-
+USER_FIELDS = ['id', 'name', 'email', 'avatar_url', 'datasets', 'idhash']
 _engine = None
 
 
 def _get_engine():
     global _engine
     if _engine is None:
-        _engine = create_engine(os.environ['OS_CONDUCTOR_ENGINE'])
+        _engine = Elasticsearch(hosts=[os.environ['OS_ELASTICSEARCH_ADDRESS']])
     return _engine
 
 
-def _session():
-    return sessionmaker(bind=_get_engine())()
-
-
-def get_user(userid):
-    return _session().query(User).filter(User.id == userid).first()
+def get_user(idhash):
+    try:
+        ret = _get_engine().get(index="users", doc_type="user_profile",
+                                id=idhash, _source=USER_FIELDS)
+        if ret['found']:
+            return ret['_source']
+        return None
+    except NotFoundError:
+        return None
 
 
 def create_or_get_user(userid, name, email, avatar_url):
-    session = _session()
-    user = session.query(User).filter(User.id == userid).first()
-    if user is not None:
-        return user
-    user = User(id=userid, name=name, email=email, avatar_url=avatar_url)
-    session.add(user)
-    session.commit()
+    idhash = md5(email.encode('utf8')).hexdigest()
+    user = get_user(idhash)
+    if user is None:
+        # TODO: Support a list of emails from the provider,
+        # and try to find one account that matches any of them
+        document = {
+            'id': userid,
+            'name': name,
+            'email': email,
+            'avatar_url': avatar_url,
+            'idhash': idhash
+        }
+        _get_engine().index(index="users", doc_type="user_profile",
+                            id=idhash, body=document)
+        _get_engine().indices.flush(index="users")
+        return document
     return user
-
-
-Base.metadata.create_all(_get_engine())

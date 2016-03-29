@@ -12,7 +12,7 @@ def create():
     blueprint = Blueprint('datastore', 'datastore')
 
     # Controller proxies
-    authorize_controller = controllers.Authorize()
+    authorize_controller = controllers.AuthorizeUpload()
 
     def authorize():
         auth_token = request.headers.get('Auth-Token')
