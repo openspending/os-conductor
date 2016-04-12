@@ -11,7 +11,8 @@ _engine = None
 def _get_engine():
     global _engine
     if _engine is None:
-        _engine = Elasticsearch(hosts=[os.environ['OS_ELASTICSEARCH_ADDRESS']])
+        es_host = os.environ['OS_ELASTICSEARCH_ADDRESS']
+        _engine = Elasticsearch(hosts=[es_host], use_ssl='https' in es_host)
     return _engine
 
 
