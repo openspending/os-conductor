@@ -55,7 +55,7 @@ class AuthorizeUpload:
                 s3key = self.__bucket.new_key(s3path)
                 s3url = s3key.generate_url(
                         config.ACCESS_KEY_EXPIRES_IN, 'PUT',
-                        headers=s3headers, force_http=True)
+                        headers=s3headers)
                 parsed = urlparse(s3url)
                 upload_url = '{0}://{1}{2}'.format(
                         parsed.scheme, parsed.netloc, parsed.path)
