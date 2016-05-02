@@ -34,9 +34,9 @@ class ApiLoad:
             key = 'os-conductor:apiload:'+datapackage
             ret = {
                 "progress": 0,
-                "status": "progress"
+                "status": "queued"
             }
-            cache.set(key, ret, 600)
+            cache.set(key, ret, 3600)
         else:
             ret = {
                 "status": "fail",
@@ -72,7 +72,7 @@ class ApiCallback:
         datapackage = request.values.get('package')
         status = request.values.get('status')
         error = request.values.get('error')
-        progress = request.values.get('progress')
+        progress = request.values.get('progress', 0)
         if datapackage is not None and status is not None:
             key = 'os-conductor:apiload:'+datapackage
             ret = cache.get(key)
@@ -82,9 +82,9 @@ class ApiCallback:
                         'progress': 0
                 }
             if progress is not None:
-                ret['progress'] = progress
+                ret['progress'] = int(progress)
             if status == 'fail' and error is not None:
                 ret['error'] = error
             ret['status'] = status
-            cache.set(key, ret, 600)
+            cache.set(key, ret, 3600)
         return ""
