@@ -48,7 +48,7 @@ class ApiloadTest(unittest.TestCase):
         api_load = module.ApiLoad()
         self.requests.get = Mock(return_value=Response(200))
         self.request.values = {'datapackage':'bla'}
-        self.assertResponse(api_load(), 'progress', 0)
+        self.assertResponse(api_load(), 'queued', 0)
 
     def test___load___bad_request(self):
         api_load = module.ApiLoad()
@@ -70,7 +70,7 @@ class ApiloadTest(unittest.TestCase):
 
         api_poll = module.ApiPoll()
         self.request.values = {'datapackage':'bla2'}
-        self.assertResponse(api_poll(), 'progress', 0)
+        self.assertResponse(api_poll(), 'queued', 0)
 
     def test___poll___nonexistent_request(self):
         api_poll = module.ApiPoll()
