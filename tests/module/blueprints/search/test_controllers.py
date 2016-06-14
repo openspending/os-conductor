@@ -34,6 +34,18 @@ class SearchTest(unittest.TestCase):
             self.es.index('packages', 'package', body)
         self.es.indices.flush('packages')
 
+    def indexSomeRealLookingRecords(self, amount):
+        for i in range(amount):
+            body = {
+                'id': 'package-id-%d' % i,
+                'package': {
+                    'author': 'The one and only author number%d' % (i+1),
+                    'title': 'This dataset is number%d' % i
+                }
+            }
+            self.es.index('packages', 'package', body)
+        self.es.indices.flush('packages')
+
     # Tests
     def test___search___all_values_and_empty(self):
         self.assertEquals(len(module.Search()('package')), 0)
@@ -81,3 +93,15 @@ class SearchTest(unittest.TestCase):
 
     def test___search___filter_nonexistent_property(self):
         self.assertEquals(module.Search()('box', {'model': ['str6'], 'boxing': ["6"]}), None)
+
+    def test___search___q_param_no_recs_no_results(self):
+        self.indexSomeRealLookingRecords(0)
+        self.assertEquals(len(module.Search()('package', {'q': ['"author"']})), 0)
+
+    def test___search___q_param_some_recs_no_results(self):
+        self.indexSomeRealLookingRecords(2)
+        self.assertEquals(len(module.Search()('package', {'q': ['"writer"']})), 0)
+
+    def test___search___q_param_some_recs_some_results(self):
+        self.indexSomeRealLookingRecords(2)
+        self.assertEquals(len(module.Search()('package', {'q': ['"number1"']})), 2)

@@ -10,12 +10,19 @@ ENABLED_SEARCHES = {
     'user': {
         'index': 'users',
         'doc_type': 'user_profile',
-        '_source': ['idhash', 'name', 'avatar_url', 'datasets']
+        '_source': ['idhash', 'name', 'avatar_url', 'datasets'],
+        'q_fields': ['name']
     },
     'package': {
         'index': 'packages',
         'doc_type': 'package',
-        '_source': ['id', 'model', 'package', 'origin_url']
+        '_source': ['id', 'model', 'package', 'origin_url'],
+        'q_fields': ['package.title',
+                     'package.author',
+                     'package.description',
+                     'package.regionCode',
+                     'package.countryCode',
+                     'package.cityCode']
     }
 }
 
@@ -26,6 +33,38 @@ def _get_engine():
         es_host = os.environ['OS_ELASTICSEARCH_ADDRESS']
         _engine = Elasticsearch(hosts=[es_host], use_ssl='https' in es_host)
     return _engine
+
+
+def build_dsl(kind_params, kw):
+    dsl = {'bool': {'must': []}}
+    q = kw.get('q')
+    if q is not None:
+        dsl['bool']['must'].append(
+            {
+                'multi_match': {
+                    'query': json.loads(q[0]),
+                    'fields': kind_params['q_fields']
+                }
+            }
+        )
+    for k, v_arr in kw.items():
+        if k.split('.')[0] in kind_params['_source']:
+            dsl['bool']['must'].append({
+                    'bool': {
+                        'should': [{'match': {k: json.loads(v)}}
+                                   for v in v_arr]
+                    }
+               })
+
+    if len(dsl['bool']['must']) == 0:
+        del dsl['bool']['must']
+    if len(dsl['bool']) == 0:
+        del dsl['bool']
+    if len(dsl) == 0:
+        dsl = {}
+    else:
+        dsl = {'query': dsl}
+    return dsl
 
 
 def query(kind, size=100, **kw):
@@ -39,19 +78,15 @@ def query(kind, size=100, **kw):
         # first item.
         if type(size) is list:
             size = size[0]
-        api_params = {'size': int(size)}
-        api_params.update(kind_params)
+        api_params = dict([
+            ('size', int(size)),
+            ('index', kind_params['index']),
+            ('doc_type', kind_params['doc_type']),
+            ('_source', kind_params['_source'])
+        ])
 
-        or_clauses = []
-        for k, v_arr in kw.items():
-            if k.split('.')[0] in kind_params['_source']:
-                filters = ["{0}:{1}".format(k, json.dumps(json.loads(v)))
-                           for v in v_arr]
-                or_clauses.append("({0})".format(" OR ".join(filters)))
-        q_str = " AND ".join(or_clauses)
-
-        if len(q_str) > 0:
-            api_params['q'] = q_str
+        body = build_dsl(kind_params, kw)
+        api_params['body'] = json.dumps(body)
         ret = _get_engine().search(**api_params)
         if ret.get('hits') is not None:
             return [hit['_source'] for hit in ret['hits']['hits']]
