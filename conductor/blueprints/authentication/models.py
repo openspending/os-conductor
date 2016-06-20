@@ -1,10 +1,12 @@
 import os
+import datetime
 from hashlib import md5
 
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
 
-USER_FIELDS = ['id', 'name', 'email', 'avatar_url', 'datasets', 'idhash']
+USER_FIELDS = ['id', 'name', 'email', 'avatar_url',
+               'datasets', 'idhash', 'username', 'join_date']
 _engine = None
 
 
@@ -27,8 +29,19 @@ def get_user(idhash):
         return None
 
 
+def hash_email(email):
+    return md5(email.encode('utf8')).hexdigest()
+
+
+def save_user(user):
+    idhash = user['idhash']
+    _get_engine().index(index="users", doc_type="user_profile",
+                        id=idhash, body=user)
+    _get_engine().indices.flush(index="users")
+
+
 def create_or_get_user(userid, name, email, avatar_url):
-    idhash = md5(email.encode('utf8')).hexdigest()
+    idhash = hash_email(email)
     user = get_user(idhash)
     if user is None:
         # TODO: Support a list of emails from the provider,
@@ -38,10 +51,10 @@ def create_or_get_user(userid, name, email, avatar_url):
             'name': name,
             'email': email,
             'avatar_url': avatar_url,
-            'idhash': idhash
+            'idhash': idhash,
+            'username': None,
+            'join_date': datetime.datetime.now().isoformat()
         }
-        _get_engine().index(index="users", doc_type="user_profile",
-                            id=idhash, body=document)
-        _get_engine().indices.flush(index="users")
+        save_user(document)
         return document
     return user

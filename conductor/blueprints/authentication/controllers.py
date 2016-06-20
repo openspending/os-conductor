@@ -11,7 +11,7 @@ import jwt
 from flask import redirect
 from flask_oauthlib.client import OAuth, OAuthException
 
-from .models import create_or_get_user, get_user
+from .models import create_or_get_user, get_user, save_user
 
 
 def readfile_or_default(filename, default):
@@ -156,3 +156,45 @@ class Callback:
                 next_url = urlparse.urlunparse(url_parts)
 
         return redirect(next_url)
+
+
+class Update:
+    """Update a user
+    """
+
+    # Public
+
+    def __call__(self, token, username):
+        err = None
+        if token is not None:
+            try:
+                token = jwt.decode(token, PRIVATE_KEY)
+            except jwt.InvalidTokenError:
+                token = None
+                err = 'Not authenticated'
+        else:
+            err = 'No token'
+
+        user = None
+        if token is not None:
+            userid = token['userid']
+            user = get_user(userid)
+
+            if user is not None:
+                dirty = False
+                if username is not None:
+                    if user.get('username') is None:
+                        user['username'] = username
+                        dirty = True
+                    else:
+                        err = 'Cannot modify username, already set'
+                if dirty:
+                    save_user(user)
+            else:
+                err = 'Unknown User'
+
+        ret = {'success': err is None}
+        if err is not None:
+            ret['error'] = err
+
+        return ret

@@ -3,9 +3,10 @@ import unittest
 from importlib import import_module
 from elasticsearch import Elasticsearch, NotFoundError
 
+from tests.module.blueprints.config import LOCAL_ELASTICSEARCH
+
 module = import_module('conductor.blueprints.search.controllers')
 
-LOCAL_ELASTICSEARCH='localhost:9200'
 
 class SearchTest(unittest.TestCase):
 

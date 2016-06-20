@@ -1,17 +1,141 @@
 import unittest
 
-import flask
+import time
 import jwt
 import datetime
 from collections import namedtuple
 from hashlib import md5
 
+from elasticsearch import Elasticsearch, NotFoundError
+
+from tests.module.blueprints.config import LOCAL_ELASTICSEARCH
+
 try:
     from unittest.mock import Mock, patch
 except ImportError:
     from mock import Mock, patch
-from importlib import import_module
-module = import_module('conductor.blueprints.authentication.controllers')
+from importlib import import_module, reload
+
+models = import_module('conductor.blueprints.authentication.models')
+
+class UserAdminTest(unittest.TestCase):
+
+    USERID = 'uusseerriidd'
+    NAME = 'nnaammee'
+    EMAIL = 'eemmaaiill'
+    AVATAR_URL = 'aavvaattaarr__uurrll'
+
+    # Actions
+
+    def setUp(self):
+
+        self.ctrl = import_module('conductor.blueprints.authentication.controllers')
+        reload(self.ctrl)
+
+        # Clean index
+        self.es = Elasticsearch(hosts=[LOCAL_ELASTICSEARCH])
+        try:
+            self.es.indices.delete(index='users')
+        except NotFoundError:
+            pass
+        self.es.indices.create('users')
+        time.sleep(1)
+
+    def test___create_user___success(self):
+        user = models.create_or_get_user(self.USERID, self.NAME, self.EMAIL, self.AVATAR_URL)
+        self.assertEquals(user['id'], self.USERID)
+        self.assertEquals(user['name'], self.NAME)
+        self.assertEquals(user['email'], self.EMAIL)
+        self.assertEquals(user['avatar_url'], self.AVATAR_URL)
+
+    def test___create__existing_user___success(self):
+        models.create_or_get_user(self.USERID, self.NAME, self.EMAIL, self.AVATAR_URL)
+        user = models.create_or_get_user(self.USERID, self.NAME, self.EMAIL, self.AVATAR_URL)
+        self.assertEquals(user['id'], self.USERID)
+        self.assertEquals(user['name'], self.NAME)
+        self.assertEquals(user['email'], self.EMAIL)
+        self.assertEquals(user['avatar_url'], self.AVATAR_URL)
+
+    def test___get__existing_user___success(self):
+        models.create_or_get_user(self.USERID, self.NAME, self.EMAIL, self.AVATAR_URL)
+        hash = models.hash_email(self.EMAIL)
+        user = models.get_user(hash)
+        self.assertEquals(user['id'], self.USERID)
+        self.assertEquals(user['name'], self.NAME)
+        self.assertEquals(user['email'], self.EMAIL)
+        self.assertEquals(user['avatar_url'], self.AVATAR_URL)
+
+    def test___get__nonexisting_user___success(self):
+        hash = models.hash_email(self.EMAIL)
+        user = models.get_user(hash)
+        self.assertIs(user, None)
+
+    def test___save__existing_user___success(self):
+        user2 = models.create_or_get_user(self.USERID, self.NAME, self.EMAIL, self.AVATAR_URL)
+        user2['email'] += 'X'
+        models.save_user(user2)
+        hash = models.hash_email(self.EMAIL)
+        user = models.get_user(hash)
+        self.assertEquals(user['id'], self.USERID)
+        self.assertEquals(user['name'], self.NAME)
+        self.assertEquals(user['email'], self.EMAIL+'X')
+        self.assertEquals(user['avatar_url'], self.AVATAR_URL)
+
+    def test___update___no_jwt(self):
+        ret = self.ctrl.Update()(None, 'new_username')
+        self.assertFalse(ret.get('success'))
+        self.assertEquals(ret.get('error'), 'No token')
+
+    def test___update___bad_jwt(self):
+        ret = self.ctrl.Update()('bla', 'new_username')
+        self.assertFalse(ret.get('success'))
+        self.assertEquals(ret.get('error'), 'Not authenticated')
+
+    def test___update___no_such_user(self):
+        hash = models.hash_email(self.EMAIL+'X')
+        token = {
+            'userid': hash,
+            'exp': (datetime.datetime.utcnow() +
+                    datetime.timedelta(days=14))
+        }
+        client_token = jwt.encode(token, 'private key stub')
+        ret = self.ctrl.Update()(client_token, 'new_username')
+        self.assertFalse(ret.get('success'))
+        self.assertEquals(ret.get('error'), 'Unknown User')
+
+    def test___update___new_user(self):
+        models.create_or_get_user(self.USERID, self.NAME, self.EMAIL, self.AVATAR_URL)
+        hash = models.hash_email(self.EMAIL)
+        token = {
+            'userid': hash,
+            'exp': (datetime.datetime.utcnow() +
+                    datetime.timedelta(days=14))
+        }
+        client_token = jwt.encode(token, 'private key stub')
+        ret = self.ctrl.Update()(client_token, 'new_username')
+        self.assertTrue(ret.get('success'))
+        self.assertEquals(ret.get('error'), None)
+        user = models.get_user(hash)
+        self.assertEquals(user['username'], 'new_username')
+
+
+    def test___update___double_update(self):
+        models.create_or_get_user(self.USERID, self.NAME, self.EMAIL, self.AVATAR_URL)
+        hash = models.hash_email(self.EMAIL)
+        token = {
+            'userid': hash,
+            'exp': (datetime.datetime.utcnow() +
+                    datetime.timedelta(days=14))
+        }
+        client_token = jwt.encode(token, 'private key stub')
+        ret = self.ctrl.Update()(client_token, 'new_username')
+        self.assertTrue(ret.get('success'))
+        self.assertEquals(ret.get('error'), None)
+        ret = self.ctrl.Update()(client_token, 'new_username_@')
+        self.assertFalse(ret.get('success'))
+        self.assertEquals(ret.get('error'), 'Cannot modify username, already set')
+        user = models.get_user(hash)
+        self.assertEquals(user['username'], 'new_username')
 
 
 class AuthenticationTest(unittest.TestCase):
@@ -23,6 +147,9 @@ class AuthenticationTest(unittest.TestCase):
 
     def setUp(self):
 
+        self.ctrl = import_module('conductor.blueprints.authentication.controllers')
+        reload(self.ctrl)
+
         # Cleanup
         self.addCleanup(patch.stopall)
 
@@ -30,18 +157,18 @@ class AuthenticationTest(unittest.TestCase):
         self.oauth_response = {
             'access_token': 'access_token'
         }
-        module.google_remote_app = Mock(
+        self.ctrl.google_remote_app = Mock(
             return_value=namedtuple('google_remote_app',
                                     ['authorize', 'authorized_response'])
             (authorize=lambda **kwargs: self.goog_provider,
              authorized_response=lambda **kwargs: self.oauth_response)
         )
-        module.get_user = Mock(
+        self.ctrl.get_user = Mock(
             return_value=namedtuple('User',
                                     ['name','email','avatar_url'])
             ('moshe','email@moshe.com','http://google.com')
         )
-        module.get_user_profile = Mock(
+        self.ctrl.get_user_profile = Mock(
             return_value={
                 'id': 'userid',
                 'idhash': self.IDHASH,
@@ -54,17 +181,17 @@ class AuthenticationTest(unittest.TestCase):
     # Tests
 
     def test___check___no_jwt(self):
-        ret = module.Check()(None, 'next', 'callback')
+        ret = self.ctrl.Check()(None, 'next', 'callback')
         self.assertFalse(ret.get('authenticated'))
         self.assertIsNotNone(ret.get('providers',{}).get('google'))
 
     def test___check___bad_jwt(self):
-        ret = module.Check()('bla', 'next', 'callback')
+        ret = self.ctrl.Check()('bla', 'next', 'callback')
         self.assertFalse(ret.get('authenticated'))
         self.assertIsNotNone(ret.get('providers',{}).get('google'))
 
     def test___check___good_jwt_no_such_user(self):
-        module.get_user = Mock(
+        self.ctrl.get_user = Mock(
             return_value=None
         )
         token = {
@@ -73,7 +200,7 @@ class AuthenticationTest(unittest.TestCase):
                     datetime.timedelta(days=14))
         }
         client_token = jwt.encode(token, 'private key stub')
-        ret = module.Check()(client_token, 'next', 'callback')
+        ret = self.ctrl.Check()(client_token, 'next', 'callback')
         self.assertFalse(ret.get('authenticated'))
         self.assertIsNotNone(ret.get('providers',{}).get('google'))
 
@@ -84,7 +211,7 @@ class AuthenticationTest(unittest.TestCase):
                     datetime.timedelta(days=1))
         }
         client_token = jwt.encode(token, 'private key stub')
-        ret = module.Check()(client_token, 'next', 'callback')
+        ret = self.ctrl.Check()(client_token, 'next', 'callback')
         self.assertFalse(ret.get('authenticated'))
         self.assertIsNotNone(ret.get('providers',{}).get('google'))
 
@@ -95,7 +222,7 @@ class AuthenticationTest(unittest.TestCase):
                     datetime.timedelta(days=14))
         }
         client_token = jwt.encode(token, 'private key stub')
-        ret = module.Check()(client_token, 'next', 'callback')
+        ret = self.ctrl.Check()(client_token, 'next', 'callback')
         self.assertTrue(ret.get('authenticated'))
         self.assertIsNotNone(ret.get('profile'))
         self.assertEquals(ret['profile'].email,'email@moshe.com')
@@ -110,7 +237,7 @@ class AuthenticationTest(unittest.TestCase):
                     datetime.timedelta(days=14))
         }
         state = jwt.encode(token, 'private key stub')
-        ret = module.Callback()(state)
+        ret = self.ctrl.Callback()(state)
         self.assertEqual(ret.status_code, 302)
         print(ret.headers['Location'])
         self.assertTrue('jwt' in ret.headers['Location'])
@@ -123,10 +250,10 @@ class AuthenticationTest(unittest.TestCase):
                     datetime.timedelta(days=14))
         }
         state = jwt.encode(token, 'private key stub')
-        ret = module.Callback()(state)
+        ret = self.ctrl.Callback()(state)
         self.assertEqual(ret.status_code, 302)
         self.assertTrue('jwt' in ret.headers['Location'])
-        ret = module.Callback()(state)
+        ret = self.ctrl.Callback()(state)
         self.assertEqual(ret.status_code, 302)
         self.assertTrue('jwt' in ret.headers['Location'])
 
@@ -139,12 +266,12 @@ class AuthenticationTest(unittest.TestCase):
                     datetime.timedelta(days=14))
         }
         state = jwt.encode(token, 'private key stub')
-        ret = module.Callback()(state)
+        ret = self.ctrl.Callback()(state)
         self.assertEqual(ret.status_code, 302)
         self.assertFalse('jwt' in ret.headers['Location'])
 
     def test___callback___bad_state(self):
-        ret = module.Callback()("das")
+        ret = self.ctrl.Callback()("das")
         self.assertEqual(ret.status_code, 302)
         self.assertFalse('jwt' in ret.headers['Location'])
 
