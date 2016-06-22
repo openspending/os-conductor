@@ -8,7 +8,7 @@ try:
 except ImportError:
     from mock import Mock, patch
 from importlib import import_module
-module = import_module('conductor.blueprints.authorization.controllers')
+module = import_module('conductor.blueprints.user.controllers')
 
 
 class AuthorizationTest(unittest.TestCase):
@@ -34,15 +34,15 @@ class AuthorizationTest(unittest.TestCase):
     # Tests
 
     def test___check___no_token(self):
-        ret = module.Check()(None, 'service')
+        ret = module.authorize(None, 'service')
         self.assertEquals(len(ret.get('permissions')), 0)
 
     def test___check___no_service(self):
-        ret = module.Check()('token', 'service')
+        ret = module.authorize('token', 'service')
         self.assertEquals(len(ret.get('permissions')), 0)
 
     def test___check___bad_token(self):
-        ret = module.Check()('token', 'service')
+        ret = module.authorize('token', 'service')
         self.assertEquals(len(ret.get('permissions')), 0)
 
     def test___check___good_token(self):
@@ -50,6 +50,6 @@ class AuthorizationTest(unittest.TestCase):
             'userid': 'userid',
         }
         client_token = jwt.encode(token, module.PRIVATE_KEY)
-        ret = module.Check()(client_token, 'os.datastore')
+        ret = module.authorize(client_token, 'os.datastore')
         self.assertEquals(ret.get('service'), 'os.datastore')
         self.assertGreater(len(ret.get('permissions',{})), 0)

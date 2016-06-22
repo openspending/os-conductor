@@ -1,5 +1,3 @@
-import json
-import requests
 from collections import namedtuple
 import unittest
 
@@ -10,10 +8,11 @@ try:
 except ImportError:
     from mock import Mock, patch
 from importlib import import_module
-module = import_module('conductor.blueprints.apiload.controllers')
+module = import_module('conductor.blueprints.package.controllers')
 
 Response = namedtuple('Response',['status_code'])
 ident = lambda x:x
+
 
 class ApiloadTest(unittest.TestCase):
 
@@ -45,90 +44,90 @@ class ApiloadTest(unittest.TestCase):
             self.assertEquals(ret['error'], error)
 
     def test___load___good_request(self):
-        api_load = module.ApiLoad()
+        api_load = module.upload
         self.requests.get = Mock(return_value=Response(200))
         self.request.values = {'datapackage':'bla'}
         self.assertResponse(api_load(), 'queued', 0)
 
     def test___load___bad_request(self):
-        api_load = module.ApiLoad()
+        api_load = module.upload
         self.requests.get = Mock(return_value=Response(200))
         self.request.values = {'datapackaged':'bla'}
         self.assertRaises(BadRequest, api_load)
 
     def test___callback___server_down(self):
-        api_load = module.ApiLoad()
+        api_load = module.upload
         self.requests.get = Mock(return_value=Response(499))
         self.request.values = {'datapackage':'bla'}
         self.assertResponse(api_load(), 'fail', error='HTTP 499')
 
     def test___poll___good_request(self):
-        api_load = module.ApiLoad()
+        api_load = module.upload
         self.requests.get = Mock(return_value=Response(200))
         self.request.values = {'datapackage':'bla2'}
         api_load()
 
-        api_poll = module.ApiPoll()
+        api_poll = module.upload_status
         self.request.values = {'datapackage':'bla2'}
         self.assertResponse(api_poll(), 'queued', 0)
 
     def test___poll___nonexistent_request(self):
-        api_poll = module.ApiPoll()
+        api_poll = module.upload_status
         self.request.values = {'datapackage':'bla3'}
         self.assertRaises(NotFound, api_poll)
 
     def test___poll___bad_request(self):
-        api_poll = module.ApiPoll()
+        api_poll = module.upload_status
         self.request.values = {'datapackaged':'bla4'}
         self.assertRaises(BadRequest, api_poll)
 
     def test___callback___no_update(self):
         # No parameters
-        api_callback = module.ApiCallback()
+        api_callback = module.upload_status_update
         self.request.values = {'package':'bla4'}
         self.assertEquals(api_callback(), "")
 
-        api_poll = module.ApiPoll()
+        api_poll = module.upload_status
         self.request.values = {'datapackage':'bla4'}
         self.assertRaises(NotFound, api_poll)
 
     def test___callback___just_status(self):
         # No parameters
-        api_callback = module.ApiCallback()
+        api_callback = module.upload_status_update
         self.request.values = {'package':'bla5', 'status':'status1'}
         self.assertEquals(api_callback(), "")
 
-        api_poll = module.ApiPoll()
+        api_poll = module.upload_status
         self.request.values = {'datapackage':'bla5'}
         self.assertResponse(api_poll(), 'status1', 0)
 
     def test___callback___progress(self):
         # No parameters
-        api_callback = module.ApiCallback()
+        api_callback = module.upload_status_update
         self.request.values = {'package':'bla6', 'status':'status2', 'progress':123}
         self.assertEquals(api_callback(), "")
 
-        api_poll = module.ApiPoll()
+        api_poll = module.upload_status
         self.request.values = {'datapackage':'bla6'}
         self.assertResponse(api_poll(), 'status2', 123)
 
     def test___callback___errormsg_wrong_status(self):
         # No parameters
-        api_callback = module.ApiCallback()
+        api_callback = module.upload_status_update
         self.request.values = {'package':'bla7', 'status':'status3', 'progress':123, 'error': 'wtf'}
         self.assertEquals(api_callback(), "")
 
-        api_poll = module.ApiPoll()
+        api_poll = module.upload_status
         self.request.values = {'datapackage':'bla7'}
         self.assertResponse(api_poll(), 'status3', 123)
 
     def test___callback___error_good_status(self):
         # No parameters
-        api_callback = module.ApiCallback()
+        api_callback = module.upload_status_update
         self.request.values = {'package':'bla8', 'status':'fail', 'error':'wtf2'}
         self.assertEquals(api_callback(), "")
 
-        api_poll = module.ApiPoll()
+        api_poll = module.upload_status
         self.request.values = {'datapackage':'bla8'}
         self.assertResponse(api_poll(), 'fail', 0, 'wtf2')
 

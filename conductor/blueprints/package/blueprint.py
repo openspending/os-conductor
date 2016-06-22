@@ -7,15 +7,16 @@ def create():
     """
 
     # Create instance
-    blueprint = Blueprint('apiload', 'apiload')
+    blueprint = Blueprint('package', 'package')
 
     # Register routes
     blueprint.add_url_rule(
-        'api', 'load', controllers.ApiLoad(), methods=['POST'])
+        'upload', 'load', controllers.upload, methods=['POST'])
     blueprint.add_url_rule(
-        'api', 'poll', controllers.ApiPoll(), methods=['GET'])
+        'status', 'poll', controllers.upload_status, methods=['GET'])
     blueprint.add_url_rule(
-        'callback', 'callback', controllers.ApiCallback(), methods=['GET'])
+        'callback', 'callback',
+        controllers.upload_status_update, methods=['GET'])
 
     # Return blueprint
     return blueprint
