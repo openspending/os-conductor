@@ -203,7 +203,6 @@ def update(token, username):
     else:
         err = 'No token'
 
-    user = None
     if token is not None:
         userid = token['userid']
         user = get_user(userid)
@@ -247,6 +246,7 @@ def authorize(token, service):
             if user_permissions is not None:
                 permissions.update(user_permissions)
             ret = {
+                'userid': userid,
                 'permissions': permissions,
                 'service': service
             }
