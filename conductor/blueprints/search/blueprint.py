@@ -1,5 +1,8 @@
+import jwt
 from flask import Blueprint, abort, request
 from flask.ext.jsonpify import jsonpify
+
+from conductor.blueprints.user.controllers import PRIVATE_KEY
 from . import controllers
 
 
@@ -11,10 +14,18 @@ def create():
     blueprint = Blueprint('search', 'search')
 
     # Controller Proxies
-    search_controller = controllers.Search()
+    search_controller = controllers.search
 
     def search(kind):
-        ret = search_controller(kind, request.args)
+        token = request.values.get('jwt')
+        userid = None
+        try:
+            if token is not None:
+                token = jwt.decode(token, PRIVATE_KEY)
+                userid = token.get('userid')
+        except jwt.InvalidTokenError:
+            pass
+        ret = search_controller(kind, userid, request.args)
         if ret is None:
             abort(400)
         return jsonpify(ret)

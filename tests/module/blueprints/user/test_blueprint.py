@@ -4,7 +4,7 @@ try:
 except ImportError:
     from mock import Mock, patch
 from importlib import import_module
-module = import_module('conductor.blueprints.authorization.blueprint')
+module = import_module('conductor.blueprints.user.blueprint')
 
 
 class createTest(unittest.TestCase):

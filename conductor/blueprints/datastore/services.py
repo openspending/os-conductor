@@ -1,8 +1,7 @@
 import jwt
-import requests
-from flask import url_for
+from conductor.blueprints.user.controllers import PUBLIC_KEY
 
-public_key = None
+public_key = PUBLIC_KEY
 
 
 def verify(auth_token, owner):
@@ -14,10 +13,6 @@ def verify(auth_token, owner):
         return False
     if auth_token == 'testing-token' and owner == '__tests':
         return True
-    global public_key
-    if public_key is None:
-        url = 'http://localhost:8000'+url_for('authorization.public-key')
-        public_key = requests.get(url).text
     try:
         token = jwt.decode(auth_token.encode('ascii'),
                            public_key,
@@ -25,6 +20,8 @@ def verify(auth_token, owner):
         has_permission = token.get('permissions', {})\
             .get('datapackage-upload', False)
         service = token.get('service')
-        return has_permission and service == 'os.datastore'
+        has_permission = has_permission and service == 'os.datastore'
+        has_permission = has_permission and owner == token.get('userid')
+        return has_permission
     except jwt.InvalidTokenError:
         return False

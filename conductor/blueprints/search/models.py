@@ -7,16 +7,18 @@ from elasticsearch.exceptions import NotFoundError
 _engine = None
 
 ENABLED_SEARCHES = {
-    'user': {
-        'index': 'users',
-        'doc_type': 'user_profile',
-        '_source': ['idhash', 'name', 'avatar_url', 'datasets'],
-        'q_fields': ['name']
-    },
+    # 'user': {
+    #     'index': 'users',
+    #     'doc_type': 'user_profile',
+    #     '_source': ['idhash', 'name', 'avatar_url', 'datasets'],
+    #     'q_fields': ['name']
+    # },
     'package': {
         'index': 'packages',
         'doc_type': 'package',
         '_source': ['id', 'model', 'package', 'origin_url'],
+        'owner': 'package.owner',
+        'private': 'package.private',
         'q_fields': ['package.title',
                      'package.author',
                      'package.description',
@@ -35,8 +37,22 @@ def _get_engine():
     return _engine
 
 
-def build_dsl(kind_params, kw):
+def build_dsl(kind_params, userid, kw):
     dsl = {'bool': {'must': []}}
+    privacy = ({
+        'bool': {
+            'should': [{'match': {kind_params['private']: False}},
+                       {'filtered':
+                        {'filter': {'missing': {'field':
+                                                kind_params['private']}}}},
+                       ]
+        }
+    })
+    if userid is not None:
+        privacy['bool']['should']\
+            .append({'match': {kind_params['owner']: userid}})
+
+    dsl['bool']['must'].append(privacy)
     q = kw.get('q')
     if q is not None:
         dsl['bool']['must'].append(
@@ -67,7 +83,7 @@ def build_dsl(kind_params, kw):
     return dsl
 
 
-def query(kind, size=100, **kw):
+def query(kind, userid, size=100, **kw):
     kind_params = ENABLED_SEARCHES.get(kind)
     if kind_params is None:
         return None
@@ -85,7 +101,7 @@ def query(kind, size=100, **kw):
             ('_source', kind_params['_source'])
         ])
 
-        body = build_dsl(kind_params, kw)
+        body = build_dsl(kind_params, userid, kw)
         api_params['body'] = json.dumps(body)
         ret = _get_engine().search(**api_params)
         if ret.get('hits') is not None:

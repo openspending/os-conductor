@@ -2,8 +2,7 @@ from flask import Flask
 from flask.ext.cors import CORS
 from flask.ext.session import Session
 
-from .blueprints import datastore, apiload, authentication, \
-    authorization, search
+from .blueprints import datastore, package, user, search
 
 
 def create():
@@ -25,13 +24,13 @@ def create():
 
     # Register blueprints
     print("Creating Datastore Blueprint")
-    app.register_blueprint(datastore.create(), url_prefix='/datastore')
-    print("Creating API Loader Blueprint")
-    app.register_blueprint(apiload.create(), url_prefix='/hooks/load/')
+    app.register_blueprint(datastore.create(), url_prefix='/datastore/')
+    print("Creating Package Blueprint")
+    app.register_blueprint(package.create(), url_prefix='/package/')
     print("Creating Authentication Blueprint")
-    app.register_blueprint(authentication.create(), url_prefix='/oauth/')
-    print("Creating Authorization Blueprint")
-    app.register_blueprint(authorization.create(), url_prefix='/permit/')
+    app.register_blueprint(user.oauth_create(), url_prefix='/oauth/')
+    print("Creating Users Blueprint")
+    app.register_blueprint(user.create(), url_prefix='/user/')
     print("Creating Search Blueprint")
     app.register_blueprint(search.create(), url_prefix='/search/')
 

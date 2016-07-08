@@ -8,17 +8,18 @@ def create():
     """Create blueprint.
     """
 
-    # Create instase
+    # Create instance
     blueprint = Blueprint('datastore', 'datastore')
 
     # Controller proxies
-    authorize_controller = controllers.AuthorizeUpload()
-
     def authorize():
         auth_token = request.headers.get('Auth-Token')
+        if auth_token is None:
+            auth_token = request.values.get('jwt')
         try:
             req_payload = json.loads(request.data.decode())
-            return authorize_controller(auth_token, req_payload)
+            return controllers.authorize(controllers.S3Connection(),
+                                         auth_token, req_payload)
         except json.JSONDecodeError:
             return Response(status=400)
 

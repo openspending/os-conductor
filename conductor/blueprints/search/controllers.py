@@ -12,11 +12,8 @@ from .models import query
 #     cache = SimpleCache()
 
 
-class Search(object):
+def search(kind, userid, args={}):
     """Initiate an elasticsearch query
     """
-
-    # Public
-    def __call__(self, kind, args={}):
-        hits = query(kind, **args)
-        return hits
+    hits = query(kind, userid, **args)
+    return hits
