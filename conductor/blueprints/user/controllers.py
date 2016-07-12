@@ -1,6 +1,10 @@
 import os
 import datetime
 import logging
+import json
+import base64
+import zlib
+
 try:
     import urllib.parse as urlparse
 except ImportError:
@@ -19,9 +23,19 @@ def readfile_or_default(filename, default):
         return open(filename).read().strip()
     except IOError:
         return default
+
 os_conductor = os.environ.get('OS_EXTERNAL_ADDRESS')
 
-PUBLIC_KEY = readfile_or_default('/secrets/public.pem', '''-----BEGIN PUBLIC KEY-----
+try:
+    credentials = ''.join(os.environ.get('OS_CONDUCTOR_SECRETS_%d' % i)
+                          for i in range(4)).encode('ascii')
+    credentials = base64.decodebytes(credentials)
+    credentials = zlib.decompress(credentials).decode('ascii')
+    credentials = json.loads(credentials)
+except:
+    credentials = {}
+
+PUBLIC_KEY = credentials.get('public.pem', '''-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzSrV/SxRNKufc6f0GQIu
 YMASgBCOiJW5fvCnGtVMIrWvBQoCFAp9QwRHrbQrQJiPg6YqqnTvGhWssL5LMMvR
 8jXXOpFUKzYaSgYaQt1LNMCwtqMB0FGSDjBrbmEmnDSo6g0Naxhi+SJX3BMcce1W
@@ -30,7 +44,7 @@ ZFuII+Ex6mtUKU9LZsg9xeAC6033dmSYe5yWfdrFehmQvPBUVH4HLtL1fXTNyXuz
 ZwtO1v61Qc1u/j7gMsrHXW+4csjS3lDwiiPIg6q1hTA7QJdB1M+rja2MG+owL0U9
 owIDAQAB
 -----END PUBLIC KEY-----''')
-PRIVATE_KEY = readfile_or_default('/secrets/private.pem', '''-----BEGIN RSA PRIVATE KEY-----
+PRIVATE_KEY = credentials.get('private.pem', '''-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEAzSrV/SxRNKufc6f0GQIuYMASgBCOiJW5fvCnGtVMIrWvBQoC
 FAp9QwRHrbQrQJiPg6YqqnTvGhWssL5LMMvR8jXXOpFUKzYaSgYaQt1LNMCwtqMB
 0FGSDjBrbmEmnDSo6g0Naxhi+SJX3BMcce1WTgKRybv3N3F+gJ9d8wPkyx9xhd3H
@@ -57,9 +71,9 @@ dkpMCQKBgQCfZ75r1l/Hzphb78Ygf9tOz1YUFqw/xY9jfufW4C/5SgV2q2t/AZok
 LixyPP8SzJcH20iKdc9kS7weiQA0ldT2SYv6VT7IqgQ3i/qYdOmaggjBGaIuIB/B
 QZOJBnaSMVJFf/ZO1/1ilGVGfZZ3TMOA1TJlcTZisk56tRTbkivL9Q==
 -----END RSA PRIVATE KEY-----''')
-GOOGLE_KEY = readfile_or_default('/secrets/google.key', 'google consumer key')
-GOOGLE_SECRET = readfile_or_default('/secrets/google.secret.key',
-                                    'google consumer secret')
+GOOGLE_KEY = credentials.get('google.key', 'google consumer key')
+GOOGLE_SECRET = credentials.get('google.secret.key',
+                                'google consumer secret')
 LIBJS = readfile_or_default(os.path.join(os.path.dirname(__file__),
                                          'lib',
                                          'lib.js'),
