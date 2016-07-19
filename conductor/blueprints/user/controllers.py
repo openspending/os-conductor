@@ -101,6 +101,8 @@ def _google_remote_app():
 
 
 def _get_user_profile(access_token):
+    if access_token is None:
+        return None
     headers = {'Authorization': 'OAuth {}'.format(access_token)}
     response = requests.get('https://www.googleapis.com/oauth2/v1/userinfo',
                             headers=headers)
@@ -154,10 +156,45 @@ def authenticate(token, next, callback_url):
     return ret
 
 
+def _update_next_url(next_url, client_token):
+    if client_token is None:
+        return next_url
+
+    url_parts = list(urlparse.urlparse(next_url))
+    query = dict(urlparse.parse_qsl(url_parts[4]))
+    query.update({'jwt': client_token})
+
+    url_parts[4] = urlparse.urlencode(query)
+
+    next_url = urlparse.urlunparse(url_parts)
+    return next_url
+
+
+def _get_token_from_profile(provider, profile):
+    if profile is None:
+        return None
+    provider_id = profile['id']
+    name = profile['name']
+    email = profile['email']
+    avatar_url = profile['picture']
+    userid = '%s:%s' % (provider, provider_id)
+    user = create_or_get_user(userid, name, email, avatar_url)
+    token = {
+        'userid': user['idhash'],
+        'exp': (datetime.datetime.utcnow() +
+                datetime.timedelta(days=14))
+    }
+    client_token = jwt.encode(token, PRIVATE_KEY)
+    return client_token
+
+
 def oauth_callback(state):
     """Callback from google
     """
-    resp = _google_remote_app().authorized_response()
+    try:
+        resp = _google_remote_app().authorized_response()
+    except OAuthException as e:
+        resp = e
     if isinstance(resp, OAuthException):
         logging.log(logging.WARN, "OAuthException: %r" % resp)
         resp = None
@@ -165,41 +202,17 @@ def oauth_callback(state):
     try:
         state = jwt.decode(state, PRIVATE_KEY)
     except jwt.InvalidTokenError:
-        state = None
+        state = {}
 
     next_url = '/'
-    provider = None
-    if state is not None:
-        provider = state.get('provider')
-        next_url = state.get('next', next_url)
+    provider = state.get('provider')
+    next_url = state.get('next', next_url)
     if resp is not None and provider is not None:
-        access_token = resp['access_token']
-        profile = None
-        client_token = None
-        if access_token is not None:
-            profile = _get_user_profile(access_token)
-        if profile is not None:
-            provider_id = profile['id']
-            name = profile['name']
-            email = profile['email']
-            avatar_url = profile['picture']
-            userid = '%s:%s' % (provider, provider_id)
-            user = create_or_get_user(userid, name, email, avatar_url)
-            token = {
-                'userid': user['idhash'],
-                'exp': (datetime.datetime.utcnow() +
-                        datetime.timedelta(days=14))
-            }
-            client_token = jwt.encode(token, PRIVATE_KEY)
-        if client_token is not None:
-            # Add client token to redirect url
-            url_parts = list(urlparse.urlparse(next_url))
-            query = dict(urlparse.parse_qsl(url_parts[4]))
-            query.update({'jwt': client_token})
-
-            url_parts[4] = urlparse.urlencode(query)
-
-            next_url = urlparse.urlunparse(url_parts)
+        access_token = resp.get('access_token')
+        profile = _get_user_profile(access_token)
+        client_token = _get_token_from_profile(provider, profile)
+        # Add client token to redirect url
+        next_url = _update_next_url(next_url, client_token)
 
     return redirect(next_url)
 
