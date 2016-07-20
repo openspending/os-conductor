@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
@@ -21,6 +22,7 @@ ENABLED_SEARCHES = {
         'private': 'package.private',
         'q_fields': ['package.title',
                      'package.author',
+                     'package.owner',
                      'package.description',
                      'package.regionCode',
                      'package.countryCode',
@@ -106,6 +108,7 @@ def query(kind, userid, size=100, **kw):
         ret = _get_engine().search(**api_params)
         if ret.get('hits') is not None:
             return [hit['_source'] for hit in ret['hits']['hits']]
-    except (NotFoundError, json.decoder.JSONDecodeError, ValueError):
+    except (NotFoundError, json.decoder.JSONDecodeError, ValueError) as e:
+        logging.error("query: %r" % e)
         pass
     return None
