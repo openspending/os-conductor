@@ -1,7 +1,9 @@
 import os
+import json
 
 import jwt
 import requests
+from six import StringIO
 
 from conductor.blueprints.user.controllers import PUBLIC_KEY
 from .models import package_registry
@@ -94,3 +96,35 @@ def toggle_publish(name, token, toggle=False, publish=False):
     package_registry.save_model(name, datapackage_url, datapackage,
                                 model, dataset_name, author)
     return {'success': True, 'published': not private}
+
+obeu_url = 'http://eis-openbudgets.iais.fraunhofer.de/' \
+           'linkedpipes/execute/fdp2rdf'
+webhook_obeu_url = os.environ.get('WEBHOOK_OBEU_URL', obeu_url)
+
+
+def run_hooks(name, token):
+    try:
+        jwt.decode(token.encode('ascii'),
+                   PUBLIC_KEY,
+                   algorithm='RS256')
+    except jwt.InvalidTokenError:
+        return None
+
+    _, datapackage_url, _, _, _, _ = package_registry.get_raw(name)
+    json_ld_payload = {
+        "@context": {
+            "@vocab": "http://schema.org/",
+            "url": {"@type": "@id"}
+        },
+        "url": datapackage_url
+    }
+    filename = 'package-url.jsonld'
+    files = [
+        ('input',
+         (filename, StringIO(json.dumps(json_ld_payload)), 'application/json')
+         )
+    ]
+    response = requests.post(webhook_obeu_url, files=files)
+    return {'success': True,
+            'response': response.text,
+            'payload': json_ld_payload}
