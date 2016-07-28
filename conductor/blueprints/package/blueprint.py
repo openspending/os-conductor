@@ -78,6 +78,16 @@ def toggle_publish():
     return jsonpify(controllers.toggle_publish(id, jwt, toggle, publish))
 
 
+def run_hooks():
+    id = request.values.get('id')
+    jwt = request.values.get('jwt')
+    if jwt is None:
+        abort(403)
+    if id is None:
+        abort(400)
+    return jsonpify(controllers.run_hooks(id, jwt))
+
+
 def create():
     """Create blueprint.
     """
@@ -95,6 +105,8 @@ def create():
         upload_status_update, methods=['GET'])
     blueprint.add_url_rule(
         'publish', 'publish', toggle_publish, methods=['POST'])
+    blueprint.add_url_rule(
+        'run-hooks', 'run-hooks', run_hooks, methods=['POST'])
 
     # Return blueprint
     return blueprint
