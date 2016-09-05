@@ -1,4 +1,6 @@
 import json
+import os
+
 import boto
 from boto.s3.connection import OrdinaryCallingFormat
 try:
@@ -72,6 +74,47 @@ def authorize(connection, auth_token, req_payload):
 
         # Return response payload
         return json.dumps(res_payload)
+
+    except Exception as exception:
+
+        raise
+        # TODO: use logger
+        # Log bad request exception
+        print('Bad request: {0}'.format(exception))
+
+        # Return request is bad
+        return Response(status=400)
+
+
+def info(auth_token):
+    """Authorize a client for the file uploading.
+    :param auth_token: authentication token to test
+    """
+    # Verify client, deny access if not verified
+
+    try:
+        # Get request payload
+        userid = services.get_user_id(auth_token)
+        if userid is None:
+            return Response(status=401)
+
+        # Make response payload
+        urls = []
+        for scheme, port in [('http', '80'), ('https', '443')]:
+            for host, path in [(config.OS_S3_HOSTNAME,
+                                config.OS_STORAGE_BUCKET_NAME),
+                               (config.OS_STORAGE_BUCKET_NAME, '')]:
+                urls.extend([
+                    '%s://%s:%s/%s' % (scheme, host, port, path),
+                    '%s://%s/%s' % (scheme, host, path),
+                    ])
+        urls = [os.path.join(url, userid) for url in urls]
+        response_payload = {
+            'prefixes': urls
+        }
+
+        # Return response payload
+        return json.dumps(response_payload)
 
     except Exception as exception:
 

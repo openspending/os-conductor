@@ -23,7 +23,17 @@ def create():
         except json.JSONDecodeError:
             return Response(status=400)
 
+    def info():
+        auth_token = request.headers.get('Auth-Token')
+        if auth_token is None:
+            auth_token = request.values.get('jwt')
+        return controllers.info(auth_token)
+
     # Register routes
+    blueprint.add_url_rule(
+            'info', 'info', info, methods=['GET'])
+    blueprint.add_url_rule(
+            'authorize', 'authorize', authorize, methods=['POST'])
     blueprint.add_url_rule(
             '/', 'authorize', authorize, methods=['POST'])
 

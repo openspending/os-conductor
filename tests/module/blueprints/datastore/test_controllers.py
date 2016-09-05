@@ -38,6 +38,8 @@ class DataStoreTest(unittest.TestCase):
         # Various patches
         self.services = patch.object(module, 'services').start()
         self.config = patch.object(module, 'config').start()
+        self.config.OS_STORAGE_BUCKET_NAME = 'buckbuck'
+        self.config.OS_S3_HOSTNAME = 's3s3s3'
         self.boto = patch.object(module, 'boto').start()
         self.bucket = self.boto.connect_s3().get_bucket()
         self.bucket.new_key().generate_url = Mock(
@@ -73,3 +75,22 @@ class DataStoreTest(unittest.TestCase):
             },
         })
         self.bucket.new_key.assert_called_with('owner/name/data/file1')
+
+    def test___info___not_authorized(self):
+        info = module.info
+        self.services.get_user_id = Mock(return_value=None)
+        self.assertEqual(info(AUTH_TOKEN).status, '401 UNAUTHORIZED')
+
+    def test___info___good_request(self):
+        info = module.info
+        self.services.get_user_id = Mock(return_value='12345678')
+        ret = json.loads(info(AUTH_TOKEN))
+        self.assertListEqual(ret['prefixes'],
+                             ['http://s3s3s3:80/buckbuck/12345678',
+                              'http://s3s3s3/buckbuck/12345678',
+                              'http://buckbuck:80/12345678',
+                              'http://buckbuck/12345678',
+                              'https://s3s3s3:443/buckbuck/12345678',
+                              'https://s3s3s3/buckbuck/12345678',
+                              'https://buckbuck:443/12345678',
+                              'https://buckbuck/12345678'])
