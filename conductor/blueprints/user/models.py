@@ -136,3 +136,7 @@ if get_permission('*', 'os.datastore') is None:
                       permissions='{"datapackage-upload":true}')
     session.add(glob)
     session.commit()
+
+create_or_get_user('global', 'OpenSpending', 'info@okfn.org',
+                   'https://www.gravatar.com/avatar/' +
+                   '6018ab87076187018fc29c94a68a3cd2?s=256')
