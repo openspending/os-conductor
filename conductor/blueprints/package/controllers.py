@@ -86,7 +86,8 @@ def toggle_publish(name, token, toggle=False, publish=False):
         return None
 
     name, datapackage_url, datapackage, \
-        model, dataset_name, author = package_registry.get_raw(name)
+        model, dataset_name, author,\
+        status, loaded = package_registry.get_raw(name)
     private = datapackage.get('private', False)
     if toggle:
         private = not private
@@ -94,7 +95,8 @@ def toggle_publish(name, token, toggle=False, publish=False):
         private = not publish
     datapackage['private'] = private
     package_registry.save_model(name, datapackage_url, datapackage,
-                                model, dataset_name, author)
+                                model, dataset_name, author,
+                                status, loaded)
     return {'success': True, 'published': not private}
 
 obeu_url = 'http://eis-openbudgets.iais.fraunhofer.de/' \
@@ -110,7 +112,7 @@ def run_hooks(name, token):
     except jwt.InvalidTokenError:
         return None
 
-    _, datapackage_url, _, _, _, _ = package_registry.get_raw(name)
+    _, datapackage_url, _, _, _, _, _, _ = package_registry.get_raw(name)
     json_ld_payload = {
         "@context": {
             "@vocab": "http://schema.org/",

@@ -17,7 +17,7 @@ ENABLED_SEARCHES = {
     'package': {
         'index': 'packages',
         'doc_type': 'package',
-        '_source': ['id', 'model', 'package', 'origin_url'],
+        '_source': ['id', 'model', 'package', 'origin_url', 'loaded'],
         'owner': 'package.owner',
         'private': 'package.private',
         'q_fields': ['package.title',
@@ -40,31 +40,35 @@ def _get_engine():
 
 
 def build_dsl(kind_params, userid, kw):
-    dsl = {'bool': {'must': []}}
-    privacy = ({
+    dsl = {'bool': {'should': [], 'must': [], 'minimum_should_match': 1}}
+    # All Datasets:
+    all_datasets = {
         'bool': {
             'should': [{'match': {kind_params['private']: False}},
                        {'filtered':
                         {'filter': {'missing': {'field':
                                                 kind_params['private']}}}},
-                       ]
+                       ],
+            'must_not': {'match': {'loaded': False}}
         }
-    })
-    if userid is not None:
-        privacy['bool']['should']\
-            .append({'match': {kind_params['owner']: userid}})
+    }
+    dsl['bool']['should'].append(all_datasets)
 
-    dsl['bool']['must'].append(privacy)
+    # User datasets
+    if userid is not None:
+        user_datasets = \
+            {'bool': {'must': {'match': {kind_params['owner']: userid}}}}
+        dsl['bool']['should'].append(user_datasets)
+
+    # Query parameters
     q = kw.get('q')
     if q is not None:
-        dsl['bool']['must'].append(
-            {
+        dsl['bool']['must'].append({
                 'multi_match': {
                     'query': json.loads(q[0]),
                     'fields': kind_params['q_fields']
                 }
-            }
-        )
+            })
     for k, v_arr in kw.items():
         if k.split('.')[0] in kind_params['_source']:
             dsl['bool']['must'].append({
