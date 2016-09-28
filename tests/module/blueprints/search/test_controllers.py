@@ -45,7 +45,8 @@ class SearchTest(unittest.TestCase):
                 }
             }
             self.es.index('packages', 'package', body)
-        self.es.indices.flush('packages')
+        if amount>0:
+            self.es.indices.flush('packages')
 
     def indexSomePrivateRecords(self):
         i = 0

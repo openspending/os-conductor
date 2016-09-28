@@ -85,7 +85,7 @@ def build_dsl(kind_params, userid, kw):
     if len(dsl) == 0:
         dsl = {}
     else:
-        dsl = {'query': dsl}
+        dsl = {'query': dsl, 'explain': True}
     return dsl
 
 
