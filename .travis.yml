@@ -20,6 +20,7 @@ install:
 
 before_script:
   - sleep 30
+  - curl localhost:9200
 
 script:
   - pylama conductor

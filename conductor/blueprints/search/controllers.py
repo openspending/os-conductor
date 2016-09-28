@@ -1,6 +1,7 @@
 import os
 
 # from werkzeug.contrib.cache import MemcachedCache, SimpleCache
+import elasticsearch
 
 from .models import query
 
@@ -15,5 +16,8 @@ from .models import query
 def search(kind, userid, args={}):
     """Initiate an elasticsearch query
     """
-    hits = query(kind, userid, **args)
-    return hits
+    try:
+        hits = query(kind, userid, **args)
+        return hits
+    except elasticsearch.exceptions.ElasticsearchException:
+        return []
