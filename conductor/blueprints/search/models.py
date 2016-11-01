@@ -49,7 +49,8 @@ def build_dsl(kind_params, userid, kw):
                         {'filter': {'missing': {'field':
                                                 kind_params['private']}}}},
                        ],
-            'must_not': {'match': {'loaded': False}}
+            'must_not': {'match': {'loaded': False}},
+            'minimum_should_match': 1
         }
     }
     dsl['bool']['should'].append(all_datasets)
@@ -74,7 +75,8 @@ def build_dsl(kind_params, userid, kw):
             dsl['bool']['must'].append({
                     'bool': {
                         'should': [{'match': {k: json.loads(v)}}
-                                   for v in v_arr]
+                                   for v in v_arr],
+                        'minimum_should_match': 1
                     }
                })
 

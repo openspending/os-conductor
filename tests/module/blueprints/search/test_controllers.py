@@ -165,6 +165,13 @@ class SearchTest(unittest.TestCase):
                                   'owner2-False-True-cat',
                                   })
 
+    def test___search___q_param_anonymous_search_with_param(self):
+        self.indexSomePrivateRecords()
+        recs = module.search('package', None, {'q': ['"cat"'], 'package.owner': ['"owner1"']})
+        self.assertEquals(len(recs), 1)
+        ids = set([r['id'] for r in recs])
+        self.assertSetEqual(ids, {'owner1-False-True-cat'})
+
     def test___search___q_param_authenticated_search(self):
         self.indexSomePrivateRecords()
         recs = module.search('package', 'owner1', {'q': ['"cat"']})
