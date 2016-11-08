@@ -88,6 +88,7 @@ def build_dsl(kind_params, userid, kw):
         dsl = {}
     else:
         dsl = {'query': dsl, 'explain': True}
+    logging.info('Sending DSL %r', dsl)
     return dsl
 
 

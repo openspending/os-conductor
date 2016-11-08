@@ -24,6 +24,7 @@ def readfile_or_default(filename, default):
     except IOError:
         return default
 
+
 os_conductor = os.environ.get('OS_EXTERNAL_ADDRESS')
 
 try:

@@ -86,6 +86,7 @@ def create_or_get_user(userid, name, email, avatar_url):
         return document
     return user
 
+
 # ## PERMISSIONS
 Base = declarative_base()
 

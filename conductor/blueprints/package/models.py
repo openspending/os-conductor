@@ -15,6 +15,6 @@ def _get_es_engine():
         _es_engine = Elasticsearch(hosts=[es_host], use_ssl='https' in es_host)
     return _es_engine
 
-# Package Registry
 
+# Package Registry
 package_registry = PackageRegistry(es_instance=_get_es_engine())

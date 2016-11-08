@@ -99,6 +99,7 @@ def toggle_publish(name, token, toggle=False, publish=False):
                                 status, loaded)
     return {'success': True, 'published': not private}
 
+
 obeu_url = 'http://eis-openbudgets.iais.fraunhofer.de/' \
            'linkedpipes/execute/fdp2rdf'
 webhook_obeu_url = os.environ.get('WEBHOOK_OBEU_URL', obeu_url)
