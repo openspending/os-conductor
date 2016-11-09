@@ -1,6 +1,6 @@
 import os
 import json
-import logging
+from ..logger import logger
 
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
@@ -88,7 +88,7 @@ def build_dsl(kind_params, userid, kw):
         dsl = {}
     else:
         dsl = {'query': dsl, 'explain': True}
-    logging.info('Sending DSL %r', dsl)
+    logger.info('Sending DSL %s', json.dumps(dsl))
     return dsl
 
 
@@ -116,6 +116,6 @@ def query(kind, userid, size=100, **kw):
         if ret.get('hits') is not None:
             return [hit['_source'] for hit in ret['hits']['hits']]
     except (NotFoundError, json.decoder.JSONDecodeError, ValueError) as e:
-        logging.error("query: %r" % e)
+        logger.error("query: %r" % e)
         pass
     return None

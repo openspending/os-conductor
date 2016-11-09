@@ -1,3 +1,4 @@
+import logging
 import os
 import json
 
@@ -61,6 +62,8 @@ def upload_status(datapackage, cache_get):
 
 def upload_status_update(datapackage, status, error,
                          progress, cache_get, cache_set):
+    logging.error('upload_status_update: %s sts:%s, err:%s, prog:%s',
+                  datapackage, status, error, progress)
     if datapackage is not None and status is not None:
         key = 'os-conductor:package:'+datapackage
         ret = cache_get(key)

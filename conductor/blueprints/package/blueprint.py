@@ -1,3 +1,4 @@
+import logging
 import os
 import json
 
@@ -15,11 +16,15 @@ else:
 os_conductor = os.environ.get('OS_CONDUCTOR')
 
 
+logging.info('CACHE=%r', cache)
+
+
 def cache_get(key):
     return cache.get(key)
 
 
 def cache_set(key, value, timeout):
+    logging.info('CACHE[%s] <- %r', key, value)
     return cache.set(key, value, timeout)
 
 
@@ -56,7 +61,7 @@ def upload_status_update():
 
     controllers.upload_status_update(datapackage, status, error,
                                      progress, cache_get, cache_set)
-    return ""
+    return jsonpify(True)
 
 
 def toggle_publish():
@@ -102,7 +107,7 @@ def create():
         'status', 'poll', upload_status, methods=['GET'])
     blueprint.add_url_rule(
         'callback', 'callback',
-        upload_status_update, methods=['GET'])
+        upload_status_update, methods=['GET', 'POST'])
     blueprint.add_url_rule(
         'publish', 'publish', toggle_publish, methods=['POST'])
     blueprint.add_url_rule(
