@@ -145,13 +145,14 @@ class PublishAPITests(unittest.TestCase):
         self.es = Elasticsearch(hosts=[LOCAL_ELASTICSEARCH])
         try:
             self.es.indices.delete(index='users')
+            self.es.indices.delete(index='packages')
         except NotFoundError:
             pass
         self.es.indices.create('users')
         time.sleep(1)
 
         self.pr = PackageRegistry(es_connection_string=LOCAL_ELASTICSEARCH)
-        self.pr.save_model('name','datapackage_url',{},{},'dataset','author','',True)
+        self.pr.save_model('name', 'datapackage_url', {}, {}, 'dataset', 'author', '', True)
 
     def test__initial_value__none(self):
         pkg = self.pr.get_package('name')

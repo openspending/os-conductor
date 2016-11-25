@@ -26,7 +26,7 @@ ENABLED_SEARCHES = {
                      'package.description',
                      'package.regionCode',
                      'package.countryCode',
-                     'package.cityCode']
+                     'package.cityCode'],
     }
 }
 
@@ -36,6 +36,7 @@ def _get_engine():
     if _engine is None:
         es_host = os.environ['OS_ELASTICSEARCH_ADDRESS']
         _engine = Elasticsearch(hosts=[es_host], use_ssl='https' in es_host)
+
     return _engine
 
 
@@ -88,7 +89,7 @@ def build_dsl(kind_params, userid, kw):
         dsl = {}
     else:
         dsl = {'query': dsl, 'explain': True}
-    logger.info('Sending DSL %s', json.dumps(dsl))
+    # logger.info('Sending DSL %s', json.dumps(dsl))
     return dsl
 
 
@@ -104,9 +105,9 @@ def query(kind, userid, size=100, **kw):
         if type(size) is list:
             size = size[0]
         api_params = dict([
-            ('size', int(size)),
             ('index', kind_params['index']),
             ('doc_type', kind_params['doc_type']),
+            ('size', int(size)),
             ('_source', kind_params['_source'])
         ])
 
