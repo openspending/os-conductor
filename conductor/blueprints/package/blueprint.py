@@ -83,6 +83,14 @@ def toggle_publish():
     return jsonpify(controllers.toggle_publish(id, jwt, toggle, publish))
 
 
+def delete_package():
+    id = request.values.get('id')
+    jwt = request.values.get('jwt')
+    if jwt is None:
+        abort(403)
+    return jsonpify(controllers.delete_package(id, jwt))
+
+
 def run_hooks():
     id = request.values.get('id')
     jwt = request.values.get('jwt')
@@ -110,6 +118,8 @@ def create():
         upload_status_update, methods=['GET', 'POST'])
     blueprint.add_url_rule(
         'publish', 'publish', toggle_publish, methods=['POST'])
+    blueprint.add_url_rule(
+        'delete', 'delete', delete_package, methods=['POST'])
     blueprint.add_url_rule(
         'run-hooks', 'run-hooks', run_hooks, methods=['POST'])
 

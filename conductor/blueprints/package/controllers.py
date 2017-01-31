@@ -103,6 +103,23 @@ def toggle_publish(name, token, toggle=False, publish=False):
     return {'success': True, 'published': not private}
 
 
+def delete_package(name, token):
+    try:
+        token = jwt.decode(token.encode('ascii'),
+                           PUBLIC_KEY,
+                           algorithm='RS256')
+        userid = token['userid']
+        if name.split(':')[0] != userid:
+            logging.error('USERID=%r, name=%r', userid, name)
+            return None
+
+    except jwt.InvalidTokenError:
+        return None
+
+    success = package_registry.delete_model(name)
+    return {'success': success}
+
+
 obeu_url = 'http://eis-openbudgets.iais.fraunhofer.de/' \
            'linkedpipes/execute/fdp2rdf'
 webhook_obeu_url = os.environ.get('WEBHOOK_OBEU_URL', obeu_url)

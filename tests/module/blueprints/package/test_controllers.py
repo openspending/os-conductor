@@ -21,7 +21,7 @@ module = import_module('conductor.blueprints.package.controllers')
 Response = namedtuple('Response', ['status_code'])
 _cache = {}
 callback = 'http://conductor/callback'
-token = jwt.encode({}, PRIVATE_KEY, algorithm='RS256').decode('ascii')
+token = jwt.encode({'userid': 'owner'}, PRIVATE_KEY, algorithm='RS256').decode('ascii')
 
 
 def cache_get(key):
@@ -138,7 +138,9 @@ class ApiloadTest(unittest.TestCase):
         self.assertResponse(api_poll('bla8', cache_get), 'fail', 0, 'wtf8')
 
 
-class PublishAPITests(unittest.TestCase):
+class PublishDeleteAPITests(unittest.TestCase):
+
+    DATASET_NAME='owner:datasetid'
 
     def setUp(self):
         # Clean index
@@ -152,42 +154,53 @@ class PublishAPITests(unittest.TestCase):
         time.sleep(1)
 
         self.pr = PackageRegistry(es_connection_string=LOCAL_ELASTICSEARCH)
-        self.pr.save_model('name', 'datapackage_url', {}, {}, 'dataset', 'author', '', True)
+        self.pr.save_model(self.DATASET_NAME, 'datapackage_url', {}, {}, 'dataset', 'author', '', True)
 
     def test__initial_value__none(self):
-        pkg = self.pr.get_package('name')
+        pkg = self.pr.get_package(self.DATASET_NAME)
         assert(pkg.get('private') is None)
 
+    def test__delete(self):
+        ret = module.delete_package(self.DATASET_NAME, token)
+        assert(ret['success'] is True)
+        try:
+            pkg = self.pr.get_package(self.DATASET_NAME)
+            assert(pkg is None)
+        except KeyError:
+            pass
+        ret = module.delete_package(self.DATASET_NAME, token)
+        assert(ret['success'] is False)
+
     def test__toggle__published(self):
-        module.toggle_publish('name', token, toggle=True)
-        pkg = self.pr.get_package('name')
+        module.toggle_publish(self.DATASET_NAME, token, toggle=True)
+        pkg = self.pr.get_package(self.DATASET_NAME)
         assert(pkg.get('private') is True)
 
     def test__toggle_twice__not_published(self):
-        module.toggle_publish('name', token, toggle=True)
-        module.toggle_publish('name', token, toggle=True)
-        pkg = self.pr.get_package('name')
+        module.toggle_publish(self.DATASET_NAME, token, toggle=True)
+        module.toggle_publish(self.DATASET_NAME, token, toggle=True)
+        pkg = self.pr.get_package(self.DATASET_NAME)
         assert(pkg.get('private') is False)
 
     def test__force_publish_initial__correct(self):
-        module.toggle_publish('name', token, publish=True)
-        pkg = self.pr.get_package('name')
+        module.toggle_publish(self.DATASET_NAME, token, publish=True)
+        pkg = self.pr.get_package(self.DATASET_NAME)
         assert(pkg.get('private') is False)
 
     def test__force_publish__correct(self):
-        module.toggle_publish('name', token, toggle=True)
-        module.toggle_publish('name', token, publish=True)
-        pkg = self.pr.get_package('name')
+        module.toggle_publish(self.DATASET_NAME, token, toggle=True)
+        module.toggle_publish(self.DATASET_NAME, token, publish=True)
+        pkg = self.pr.get_package(self.DATASET_NAME)
         assert(pkg.get('private') is False)
 
     def test__force_unpublish_initial__correct(self):
-        module.toggle_publish('name', token, publish=False)
-        pkg = self.pr.get_package('name')
+        module.toggle_publish(self.DATASET_NAME, token, publish=False)
+        pkg = self.pr.get_package(self.DATASET_NAME)
         assert(pkg.get('private') is True)
 
     def test__force_unpublish__correct(self):
-        module.toggle_publish('name', token, toggle=True)
-        module.toggle_publish('name', token, toggle=True)
-        module.toggle_publish('name', token, publish=False)
-        pkg = self.pr.get_package('name')
+        module.toggle_publish(self.DATASET_NAME, token, toggle=True)
+        module.toggle_publish(self.DATASET_NAME, token, toggle=True)
+        module.toggle_publish(self.DATASET_NAME, token, publish=False)
+        pkg = self.pr.get_package(self.DATASET_NAME)
         assert(pkg.get('private') is True)
