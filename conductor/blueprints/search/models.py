@@ -17,7 +17,8 @@ ENABLED_SEARCHES = {
     'package': {
         'index': 'packages',
         'doc_type': 'package',
-        '_source': ['id', 'model', 'package', 'origin_url', 'loaded'],
+        '_source': ['id', 'model', 'package',
+                    'origin_url', 'loaded', 'last_update'],
         'owner': 'package.owner',
         'private': 'package.private',
         'q_fields': ['package.title',
