@@ -5,6 +5,7 @@ flask-jsonpify
 flask-oauthlib
 pyyaml
 boto
+raven==6.0.0
 requests
 pyjwt
 sqlalchemy
