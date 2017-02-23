@@ -33,7 +33,7 @@ try:
     credentials = base64.decodebytes(credentials)
     credentials = zlib.decompress(credentials).decode('ascii')
     credentials = json.loads(credentials)
-except:
+except Exception as e:
     credentials = {}
 
 PUBLIC_KEY = credentials.get('public.pem', '''-----BEGIN PUBLIC KEY-----
