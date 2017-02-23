@@ -5,6 +5,7 @@ flask-jsonpify
 flask-oauthlib
 pyyaml
 boto
+raven==6.0.0
 requests
 pyjwt
 sqlalchemy
@@ -12,3 +13,4 @@ psycopg2
 cryptography
 elasticsearch>=1.0.0,<2.0.0
 os-package-registry>=0.0.8
+blinker>=1.1
