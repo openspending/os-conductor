@@ -28,7 +28,7 @@ def create():
     def check():
         token = request.values.get('jwt')
         next_url = request.args.get('next', None)
-        callback_url = 'http://'+os_conductor+url_for('oauth.callback')
+        callback_url = 'https://'+os_conductor+url_for('oauth.callback')
         return jsonpify(authenticate_controller(token, next_url, callback_url))
 
     def update():

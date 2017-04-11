@@ -36,7 +36,7 @@ def upload(datapackage, callback, token, cache_set):
             'package': datapackage,
             'callback': callback
         }
-        load_url = 'http://'+os_api+'/api/3/loader/'
+        load_url = 'https://'+os_api+'/api/3/loader/'
         response = requests.get(load_url, params=params)
         if response.status_code == 200:
             key = 'os-conductor:package:'+datapackage
