@@ -36,7 +36,7 @@ def upload():
         abort(400)
     if jwt is None:
         abort(403)
-    callback = 'https://'+os_conductor+url_for('.callback')
+    callback = 'http://'+os_conductor+url_for('.callback')
     ret = controllers.upload(datapackage, callback, jwt, cache_set)
     return jsonpify(ret)
 
