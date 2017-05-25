@@ -143,7 +143,7 @@ def authenticate(token, next, callback_url):
     state = jwt.encode(state, PRIVATE_KEY)
     google_login_url = _google_remote_app() \
         .authorize(callback=callback_url, state=state).headers['Location']
-    logging.info('Requesting URL for callback %r, state %r', callback_url, state)
+    logging.error('Requesting URL for callback %r, state %r', callback_url, state)
 
     ret = {
         'authenticated': False,
