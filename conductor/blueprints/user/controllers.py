@@ -25,6 +25,8 @@ def readfile_or_default(filename, default):
         return default
 
 
+logging.getLogger('flask_oauthlib').setLevel(logging.DEBUG)
+
 os_conductor = os.environ.get('OS_EXTERNAL_ADDRESS')
 
 try:
@@ -195,7 +197,7 @@ def oauth_callback(state):
     """
     try:
         app = _google_remote_app()
-        logging.error('URI: %r', app._session_redirect_url)
+        logging.error('URI: %r', app.__dict__)
         resp = app.authorized_response()
     except OAuthException as e:
         resp = e

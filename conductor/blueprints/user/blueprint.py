@@ -1,6 +1,6 @@
 import os
 
-from flask import Blueprint, request, url_for
+from flask import Blueprint, request, url_for, session
 from flask.ext.jsonpify import jsonpify
 
 from conductor.blueprints.user import controllers
@@ -63,6 +63,8 @@ def oauth_create():
     callback_controller = controllers.oauth_callback
 
     def callback():
+        import logging; logging.error('REQ %r', request.headers)
+        import logging; logging.error('SESSION %r', list(session.items()))
         state = request.args.get('state')
         return callback_controller(state)
 
