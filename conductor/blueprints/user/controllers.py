@@ -194,7 +194,9 @@ def oauth_callback(state):
     """Callback from google
     """
     try:
-        resp = _google_remote_app().authorized_response()
+        app = _google_remote_app()
+        logging.error('URI: %r', app._session_redirect_url)
+        resp = app.authorized_response()
     except OAuthException as e:
         resp = e
     if isinstance(resp, OAuthException):
