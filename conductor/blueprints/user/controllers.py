@@ -25,8 +25,6 @@ def readfile_or_default(filename, default):
         return default
 
 
-logging.getLogger('flask_oauthlib').setLevel(logging.DEBUG)
-
 os_conductor = os.environ.get('OS_EXTERNAL_ADDRESS')
 
 try:
@@ -87,7 +85,6 @@ oauth = OAuth()
 
 def _google_remote_app():
     if 'google' not in oauth.remote_apps:
-        logging.error('Creating remote app')
         oauth.remote_app(
             'google',
             base_url='https://www.googleapis.com/oauth2/v1/',
@@ -146,8 +143,6 @@ def authenticate(token, next, callback_url):
     state = jwt.encode(state, PRIVATE_KEY)
     google_login_url = _google_remote_app() \
         .authorize(callback=callback_url, state=state).headers['Location']
-    logging.error('Requesting URL for callback %r, state %r', callback_url, state)
-
     ret = {
         'authenticated': False,
         'providers': {
@@ -197,7 +192,6 @@ def oauth_callback(state):
     """
     try:
         app = _google_remote_app()
-        logging.error('URI: %r', app.__dict__)
         resp = app.authorized_response()
     except OAuthException as e:
         resp = e

@@ -2,7 +2,6 @@ import os
 
 from flask import Flask
 from flask.ext.cors import CORS
-# from flask.ext.session import Session
 from raven.contrib.flask import Sentry
 from .blueprints import datastore, package, user, search
 from .blueprints.logger import logger
@@ -23,10 +22,6 @@ def create():
     Sentry(app, dsn=os.environ.get('SENTRY_DSN', ''))
 
     # Session
-    # sess = Session()
-    # app.config['SESSION_TYPE'] = 'filesystem'
-    # app.config['SECRET_KEY'] = 'openspending rocks'
-    # sess.init_app(app)
     app.secret_key = b'openspendingopenspending'
 
     # Register blueprints
