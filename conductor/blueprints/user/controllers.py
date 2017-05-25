@@ -33,7 +33,7 @@ try:
     credentials = base64.decodebytes(credentials)
     credentials = zlib.decompress(credentials).decode('ascii')
     credentials = json.loads(credentials)
-except Exception as e:
+except Exception as _:
     credentials = {}
 
 PUBLIC_KEY = credentials.get('public.pem', '''-----BEGIN PUBLIC KEY-----
@@ -87,12 +87,11 @@ def _google_remote_app():
     if 'google' not in oauth.remote_apps:
         oauth.remote_app(
             'google',
-            base_url='https://www.google.com/accounts/',
+            base_url='https://www.googleapis.com/oauth2/v1/',
             authorize_url='https://accounts.google.com/o/oauth2/auth',
             request_token_url=None,
             request_token_params={
-                'scope': 'https://www.googleapis.com/auth/userinfo.email ' +
-                         'https://www.googleapis.com/auth/userinfo.profile',
+                'scope': 'email profile',
             },
             access_token_url='https://accounts.google.com/o/oauth2/token',
             access_token_method='POST',
@@ -197,7 +196,7 @@ def oauth_callback(state):
     except OAuthException as e:
         resp = e
     if isinstance(resp, OAuthException):
-        logging.log(logging.WARN, "OAuthException: %r" % resp)
+        logging.error("OAuthException: %r", exc_info=resp)
         resp = None
 
     try:
