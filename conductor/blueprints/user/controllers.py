@@ -85,6 +85,7 @@ oauth = OAuth()
 
 def _google_remote_app():
     if 'google' not in oauth.remote_apps:
+        logging.error('Creating remote app')
         oauth.remote_app(
             'google',
             base_url='https://www.googleapis.com/oauth2/v1/',

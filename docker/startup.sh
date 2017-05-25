@@ -20,9 +20,4 @@ else
     ) || true
 fi
 
-echo "Maintenance mode $OS_CONDUCTOR_MAINTENANCE"
-if [ ! -z "$OS_CONDUCTOR_MAINTENANCE" ]; then
-  python3 tools/reindexer.py
-else
-  gunicorn -w 4 conductor.server:app -b 0.0.0.0:8000
-fi
+gunicorn -w 1 conductor.server:app -b 0.0.0.0:8000
