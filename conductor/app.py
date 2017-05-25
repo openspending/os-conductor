@@ -17,7 +17,7 @@ def create():
     app.config['DEBUG'] = True
 
     # CORS support
-    CORS(app)
+    CORS(app, supports_credentials=True)
 
     # Exception logging
     Sentry(app, dsn=os.environ.get('SENTRY_DSN', ''))
