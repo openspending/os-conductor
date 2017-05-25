@@ -196,7 +196,7 @@ def oauth_callback(state):
     except OAuthException as e:
         resp = e
     if isinstance(resp, OAuthException):
-        logging.error("OAuthException: %r", exc_info=resp)
+        logging.error("OAuthException: %r", resp.data, exc_info=resp)
         resp = None
 
     try:
