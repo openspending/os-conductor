@@ -12,7 +12,7 @@ except ImportError:
 
 import jwt
 import requests
-from flask import make_response, redirect
+from flask import make_response, redirect, session
 from flask_oauthlib.client import OAuth, OAuthException
 
 from .models import get_permission, get_user, create_or_get_user, save_user
@@ -187,11 +187,12 @@ def _get_token_from_profile(provider, profile):
     return client_token
 
 
-def oauth_callback(state):
+def oauth_callback(state, callback_url):
     """Callback from google
     """
     try:
         app = _google_remote_app()
+        session['%s_oauthredir' % app.name] = callback_url
         resp = app.authorized_response()
     except OAuthException as e:
         resp = e

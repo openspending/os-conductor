@@ -8,6 +8,10 @@ from conductor.blueprints.user import controllers
 os_conductor = os.environ.get('OS_EXTERNAL_ADDRESS')
 
 
+def get_callback_url():
+    return 'https://'+os_conductor+url_for('oauth.callback')
+
+
 def create():
     """Create blueprint.
     """
@@ -28,8 +32,7 @@ def create():
     def check():
         token = request.values.get('jwt')
         next_url = request.args.get('next', None)
-        callback_url = 'https://'+os_conductor+url_for('oauth.callback')
-        return jsonpify(authenticate_controller(token, next_url, callback_url))
+        return jsonpify(authenticate_controller(token, next_url, get_callback_url()))
 
     def update():
         token = request.values.get('jwt')
@@ -64,7 +67,7 @@ def oauth_create():
 
     def callback():
         state = request.args.get('state')
-        return callback_controller(state)
+        return callback_controller(state, get_callback_url())
 
     # Register routes
     blueprint.add_url_rule(
