@@ -101,6 +101,10 @@ def run_hooks():
     return jsonpify(controllers.run_hooks(id, jwt))
 
 
+def stats():
+    return jsonpify(controllers.stats())
+
+
 def create():
     """Create blueprint.
     """
@@ -122,6 +126,8 @@ def create():
         'delete', 'delete', delete_package, methods=['POST'])
     blueprint.add_url_rule(
         'run-hooks', 'run-hooks', run_hooks, methods=['POST'])
+    blueprint.add_url_rule(
+        'stats', 'stats', stats, methods=['GET'])
 
     # Return blueprint
     return blueprint
