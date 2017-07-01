@@ -161,9 +161,10 @@ class AuthenticationTest(unittest.TestCase):
         }
         self.ctrl._google_remote_app = Mock(
             return_value=namedtuple('_google_remote_app',
-                                    ['authorize', 'authorized_response'])
+                                    ['authorize', 'authorized_response', 'name'])
             (authorize=lambda **kwargs: self.goog_provider,
-             authorized_response=lambda **kwargs: self.oauth_response)
+             authorized_response=lambda **kwargs: self.oauth_response,
+             name='google')
         )
         self.ctrl.get_user = Mock(
             return_value=namedtuple('User',
@@ -239,9 +240,8 @@ class AuthenticationTest(unittest.TestCase):
                     datetime.timedelta(days=14))
         }
         state = jwt.encode(token, self.private_key)
-        ret = self.ctrl.oauth_callback(state)
-        self.assertEqual(ret.status_code, 302)
-        self.assertTrue('jwt' in ret.headers['Location'])
+        ret = self.ctrl.oauth_callback(state, 'callback')
+        self.assertTrue('jwt' in ret)
 
     def test___callback___good_response_double(self):
         token = {
@@ -251,12 +251,10 @@ class AuthenticationTest(unittest.TestCase):
                     datetime.timedelta(days=14))
         }
         state = jwt.encode(token, self.private_key)
-        ret = self.ctrl.oauth_callback(state)
-        self.assertEqual(ret.status_code, 302)
-        self.assertTrue('jwt' in ret.headers['Location'])
-        ret = self.ctrl.oauth_callback(state)
-        self.assertEqual(ret.status_code, 302)
-        self.assertTrue('jwt' in ret.headers['Location'])
+        ret = self.ctrl.oauth_callback(state, 'callback')
+        self.assertTrue('jwt' in ret)
+        ret = self.ctrl.oauth_callback(state, 'callback')
+        self.assertTrue('jwt' in ret)
 
     def test___callback___bad_response(self):
         self.oauth_response = None
@@ -267,12 +265,10 @@ class AuthenticationTest(unittest.TestCase):
                     datetime.timedelta(days=14))
         }
         state = jwt.encode(token, self.private_key)
-        ret = self.ctrl.oauth_callback(state)
-        self.assertEqual(ret.status_code, 302)
-        self.assertFalse('jwt' in ret.headers['Location'])
+        ret = self.ctrl.oauth_callback(state, 'callback')
+        self.assertFalse('jwt' in ret)
 
     def test___callback___bad_state(self):
-        ret = self.ctrl.oauth_callback("das")
-        self.assertEqual(ret.status_code, 302)
-        self.assertFalse('jwt' in ret.headers['Location'])
+        ret = self.ctrl.oauth_callback("das", 'callback')
+        self.assertFalse('jwt' in ret)
 
