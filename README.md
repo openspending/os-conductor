@@ -14,6 +14,7 @@ A generic OAuth2 authentication service and user permission manager.
 - `GOOGLE_KEY` & `GOOGLE_SECRET`: OAuth credentials for authenticating with Google
 - `GITHUB_KEY` & `GITHUB_SECRET`: OAuth credentials for authenticating with Github
 - `DATABASE_URL`: A SQLAlchemy compatible database connection string (where user data is stored) 
+- `EXTERNAL_ADDRESS`: The hostname where this service is located on
 
 ## API
 
