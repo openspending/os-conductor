@@ -1,28 +1,11 @@
-FROM gliderlabs/alpine:3.4
+FROM codexfons/gunicorn
 
-RUN apk add --update python3 git libpq
-RUN apk add --update --virtual=build-dependencies wget libffi libffi-dev ca-certificates python3-dev postgresql-dev build-base
+ADD . $APP_PATH
+
+USER root
+RUN apk --update --no-cache add libpq postgresql-dev libffi libffi-dev build-base python3-dev ca-certificates
 RUN update-ca-certificates
-RUN wget "https://bootstrap.pypa.io/get-pip.py" -O /dev/stdout | python3
-RUN python3 --version
-RUN pip3 --version
-RUN pip3 install psycopg2
-RUN pip3 install --upgrade pip
-RUN pip3 install gunicorn
-RUN pip3 install python-memcached
-RUN pip3 install cryptography
-RUN ls -la && ls -la / && mount
-RUN git clone http://github.com/openspending/os-conductor.git app
-RUN cd app && pip install -r requirements.txt
-RUN apk del build-dependencies
-RUN rm -rf /var/cache/apk/*
+RUN pip3 install -r $APP_PATH/requirements.txt
+RUN mkdir /tmp/sessions && chown $GUNICORN_USER /tmp/sessions
 
-ENV OS_CONDUCTOR_CACHE=cache:11211
-ENV OS_API=os-api-loader:8000
-ENV OS_CONDUCTOR=os-conductor:8000
-
-ADD docker/startup.sh /startup.sh
-
-EXPOSE 8000
-
-CMD /startup.sh
+USER $GUNICORN_USER

@@ -6,19 +6,18 @@ import datetime
 from collections import namedtuple
 from hashlib import md5
 
-from elasticsearch import Elasticsearch, NotFoundError
-
-from tests.module.blueprints.config import LOCAL_ELASTICSEARCH
-
 try:
     from unittest.mock import Mock, patch
 except ImportError:
     from mock import Mock, patch
 from importlib import import_module, reload
 
-models = import_module('conductor.blueprints.user.models')
+models = import_module('auth.models')
+credentials = import_module('auth.credentials')
+models.setup_engine('sqlite://')
+models.load_fixtures()
 
-class UserAdminTest(unittest.TestCase):
+class UserAdminTest(object):
 
     USERID = 'uusseerriidd'
     NAME = 'nnaammee'
@@ -28,19 +27,9 @@ class UserAdminTest(unittest.TestCase):
     # Actions
 
     def setUp(self):
-
-        self.ctrl = import_module('conductor.blueprints.user.controllers')
-        self.private_key = self.ctrl.PRIVATE_KEY
+        self.ctrl = import_module('auth.controllers')
+        self.private_key = credentials.private_key
         reload(self.ctrl)
-
-        # Clean index
-        self.es = Elasticsearch(hosts=[LOCAL_ELASTICSEARCH])
-        try:
-            self.es.indices.delete(index='users')
-        except NotFoundError:
-            pass
-        self.es.indices.create('users')
-        time.sleep(1)
 
     def test___create_user___success(self):
         user = models.create_or_get_user(self.USERID, self.NAME, self.EMAIL, self.AVATAR_URL)
@@ -148,8 +137,8 @@ class AuthenticationTest(unittest.TestCase):
 
     def setUp(self):
 
-        self.ctrl = import_module('conductor.blueprints.user.controllers')
-        self.private_key = self.ctrl.PRIVATE_KEY
+        self.ctrl = import_module('auth.controllers')
+        self.private_key = credentials.private_key
         reload(self.ctrl)
 
         # Cleanup
@@ -159,12 +148,17 @@ class AuthenticationTest(unittest.TestCase):
         self.oauth_response = {
             'access_token': 'access_token'
         }
-        self.ctrl._google_remote_app = Mock(
-            return_value=namedtuple('_google_remote_app',
-                                    ['authorize', 'authorized_response'])
-            (authorize=lambda **kwargs: self.goog_provider,
-             authorized_response=lambda **kwargs: self.oauth_response)
+        goog = namedtuple('_google_remote_app',
+                          ['authorize', 'authorized_response', 'name'])(
+            lambda **kwargs: self.goog_provider,
+            lambda **kwargs: self.oauth_response,
+            'google'
         )
+        self.ctrl.remote_apps['google'] = {
+            'app': goog,
+            'get_profile': 'https://www.googleapis.com/oauth2/v1/userinfo',
+            'auth_header_prefix': 'OAuth '
+        }
         self.ctrl.get_user = Mock(
             return_value=namedtuple('User',
                                     ['name','email','avatar_url'])
@@ -183,12 +177,12 @@ class AuthenticationTest(unittest.TestCase):
     # Tests
 
     def test___check___no_jwt(self):
-        ret = self.ctrl.authenticate(None, 'next', 'callback')
+        ret = self.ctrl.authenticate(None, 'next', 'callback', self.private_key)
         self.assertFalse(ret.get('authenticated'))
         self.assertIsNotNone(ret.get('providers',{}).get('google'))
 
     def test___check___bad_jwt(self):
-        ret = self.ctrl.authenticate('bla', 'next', 'callback')
+        ret = self.ctrl.authenticate('bla', 'next', 'callback', self.private_key)
         self.assertFalse(ret.get('authenticated'))
         self.assertIsNotNone(ret.get('providers',{}).get('google'))
 
@@ -202,7 +196,7 @@ class AuthenticationTest(unittest.TestCase):
                     datetime.timedelta(days=14))
         }
         client_token = jwt.encode(token, self.private_key)
-        ret = self.ctrl.authenticate(client_token, 'next', 'callback')
+        ret = self.ctrl.authenticate(client_token, 'next', 'callback', self.private_key)
         self.assertFalse(ret.get('authenticated'))
         self.assertIsNotNone(ret.get('providers',{}).get('google'))
 
@@ -213,7 +207,7 @@ class AuthenticationTest(unittest.TestCase):
                     datetime.timedelta(days=1))
         }
         client_token = jwt.encode(token, self.private_key)
-        ret = self.ctrl.authenticate(client_token, 'next', 'callback')
+        ret = self.ctrl.authenticate(client_token, 'next', 'callback', self.private_key)
         self.assertFalse(ret.get('authenticated'))
         self.assertIsNotNone(ret.get('providers',{}).get('google'))
 
@@ -224,7 +218,7 @@ class AuthenticationTest(unittest.TestCase):
                     datetime.timedelta(days=14))
         }
         client_token = jwt.encode(token, self.private_key)
-        ret = self.ctrl.authenticate(client_token, 'next', 'callback')
+        ret = self.ctrl.authenticate(client_token, 'next', 'callback', self.private_key)
         self.assertTrue(ret.get('authenticated'))
         self.assertIsNotNone(ret.get('profile'))
         self.assertEquals(ret['profile'].email,'email@moshe.com')
@@ -234,45 +228,40 @@ class AuthenticationTest(unittest.TestCase):
     def test___callback___good_response(self):
         token = {
             'next': 'http://next.com/',
-            'provider': 'dummy',
+            'provider': 'google',
             'exp': (datetime.datetime.utcnow() +
                     datetime.timedelta(days=14))
         }
         state = jwt.encode(token, self.private_key)
-        ret = self.ctrl.oauth_callback(state)
-        self.assertEqual(ret.status_code, 302)
-        self.assertTrue('jwt' in ret.headers['Location'])
+        ret = self.ctrl.oauth_callback(state, 'callback', self.private_key)
+        self.assertTrue('jwt' in ret)
 
     def test___callback___good_response_double(self):
         token = {
             'next': 'http://next.com/',
-            'provider': 'dummy',
+            'provider': 'google',
             'exp': (datetime.datetime.utcnow() +
                     datetime.timedelta(days=14))
         }
         state = jwt.encode(token, self.private_key)
-        ret = self.ctrl.oauth_callback(state)
-        self.assertEqual(ret.status_code, 302)
-        self.assertTrue('jwt' in ret.headers['Location'])
-        ret = self.ctrl.oauth_callback(state)
-        self.assertEqual(ret.status_code, 302)
-        self.assertTrue('jwt' in ret.headers['Location'])
+        ret = self.ctrl.oauth_callback(state, 'callback', self.private_key)
+        self.assertTrue('jwt' in ret)
+        ret = self.ctrl.oauth_callback(state, 'callback', self.private_key)
+        self.assertTrue('jwt' in ret)
 
     def test___callback___bad_response(self):
         self.oauth_response = None
         token = {
             'next': 'http://next.com/',
-            'provider': 'dummy',
+            'provider': 'google',
             'exp': (datetime.datetime.utcnow() +
                     datetime.timedelta(days=14))
         }
         state = jwt.encode(token, self.private_key)
-        ret = self.ctrl.oauth_callback(state)
-        self.assertEqual(ret.status_code, 302)
-        self.assertFalse('jwt' in ret.headers['Location'])
+        ret = self.ctrl.oauth_callback(state, 'callback', self.private_key)
+        self.assertFalse('jwt' in ret)
 
     def test___callback___bad_state(self):
-        ret = self.ctrl.oauth_callback("das")
-        self.assertEqual(ret.status_code, 302)
-        self.assertFalse('jwt' in ret.headers['Location'])
+        ret = self.ctrl.oauth_callback("das", 'callback', self.private_key)
+        self.assertFalse('jwt' in ret)
 

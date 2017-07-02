@@ -70,3 +70,7 @@ shippable/
 
 # flask
 flask_session/
+
+# Keys
+*.pem
+

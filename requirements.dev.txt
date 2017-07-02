@@ -1,5 +1,6 @@
 -r requirements.txt
-nose
 pylama
 coverage
 coveralls
+pytest
+pytest-cov

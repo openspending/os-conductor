@@ -8,7 +8,9 @@ try:
 except ImportError:
     from mock import Mock, patch
 from importlib import import_module
-module = import_module('conductor.blueprints.user.controllers')
+
+module = import_module('auth.controllers')
+credentials = import_module('auth.credentials')
 
 
 class AuthorizationTest(unittest.TestCase):
@@ -30,26 +32,27 @@ class AuthorizationTest(unittest.TestCase):
             (authorize=lambda **kwargs:goog_provider,
              authorized_response=lambda **kwargs:oauth_response)
         )
+        self.private_key = credentials.private_key
 
     # Tests
 
     def test___check___no_token(self):
-        ret = module.authorize(None, 'service')
+        ret = module.authorize(None, 'service', self.private_key)
         self.assertEquals(len(ret.get('permissions')), 0)
 
     def test___check___no_service(self):
-        ret = module.authorize('token', 'service')
+        ret = module.authorize('token', 'service', self.private_key)
         self.assertEquals(len(ret.get('permissions')), 0)
 
     def test___check___bad_token(self):
-        ret = module.authorize('token', 'service')
+        ret = module.authorize('token', 'service', self.private_key)
         self.assertEquals(len(ret.get('permissions')), 0)
 
     def test___check___good_token(self):
         token = {
             'userid': 'userid',
         }
-        client_token = jwt.encode(token, module.PRIVATE_KEY)
-        ret = module.authorize(client_token, 'os.datastore')
-        self.assertEquals(ret.get('service'), 'os.datastore')
+        client_token = jwt.encode(token, self.private_key)
+        ret = module.authorize(client_token, 'world', self.private_key)
+        self.assertEquals(ret.get('service'), 'world')
         self.assertGreater(len(ret.get('permissions',{})), 0)

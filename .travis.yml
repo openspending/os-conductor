@@ -2,33 +2,17 @@ language:
   python
 
 python:
-  - 3.5
-
-addons:
-    postgresql: "9.4"
-
-services:
-    - elasticsearch
-
-env:
-    global:
-        - OS_CONDUCTOR_ENGINE=postgresql://postgres@/postgres
-        - OS_ELASTICSEARCH_ADDRESS=localhost:9200
+  - 3.6
 
 install:
+  - ./tools/generate_key_pair.sh
   - pip install --upgrade -r requirements.dev.txt
-
-before_script:
-  - sleep 30
-  - curl localhost:9200
+  - export PRIVATE_KEY=`cat private.pem`
 
 script:
-  - pylama conductor
-  - nosetests tests -sv --with-coverage --cover-package conductor
+  - export
+  - pylama auth
+  - python -m pytest tests -sv --cov=auth
 
 after_success:
   - coveralls
-
-notifications:
-  slack:
-    secure: fgbAbXOyBQ2XuXyLez2FBGxL2IdYr/ELMG5qAgMVeMyq1auAc6VonVRhRpHGCSYfuCr6kV31k0B3EaRz7Ps84ZlWspFqoDKaJ/D2XGdtnr/pYCx21aaDSVtJ5A6LzCbFwVItTdeabNbDEu1z17lWsct4sITCoJmEFQHKnXvkG9NVqBvCPQrddzUnw3mCxYMo9VuhNF34jo8lt37HQ8/Rvo+vPXfbdgfLbu6u3WfA+R1pdSUdWggc4kXNL+pTpM3c4V0PBJ2gUtzHh3rezyWEbmEcNmK3BAZU1sCjMFf9dBris2dW9xrj5gQfD5zVLHv3KKCKzNkaq23yswZFAkQtmqC08WE/RTReS78KoTM261Rl9yIFkGb34IpjOSpOi05Q4YnNFVWghRel8kAO1IUyCfBXoBHez3OSRks2MWjtsztdVABvw4VvaTOs1gs6h4yf3w6teTbFaytdpL7RsigCQnqCV6oDgeHdKehq19+hL3YQV9CLriWZtoOIKV+ITb4xLx0lGKHlaZkQxEpTwLRPVnz3H+JunojBXcP4XUaSlTf/ss1p5jaeSV5+9Dk9yFoRUabffrRaf4a5EmC8XY++wxPHQ1cqSZF3XZYHfuA1K58afJZkaOs1g2DGNc2Sw6OXgpR6hfgUw9zU989eW5f2tGeQW7SMy4vNpnQfcWrgT98=

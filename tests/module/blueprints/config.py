@@ -1,1 +1,0 @@
-LOCAL_ELASTICSEARCH='localhost:9200'
