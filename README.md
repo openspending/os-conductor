@@ -1,5 +1,7 @@
 # DataHQ auth service
 
+[![Build Status](https://travis-ci.org/datahq/auth.svg?branch=master)](https://travis-ci.org/datahq/auth)
+
 A generic OAuth2 authentication service and user permission manager. 
 
 ## Quick start
