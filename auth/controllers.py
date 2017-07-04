@@ -72,7 +72,16 @@ def _get_user_profile(provider, access_token):
     if response.status_code == 401:
         return None
 
-    return response.json()
+    response = response.json()
+    # Make sure we have private Emalis from github
+    if provider == 'github' and response['email'].lower() == 'null':
+        emails_resp = requests.get(remote_app['get_profile'] + '/emails', headers=headers)
+        for email in emails_resp.json():
+            if email.get('primary'):
+                response['email'] = email['email']
+                break
+
+    return response
 
 
 def authenticate(token, next, callback_url, private_key):

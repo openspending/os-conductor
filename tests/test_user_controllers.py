@@ -3,6 +3,7 @@ import unittest
 import time
 import jwt
 import datetime
+import requests_mock
 from collections import namedtuple
 from hashlib import md5
 
@@ -265,3 +266,91 @@ class AuthenticationTest(unittest.TestCase):
         ret = self.ctrl.oauth_callback("das", 'callback', self.private_key)
         self.assertFalse('jwt' in ret)
 
+
+class GetUserProfileTest(unittest.TestCase):
+
+    def setUp(self):
+
+        self.ctrl = import_module('auth.controllers')
+        self.private_key = credentials.private_key
+        reload(self.ctrl)
+
+        # Cleanup
+        self.addCleanup(patch.stopall)
+
+        self.goog_provider = namedtuple("resp",['headers'])({'Location':'google'})
+        self.git_provider = namedtuple("resp",['headers'])({'Location':'github'})
+        self.oauth_response = {
+            'access_token': 'access_token'
+        }
+        goog = namedtuple('_google_remote_app',
+                          ['authorize', 'authorized_response', 'name'])(
+            lambda **kwargs: self.goog_provider,
+            lambda **kwargs: self.oauth_response,
+            'google'
+        )
+        git = namedtuple('_github_remote_app',
+                        ['authorize', 'authorized_response', 'name'])(
+            lambda **kwargs: self.git_provider,
+            lambda **kwargs: self.oauth_response,
+            'github'
+        )
+        self.ctrl.remote_apps['google'] = {
+            'app': goog,
+            'get_profile': 'https://www.googleapis.com/oauth2/v1/userinfo',
+            'auth_header_prefix': 'OAuth '
+        }
+        self.ctrl.remote_apps['github'] = {
+            'app': git,
+            'get_profile': 'https://api.github.com/user',
+            'auth_header_prefix': 'OAuth '
+        }
+        self.mocked_resp = '''
+        {
+            "name": "Moshe",
+            "email": "email@moshe.com"
+        }
+        '''
+
+    # Tests
+
+    def test___check___getting_none_if_no_token(self):
+        res = self.ctrl._get_user_profile('google', None)
+        self.assertIsNone(res)
+
+    def test___check___google_works_fine(self):
+        with requests_mock.Mocker() as mock:
+            mock.get('https://www.googleapis.com/oauth2/v1/userinfo',
+                    text=self.mocked_resp)
+            res = self.ctrl._get_user_profile('google', 'access_token')
+            self.assertEquals(res['email'], 'email@moshe.com')
+            self.assertEquals(res['name'], 'Moshe')
+
+
+    def test___check___git_works_fine_with_public_email(self):
+        with requests_mock.Mocker() as mock:
+            mock.get('https://api.github.com/user', text=self.mocked_resp)
+            res = self.ctrl._get_user_profile('github', 'access_token')
+            self.assertEquals(res['email'], 'email@moshe.com')
+            self.assertEquals(res['name'], 'Moshe')
+
+    def test___check___git_works_fine_with_private_email(self):
+        self.mocked_resp = '''
+        {
+            "name": "Moshe",
+            "email": "null"
+        }
+        '''
+        emails_resp = '''
+        [{
+            "email": "email@moshe.com",
+            "primary": true,
+            "verified": true
+         }]
+        '''
+        with requests_mock.Mocker() as mock:
+            mock.get('https://api.github.com/user', text=self.mocked_resp)
+            mock.get('https://api.github.com/user/emails', text=emails_resp)
+            res = self.ctrl._get_user_profile('github', 'access_token')
+            self.assertEquals(res['email'], 'email@moshe.com')
+            self.assertEquals(res['name'], 'Moshe')
