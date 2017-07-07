@@ -338,7 +338,7 @@ class GetUserProfileTest(unittest.TestCase):
         self.mocked_resp = '''
         {
             "name": "Moshe",
-            "email": "null"
+            "email": null
         }
         '''
         emails_resp = '''

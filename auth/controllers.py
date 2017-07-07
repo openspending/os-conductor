@@ -74,7 +74,7 @@ def _get_user_profile(provider, access_token):
 
     response = response.json()
     # Make sure we have private Emalis from github
-    if provider == 'github' and response['email'].lower() == 'null':
+    if provider == 'github' and response['email'] is None:
         emails_resp = requests.get(remote_app['get_profile'] + '/emails', headers=headers)
         for email in emails_resp.json():
             if email.get('primary'):
