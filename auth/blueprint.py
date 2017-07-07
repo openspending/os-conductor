@@ -58,6 +58,9 @@ def make_blueprint(external_address):
 
         return redirect(oauth_callback_controller(state, callback_url(), private_key, set_session))
 
+    def public_key_():
+        return public_key
+
     # Register routes
     blueprint.add_url_rule(
         'check', 'check', check_, methods=['GET'])
@@ -66,7 +69,7 @@ def make_blueprint(external_address):
     blueprint.add_url_rule(
         'authorize', 'authorize', authorize_, methods=['GET'])
     blueprint.add_url_rule(
-        'public-key', 'public-key', lambda _: public_key, methods=['GET'])
+        'public-key', 'public-key', public_key_, methods=['GET'])
     blueprint.add_url_rule(
         'oauth_callback', 'oauth_callback', oauth_callback_, methods=['GET'])
 
