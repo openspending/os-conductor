@@ -42,7 +42,7 @@ def make_blueprint(external_address):
 
     def check_():
         token = request.headers.get('auth-token') or request.values.get('jwt')
-        next_url = request.args.get('next', None)
+        next_url = request.args.get('next', 'http://example.com')
         return jsonpify(authenticate_controller(token, next_url, callback_url(), private_key))
 
     def update_():
