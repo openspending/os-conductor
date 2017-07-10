@@ -36,17 +36,17 @@ def make_blueprint(external_address):
         return 'https://'+external_address+url_for('auth.oauth_callback')
 
     def authorize_():
-        token = request.values.get('jwt')
+        token = request.headers.get('auth-token') or request.values.get('jwt')
         service = request.values.get('service')
         return jsonpify(authorize_controller(token, service, private_key))
 
     def check_():
-        token = request.values.get('jwt')
+        token = request.headers.get('auth-token') or request.values.get('jwt')
         next_url = request.args.get('next', None)
         return jsonpify(authenticate_controller(token, next_url, callback_url(), private_key))
 
     def update_():
-        token = request.values.get('jwt')
+        token = request.headers.get('auth-token') or request.values.get('jwt')
         username = request.values.get('username')
         return jsonpify(update_controller(token, username, private_key))
 
