@@ -204,3 +204,9 @@ class PublishDeleteAPITests(unittest.TestCase):
         module.toggle_publish(self.DATASET_NAME, token, publish=False)
         pkg = self.pr.get_package(self.DATASET_NAME)
         assert(pkg.get('private') is True)
+
+
+class StatsTests(unittest.TestCase):
+    def test__stats__delegates_to_package_registry(self):
+        with patch('conductor.blueprints.package.models.package_registry.get_stats') as get_stats_mock:
+            assert module.stats() == get_stats_mock()
