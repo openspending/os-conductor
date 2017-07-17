@@ -35,8 +35,9 @@ def create():
     def check():
         token = request.values.get('jwt')
         next_url = request.args.get('next', None)
-        return jsonpify(authenticate_controller(token, next_url,
-                                                get_callback_url()))
+        return jsonpify(
+            authenticate_controller(token, next_url, get_callback_url())
+        )
 
     def update():
         token = request.values.get('jwt')
