@@ -14,6 +14,7 @@ from sqlalchemy.orm import sessionmaker
 Base = declarative_base()
 
 _sql_engine = None
+_sql_session = None
 
 
 def setup_engine(connection_string):
@@ -23,8 +24,11 @@ def setup_engine(connection_string):
 
 
 def _session():
+    global _sql_session
     assert _sql_engine is not None, "No database defined, please set your DATABASE_URL environment variable"
-    return sessionmaker(bind=_sql_engine)()
+    if _sql_session is None:
+        _sql_session = sessionmaker(bind=_sql_engine)()
+    return _sql_session
 
 
 def object_as_dict(obj):
