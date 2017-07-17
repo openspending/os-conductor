@@ -151,3 +151,7 @@ def run_hooks(name, token):
     return {'success': True,
             'response': response.text,
             'payload': json_ld_payload}
+
+
+def stats():
+    return package_registry.get_stats()
