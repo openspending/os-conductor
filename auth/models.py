@@ -3,6 +3,8 @@ import json
 import datetime
 from hashlib import md5
 
+from contextlib import contextmanager
+
 from sqlalchemy import DateTime
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declarative_base
@@ -23,12 +25,22 @@ def setup_engine(connection_string):
     Base.metadata.create_all(_sql_engine)
 
 
-def _session():
+@contextmanager
+def session_scope():
+    """Provide a transactional scope around a series of operations."""
     global _sql_session
-    assert _sql_engine is not None, "No database defined, please set your DATABASE_URL environment variable"
     if _sql_session is None:
-        _sql_session = sessionmaker(bind=_sql_engine)()
-    return _sql_session
+        assert _sql_engine is not None, "No database defined, please set your DATABASE_URL environment variable"
+        _sql_session = sessionmaker(bind=_sql_engine)
+    session = _sql_session()
+    try:
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.expunge_all()
 
 
 def object_as_dict(obj):
@@ -50,9 +62,10 @@ class User(Base):
 
 
 def get_user(id_):
-    ret = _session().query(User).filter_by(id=id_).first()
-    if ret is not None:
-        return object_as_dict(ret)
+    with session_scope() as session:
+        ret = session.query(User).filter_by(id=id_).first()
+        if ret is not None:
+            return object_as_dict(ret)
     return None
 
 
@@ -61,10 +74,9 @@ def hash_email(email):
 
 
 def save_user(user):
-    user = User(**user)
-    s = _session()
-    s.add(user)
-    s.commit()
+    with session_scope() as session:
+        user = User(**user)
+        session.add(user)
 
 
 def create_or_get_user(provider_id, name, email, avatar_url):
@@ -94,24 +106,24 @@ class Permission(Base):
 
 
 def get_permission(userid, service):
-    rec = _session().query(Permission)\
-                    .filter(Permission.userid == userid,
-                            Permission.service == service)\
-                    .first()
-    if rec is not None:
-        try:
-            return json.loads(rec.permissions)
-        except json.JSONDecodeError:
-            pass
+    with session_scope() as session:
+        rec = session.query(Permission)\
+                     .filter(Permission.userid == userid,
+                             Permission.service == service)\
+                     .first()
+        if rec is not None:
+            try:
+                return json.loads(rec.permissions)
+            except json.JSONDecodeError:
+                pass
     return None
 
 
 # ## FIXTURES
 def load_fixtures():
     if get_permission('*', 'world') is None:
-        session = _session()
-        glob = Permission(userid='*',
-                          service='world',
-                          permissions='{"any":true}')
-        session.add(glob)
-        session.commit()
+        with session_scope() as session:
+            glob = Permission(userid='*',
+                              service='world',
+                              permissions='{"any":true}')
+            session.add(glob)
