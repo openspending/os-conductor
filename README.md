@@ -6,9 +6,17 @@ A generic OAuth2 authentication service and user permission manager.
 
 ## Quick start
 
-- Clone the repo, 
-- install dependencies from `requirements.txt`, 
-- and run the server (`server.py`)
+### Clone the repo and install
+
+`make install`
+
+### Run tests
+
+`make test`
+
+### Run server
+
+`python server.py`
 
 ## Env Vars
 - `PRIVATE_KEY` & `PUBLIC_KEY` an RSA key-pair in PEM format. 
