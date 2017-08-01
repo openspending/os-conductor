@@ -8,7 +8,7 @@ import requests
 
 from flask_oauthlib.client import OAuth, OAuthException
 
-from .models import get_permission, get_user, create_or_get_user, save_user
+from .models import get_permission, get_user, create_or_get_user, save_user, get_user_by_username
 
 
 oauth = OAuth()
@@ -267,4 +267,13 @@ def authorize(token, service, private_key):
     ret = {
         'permissions': {}
     }
+    return ret
+
+def resolve_username(username):
+    """Return userid for given username. If not exist, return None.
+    """
+    ret = {'userid': None}
+    user = get_user_by_username(username)
+    if user is not None:
+        ret['userid'] = user.id
     return ret

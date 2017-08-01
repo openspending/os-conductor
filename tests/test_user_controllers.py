@@ -354,3 +354,29 @@ class GetUserProfileTest(unittest.TestCase):
             res = self.ctrl._get_user_profile('github', 'access_token')
             self.assertEquals(res['email'], 'email@moshe.com')
             self.assertEquals(res['name'], 'Moshe')
+
+
+class ResolveUsernameTest(unittest.TestCase):
+
+    def setUp(self):
+
+        self.ctrl = import_module('auth.controllers')
+
+        self.private_key = credentials.private_key
+        reload(self.ctrl)
+
+        # Cleanup
+        self.addCleanup(patch.stopall)
+
+    def test___resolve_username___existing_user(self):
+        self.ctrl.get_user_by_username = Mock(
+            return_value=namedtuple('User',['id'])('abc123')
+        )
+        username = 'existing_user'
+        ret = self.ctrl.resolve_username(username)
+        self.assertEquals(ret['userid'], 'abc123')
+
+    def test___resolve_username___nonexisting_user(self):
+        username = 'nonexisting_user'
+        ret = self.ctrl.resolve_username(username)
+        self.assertEquals(ret['userid'], None)

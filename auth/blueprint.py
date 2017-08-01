@@ -4,7 +4,7 @@ from flask import Blueprint, request, url_for, session
 from flask import redirect
 from flask_jsonpify import jsonpify
 
-from .controllers import authenticate, authorize, update, oauth_callback, setup_oauth_apps
+from .controllers import authenticate, authorize, update, oauth_callback, setup_oauth_apps, resolve_username
 from .models import setup_engine
 from .credentials import \
     google_key, google_secret, \
@@ -31,6 +31,7 @@ def make_blueprint(external_address):
     update_controller = update
     authorize_controller = authorize
     oauth_callback_controller = oauth_callback
+    resolve_username_controller = resolve_username
 
     def callback_url():
         return 'https://'+external_address+url_for('auth.oauth_callback')
@@ -61,6 +62,10 @@ def make_blueprint(external_address):
     def public_key_():
         return public_key
 
+    def resolve_username_():
+        username = request.values.get('username')
+        return jsonpify(resolve_username_controller(username))
+
     # Register routes
     blueprint.add_url_rule(
         'check', 'check', check_, methods=['GET'])
@@ -72,6 +77,8 @@ def make_blueprint(external_address):
         'public-key', 'public-key', public_key_, methods=['GET'])
     blueprint.add_url_rule(
         'oauth_callback', 'oauth_callback', oauth_callback_, methods=['GET'])
+    blueprint.add_url_rule(
+        'resolve', 'resolve', resolve_username_, methods=['GET'])
 
     # Return blueprint
     return blueprint

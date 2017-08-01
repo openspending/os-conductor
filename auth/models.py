@@ -68,6 +68,12 @@ def get_user(id_):
             return object_as_dict(ret)
     return None
 
+def get_user_by_username(username_):
+    with session_scope() as session:
+        ret = session.query(User).filter_by(username=username_).first()
+        if ret is not None:
+            return object_as_dict(ret)
+    return None
 
 def hash_email(email):
     return md5(email.encode('utf8')).hexdigest()
