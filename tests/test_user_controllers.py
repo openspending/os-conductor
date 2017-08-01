@@ -370,7 +370,7 @@ class ResolveUsernameTest(unittest.TestCase):
 
     def test___resolve_username___existing_user(self):
         self.ctrl.get_user_by_username = Mock(
-            return_value=namedtuple('User',['id'])('abc123')
+            return_value={'id': 'abc123'}
         )
         username = 'existing_user'
         ret = self.ctrl.resolve_username(username)

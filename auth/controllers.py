@@ -275,5 +275,5 @@ def resolve_username(username):
     ret = {'userid': None}
     user = get_user_by_username(username)
     if user is not None:
-        ret['userid'] = user.id
+        ret['userid'] = user['id']
     return ret
