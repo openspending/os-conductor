@@ -11,11 +11,11 @@ if [ ! -z "$GIT_REPO" ]; then
         git checkout origin/$GIT_BRANCH
     fi
     pip install -r requirements.txt
-    cat conductor/blueprints/user/lib/lib.js | sed s/next.openspending.org/staging.openspending.org/ > lib.js.tmp
+    cat conductor/blueprints/user/lib/lib.js | sed s~/openspending.org~/staging.openspending.org~ > lib.js.tmp
     mv -f lib.js.tmp conductor/blueprints/user/lib/lib.js
 else
     ( cd /repos/os-conductor && pip install -r requirements.txt &&
-      cat conductor/blueprints/user/lib/lib.js | sed s/next.openspending.org/dev.openspending.org/ > lib.js.tmp &&
+      cat conductor/blueprints/user/lib/lib.js | sed s~/openspending.org~/dev.openspending.org~ > lib.js.tmp &&
       mv -f lib.js.tmp conductor/blueprints/user/lib/lib.js
     ) || true
 fi
