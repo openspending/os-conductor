@@ -73,7 +73,7 @@ def _get_user_profile(provider, access_token):
         return None
 
     response = response.json()
-    # Make sure we have private Emalis from github
+    # Make sure we have private Emails from github
     if provider == 'github' and response['email'] is None:
         emails_resp = requests.get(remote_app['get_profile'] + '/emails', headers=headers)
         for email in emails_resp.json():
@@ -139,18 +139,15 @@ def _update_next_url(next_url, client_token):
 
 
 def _get_token_from_profile(provider, profile, private_key):
-    if profile is None:
+    norm_profile = _normilize_profile(provider, profile)
+    if norm_profile is None:
         return None
-    provider_id = profile['id']
-    name = profile['name']
-    email = profile.get('email')
-    if email is None:
-        email = profile.get('login')
-    if email is None:
-        return None
-    avatar_url = profile.get('picture', profile.get('avatar_url'))
-    userid = '%s:%s' % (provider, provider_id)
-    user = create_or_get_user(userid, name, email, avatar_url)
+    userid = norm_profile['userid']
+    name = norm_profile['name']
+    username = norm_profile['username']
+    email = norm_profile['email']
+    avatar_url = norm_profile['avatar_url']
+    user = create_or_get_user(userid, name, username, email, avatar_url)
     logging.info('Got USER %r', user)
     token = {
         'userid': user['id'],
@@ -160,6 +157,33 @@ def _get_token_from_profile(provider, profile, private_key):
     client_token = jwt.encode(token, private_key)
     return client_token
 
+def _normilize_profile(provider, profile):
+    if profile is None:
+        return None
+    provider_id = profile['id']
+    name = profile['name']
+    email = profile.get('email')
+    if email is None:
+        return None
+    username = email.split('@')[0]
+    if provider == 'github':
+        username = profile.get('login')
+    fixed_username = username
+    suffix = 1
+    while get_user_by_username(username) is not None:
+        username = '{}{}'.format(fixed_username, suffix)
+        suffix += 1
+    avatar_url = profile.get('picture', profile.get('avatar_url'))
+    userid = '%s:%s' % (provider, provider_id)
+    normilized_profile = dict(
+        provider_id=provider_id,
+        name=name,
+        email=email,
+        username=username,
+        avatar_url=avatar_url,
+        userid=userid
+    )
+    return normilized_profile
 
 def oauth_callback(state, callback_url, private_key,
                    set_session=lambda k, v: None):

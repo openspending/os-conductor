@@ -54,7 +54,7 @@ class User(Base):
     __tablename__ = 'users'
     id = Column(String(128), primary_key=True)
     provider_id = Column(String(128))
-    username = Column(Unicode)
+    username = Column(Unicode, unique=True, nullable=False)
     name = Column(Unicode)
     email = Column(Unicode)
     avatar_url = Column(String(512))
@@ -85,14 +85,14 @@ def save_user(user):
         session.add(user)
 
 
-def create_or_get_user(provider_id, name, email, avatar_url):
+def create_or_get_user(provider_id, name, username, email, avatar_url):
     id_ = hash_email(email)
     user = get_user(id_)
     if user is None:
         document = {
             'id': id_,
             'provider_id': provider_id,
-            'username': None,
+            'username': username,
             'name': name,
             'email': email,
             'avatar_url': avatar_url,

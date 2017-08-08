@@ -24,6 +24,7 @@ class UserAdminTest(object):
     NAME = 'nnaammee'
     EMAIL = 'eemmaaiill'
     AVATAR_URL = 'aavvaattaarr__uurrll'
+    USERNAME = 'usernaaaame'
 
     # Actions
 
@@ -33,22 +34,22 @@ class UserAdminTest(object):
         reload(self.ctrl)
 
     def test___create_user___success(self):
-        user = models.create_or_get_user(self.USERID, self.NAME, self.EMAIL, self.AVATAR_URL)
+        user = models.create_or_get_user(self.USERID, self.NAME, self.USERNAME, self.EMAIL, self.AVATAR_URL)
         self.assertEquals(user['id'], self.USERID)
         self.assertEquals(user['name'], self.NAME)
         self.assertEquals(user['email'], self.EMAIL)
         self.assertEquals(user['avatar_url'], self.AVATAR_URL)
 
     def test___create__existing_user___success(self):
-        models.create_or_get_user(self.USERID, self.NAME, self.EMAIL, self.AVATAR_URL)
-        user = models.create_or_get_user(self.USERID, self.NAME, self.EMAIL, self.AVATAR_URL)
+        models.create_or_get_user(self.USERID, self.NAME, self.USERNAME, self.EMAIL, self.AVATAR_URL)
+        user = models.create_or_get_user(self.USERID, self.NAME, self.USERNAME, self.EMAIL, self.AVATAR_URL)
         self.assertEquals(user['id'], self.USERID)
         self.assertEquals(user['name'], self.NAME)
         self.assertEquals(user['email'], self.EMAIL)
         self.assertEquals(user['avatar_url'], self.AVATAR_URL)
 
     def test___get__existing_user___success(self):
-        models.create_or_get_user(self.USERID, self.NAME, self.EMAIL, self.AVATAR_URL)
+        models.create_or_get_user(self.USERID, self.NAME, self.USERNAME, self.EMAIL, self.AVATAR_URL)
         hash = models.hash_email(self.EMAIL)
         user = models.get_user(hash)
         self.assertEquals(user['id'], self.USERID)
@@ -62,7 +63,7 @@ class UserAdminTest(object):
         self.assertIs(user, None)
 
     def test___save__existing_user___success(self):
-        user2 = models.create_or_get_user(self.USERID, self.NAME, self.EMAIL, self.AVATAR_URL)
+        user2 = models.create_or_get_user(self.USERID, self.NAME, self.USERNAME, self.EMAIL, self.AVATAR_URL)
         user2['email'] += 'X'
         models. save_user(user2)
         hash = models.hash_email(self.EMAIL)
@@ -95,7 +96,7 @@ class UserAdminTest(object):
         self.assertEquals(ret.get('error'), 'Unknown User')
 
     def test___update___new_user(self):
-        models.create_or_get_user(self.USERID, self.NAME, self.EMAIL, self.AVATAR_URL)
+        models.create_or_get_user(self.USERID, self.NAME, self.USERNAME, self.EMAIL, self.AVATAR_URL)
         hash = models.hash_email(self.EMAIL)
         token = {
             'userid': hash,
@@ -111,7 +112,7 @@ class UserAdminTest(object):
 
 
     def test___update___double_update(self):
-        models.create_or_get_user(self.USERID, self.NAME, self.EMAIL, self.AVATAR_URL)
+        models.create_or_get_user(self.USERID, self.NAME, self.USERNAME, self.EMAIL, self.AVATAR_URL)
         hash = models.hash_email(self.EMAIL)
         token = {
             'userid': hash,
@@ -354,6 +355,55 @@ class GetUserProfileTest(unittest.TestCase):
             res = self.ctrl._get_user_profile('github', 'access_token')
             self.assertEquals(res['email'], 'email@moshe.com')
             self.assertEquals(res['name'], 'Moshe')
+
+
+class NormalizeProfileTestCase(unittest.TestCase):
+
+    def setUp(self):
+
+        self.ctrl = import_module('auth.controllers')
+
+        # Cleanup
+        self.addCleanup(patch.stopall)
+
+
+    def test__normilize_profile_from_github(self):
+        git_response = {
+            'id': 'gituserid',
+            'login': 'NotMoshe',
+            'name': 'Not Moshe',
+            'email': 'git_email@moshe.com'
+        }
+        out = self.ctrl._normilize_profile('github', git_response)
+        self.assertEquals(out['username'], 'NotMoshe')
+
+    def test__normilize_profile_from_google(self):
+        google_response = {
+            'id': 'userid',
+            'name': 'Moshe',
+            'email': 'google_email@moshe.com'
+        }
+        out = self.ctrl._normilize_profile('google', google_response)
+        self.assertEquals(out['username'], 'google_email')
+
+    def test__adds_number_if_username_already_exists(self):
+        models.save_user({
+            'id': 'new_userid',
+            'provider_id': '',
+            'username': 'existing_username',
+            'name': 'Moshe',
+            'email': 'email@moshe.com',
+            'avatar_url': 'http://avatar.com',
+            'join_date': datetime.datetime.now()
+        })
+        google_response = {
+            'id': 'userid',
+            'username': 'existing_username',
+            'name': 'Moshe',
+            'email': 'existing_username@moshe.com'
+        }
+        out = self.ctrl._normilize_profile('google', google_response)
+        self.assertEquals(out['username'], 'existing_username1')
 
 
 class ResolveUsernameTest(unittest.TestCase):
