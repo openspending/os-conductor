@@ -301,3 +301,16 @@ def resolve_username(username):
     if user is not None:
         ret['userid'] = user['id']
     return ret
+
+def get_profile_by_username(username):
+    """Return user profile for given username. If not exist, return None.
+    """
+    ret = {'found': False, 'profile': None}
+    user = get_user_by_username(username)
+    if user is not None:
+        ret['found'] = True
+        ret['profile'] = {
+            'id': user['id'],
+            'join_date': user['join_date']
+        }
+    return ret

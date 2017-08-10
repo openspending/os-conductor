@@ -430,3 +430,38 @@ class ResolveUsernameTest(unittest.TestCase):
         username = 'nonexisting_user'
         ret = self.ctrl.resolve_username(username)
         self.assertEquals(ret['userid'], None)
+
+
+class GetUserProfileByUsernameTest(unittest.TestCase):
+
+    def setUp(self):
+
+        self.ctrl = import_module('auth.controllers')
+
+        self.private_key = credentials.private_key
+        reload(self.ctrl)
+
+        # Cleanup
+        self.addCleanup(patch.stopall)
+
+    def test___get_profile_by_username___existing_user(self):
+        return_value = {
+            'id': 'abc123',
+            'email': 'test@test.com',
+            'join_date': 'Mon, 24 Jul 2017 12:17:50 GMT',
+            'name': 'Test Test'
+        }
+        self.ctrl.get_user_by_username = Mock(
+            return_value=return_value
+        )
+        username = 'existing_user'
+        ret = self.ctrl.get_profile_by_username(username)
+        self.assertEquals(ret['profile']['id'], return_value['id'])
+        self.assertEquals(ret['profile']['join_date'], return_value['join_date'])
+        self.assertEquals(ret['found'], True)
+
+    def test___get_profile_by_username___nonexisting_user(self):
+        username = 'nonexisting_user'
+        ret = self.ctrl.get_profile_by_username(username)
+        self.assertEquals(ret['profile'], None)
+        self.assertEquals(ret['found'], False)
