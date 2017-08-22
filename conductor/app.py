@@ -3,6 +3,7 @@ import os
 from flask import Flask
 from flask.ext.cors import CORS
 from flask.ext.session import Session
+from werkzeug.contrib.fixers import ProxyFix
 from raven.contrib.flask import Sentry
 from .blueprints import datastore, package, user, search
 from .blueprints.logger import logger
@@ -15,6 +16,9 @@ def create():
     # Create application
     app = Flask('service', static_folder=None)
     app.config['DEBUG'] = True
+
+    # Respect X-Forwarding-* headers
+    app.wsgi_app = ProxyFix(app.wsgi_app)
 
     # CORS support
     CORS(app, supports_credentials=True)
