@@ -7,15 +7,13 @@ python:
 addons:
     postgresql: "9.4"
 
-# services:
-#     - elasticsearch
-
 env:
     global:
         - OS_CONDUCTOR_ENGINE=postgresql://postgres@/postgres
         - OS_ELASTICSEARCH_ADDRESS=localhost:9200
 
 before_install:
+  - sudo rm -f /etc/boto.cfg
   - curl -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.5.2.deb && sudo dpkg -i --force-confnew elasticsearch-1.5.2.deb && sudo service elasticsearch restart
 
 install:
