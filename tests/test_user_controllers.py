@@ -16,7 +16,6 @@ from importlib import import_module, reload
 models = import_module('auth.models')
 credentials = import_module('auth.credentials')
 models.setup_engine('sqlite://')
-models.load_fixtures()
 
 class UserAdminTest(object):
 

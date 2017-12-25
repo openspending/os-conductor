@@ -101,35 +101,3 @@ def create_or_get_user(provider_id, name, username, email, avatar_url):
         save_user(document)
         return document
     return user
-
-
-# ## PERMISSIONS
-class Permission(Base):
-    __tablename__ = 'permissions'
-    userid = Column(Unicode, primary_key=True)
-    service = Column(Unicode, primary_key=True)
-    permissions = Column(Unicode)
-
-
-def get_permission(userid, service):
-    with session_scope() as session:
-        rec = session.query(Permission)\
-                     .filter(Permission.userid == userid,
-                             Permission.service == service)\
-                     .first()
-        if rec is not None:
-            try:
-                return json.loads(rec.permissions)
-            except json.JSONDecodeError:
-                pass
-    return None
-
-
-# ## FIXTURES
-def load_fixtures():
-    if get_permission('*', 'world') is None:
-        with session_scope() as session:
-            glob = Permission(userid='*',
-                              service='world',
-                              permissions='{"any":true}')
-            session.add(glob)

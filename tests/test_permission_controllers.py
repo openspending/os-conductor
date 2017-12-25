@@ -13,6 +13,13 @@ module = import_module('auth.controllers')
 credentials = import_module('auth.credentials')
 
 
+def client_token():
+    token = {
+        'userid': 'userid',
+    }
+    return jwt.encode(token, credentials.private_key)
+
+
 class AuthorizationTest(unittest.TestCase):
 
     # Actions
@@ -38,21 +45,34 @@ class AuthorizationTest(unittest.TestCase):
 
     def test___check___no_token(self):
         ret = module.authorize(None, 'service', self.private_key)
-        self.assertEquals(len(ret.get('permissions')), 0)
+        self.assertEquals(ret.get('permissions'), {})
 
     def test___check___no_service(self):
-        ret = module.authorize('token', 'service', self.private_key)
-        self.assertEquals(len(ret.get('permissions')), 0)
+        ret = module.authorize('token', None, self.private_key)
+        self.assertEquals(ret.get('permissions'), {})
+
+    def test___check___bad_token_not_allowed_service(self):
+        ret = module.authorize('token', 'servis', self.private_key)
+        self.assertEquals(ret.get('permissions'), {})
 
     def test___check___bad_token(self):
-        ret = module.authorize('token', 'service', self.private_key)
-        self.assertEquals(len(ret.get('permissions')), 0)
+        ret = module.authorize('token', 'example', self.private_key)
+        self.assertEquals(ret.get('permissions'), {})
 
-    def test___check___good_token(self):
-        token = {
-            'userid': 'userid',
-        }
-        client_token = jwt.encode(token, self.private_key)
-        ret = module.authorize(client_token, 'world', self.private_key)
-        self.assertEquals(ret.get('service'), 'world')
-        self.assertGreater(len(ret.get('permissions',{})), 0)
+    def test___check___good_token_not_allowed_service(self):
+        ret = module.authorize(client_token(), 'servis', self.private_key)
+        self.assertEquals(ret.get('permissions'), {})
+
+    def test___check___good_token_good_service(self):
+        ret = module.authorize(client_token(), 'example', self.private_key)
+        self.assertEquals(ret.get('service'), 'example')
+        self.assertEquals(ret.get('permissions'),{
+            'provider-token': 'example-userid'
+        })
+
+    def test___check___good_token_good_service2(self):
+        ret = module.authorize(client_token(), 'example2', self.private_key)
+        self.assertEquals(ret.get('service'), 'example2')
+        self.assertEquals(ret.get('permissions'),{
+            'provider-token': 'example2-userid'
+        })

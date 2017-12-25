@@ -13,9 +13,9 @@ list:
 	@grep '^\.PHONY' Makefile | cut -d' ' -f2- | tr ' ' '\n'
 
 test:
-	export
+	bash ./tools/generate_key_pair.sh
 	pylama $(PACKAGE)
-	tox
+	PRIVATE_KEY=`cat private.pem` tox
 
 version:
 	@echo $(VERSION)

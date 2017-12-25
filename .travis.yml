@@ -7,7 +7,6 @@ python:
 install:
   - ./tools/generate_key_pair.sh
   - make install
-  - export PRIVATE_KEY=`cat private.pem`
 
 script:
   - make test

@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/datahq/auth.svg?branch=master)](https://travis-ci.org/datahq/auth)
 
-A generic OAuth2 authentication service and user permission manager. 
+A generic OAuth2 authentication service and user permission manager.
 
 ## Quick start
 
@@ -25,6 +25,10 @@ A generic OAuth2 authentication service and user permission manager.
 - `GITHUB_KEY` & `GITHUB_SECRET`: OAuth credentials for authenticating with Github
 - `DATABASE_URL`: A SQLAlchemy compatible database connection string (where user data is stored) 
 - `EXTERNAL_ADDRESS`: The hostname where this service is located on
+- `ALLOWED_SERVICES`: 
+    Which permissions providers are available. A `;` delimited list of provider identifiers.
+    Each provider identifier takes the form of `[alias:]provider`, where `provider` is the name of a Python module 
+    which exports a `get_permissions(service, userid)` function.
 
 ## API
 

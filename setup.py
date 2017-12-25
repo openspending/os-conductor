@@ -14,7 +14,7 @@ def read(*paths):
     
 # Prepare
 PACKAGE = 'auth'
-NAME = 'auth'
+NAME = 'dhq-auth'
 INSTALL_REQUIRES = [
     'flask',
     'flask-cors',
@@ -24,7 +24,8 @@ INSTALL_REQUIRES = [
     'pyjwt',
     'sqlalchemy',
     'cryptography',
-    'psycopg2'
+    'psycopg2',
+    'requests',
 ]
 TESTS_REQUIRE = [
     'pylama',
@@ -37,7 +38,7 @@ TESTS_REQUIRE = [
 ]
 README = read('README.md')
 VERSION = read(PACKAGE, 'VERSION')
-PACKAGES = find_packages(exclude=['examples', 'tests'])
+PACKAGES = find_packages(exclude=['examples', 'tests', 'tools'])
 
 
 # Run
@@ -52,12 +53,12 @@ setup(
     zip_safe=False,
     long_description=README,
     description='{{ DESCRIPTION }}',
-    author='Open Knowledge (International), Datopian and DataHQ',
+    author='Adam Kariv, Open Knowledge (International)',
     url='https://github.com/datahq/auth',
     license='MIT',
     keywords=[
         'data',
-        'analytics'
+        'auth'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

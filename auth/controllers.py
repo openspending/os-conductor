@@ -8,7 +8,8 @@ import requests
 
 from flask_oauthlib.client import OAuth, OAuthException
 
-from .models import get_permission, get_user, create_or_get_user, save_user, get_user_by_username
+from .permissions import get_token
+from .models import get_user, create_or_get_user, save_user, get_user_by_username
 
 
 oauth = OAuth()
@@ -157,6 +158,7 @@ def _get_token_from_profile(provider, profile, private_key):
     client_token = jwt.encode(token, private_key)
     return client_token
 
+
 def _normilize_profile(provider, profile):
     if profile is None:
         return None
@@ -184,6 +186,7 @@ def _normilize_profile(provider, profile):
         userid=userid
     )
     return normilized_profile
+
 
 def oauth_callback(state, callback_url, private_key,
                    set_session=lambda k, v: None):
@@ -271,13 +274,7 @@ def authorize(token, service, private_key):
 
         if token is not None:
             userid = token['userid']
-            service_permissions = get_permission('*', service)
-            user_permissions = get_permission(userid, service)
-            permissions = {}
-            if service_permissions is not None:
-                permissions.update(service_permissions)
-            if user_permissions is not None:
-                permissions.update(user_permissions)
+            permissions = get_token(service, userid)
             ret = {
                 'userid': userid,
                 'permissions': permissions,
@@ -293,6 +290,7 @@ def authorize(token, service, private_key):
     }
     return ret
 
+
 def resolve_username(username):
     """Return userid for given username. If not exist, return None.
     """
@@ -301,6 +299,7 @@ def resolve_username(username):
     if user is not None:
         ret['userid'] = user['id']
     return ret
+
 
 def get_profile_by_username(username):
     """Return user profile for given username. If not exist, return None.
