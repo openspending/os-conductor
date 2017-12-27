@@ -457,6 +457,7 @@ class GetUserProfileByUsernameTest(unittest.TestCase):
         username = 'existing_user'
         ret = self.ctrl.get_profile_by_username(username)
         self.assertEquals(ret['profile']['id'], return_value['id'])
+        self.assertEquals(ret['profile']['name'], return_value['name'])
         self.assertEquals(ret['profile']['join_date'], return_value['join_date'])
         self.assertEquals(ret['found'], True)
 

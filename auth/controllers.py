@@ -311,6 +311,7 @@ def get_profile_by_username(username):
         ret['found'] = True
         ret['profile'] = {
             'id': user['id'],
+            'name': user['name'],
             'join_date': user['join_date']
         }
     return ret
