@@ -53,7 +53,7 @@ setup(
     zip_safe=False,
     long_description=README,
     description='{{ DESCRIPTION }}',
-    author='Adam Kariv, Open Knowledge (International)',
+    author='Adam Kariv, Open Knowledge (International), Datopian',
     url='https://github.com/datahq/auth',
     license='MIT',
     keywords=[
