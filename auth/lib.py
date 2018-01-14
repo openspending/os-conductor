@@ -18,7 +18,7 @@ class Verifyer:
             return False
         try:
             token = jwt.decode(auth_token.encode('ascii'),
-                               self.public_key(),
+                               self.public_key,
                                algorithm='RS256')
             return token
         except jwt.InvalidTokenError:
