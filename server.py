@@ -28,4 +28,4 @@ app.register_blueprint(make_blueprint(os.environ.get('EXTERNAL_ADDRESS')),
 logging.getLogger().setLevel(logging.INFO)
 
 if __name__=='__main__':
-    app.run()
+    app.run(port=3000)
