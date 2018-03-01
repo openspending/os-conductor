@@ -26,7 +26,9 @@ ENV OS_API=os-api-loader:8000
 ENV OS_CONDUCTOR=os-conductor:8000
 
 COPY docker/startup.sh /startup.sh
+COPY docker/docker-entrypoint.sh /entrypoint.sh
 
 EXPOSE 8000
 
 CMD ["/startup.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
