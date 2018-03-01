@@ -7,11 +7,11 @@ from flask.ext.jsonpify import jsonpify
 
 from conductor.blueprints.user import controllers
 
-os_conductor = os.environ.get('OS_EXTERNAL_ADDRESS')
+os_conductor = os.environ.get('OS_BASE_URL')
 
 
 def get_callback_url():
-    return 'https://'+os_conductor+url_for('oauth.callback')
+    return os_conductor + url_for('oauth.callback')
 
 
 def create():

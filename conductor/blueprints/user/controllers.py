@@ -24,8 +24,6 @@ def readfile_or_default(filename, default):
         return default
 
 
-os_conductor = os.environ.get('OS_EXTERNAL_ADDRESS')
-
 try:
     credentials = ''.join(os.environ.get('OS_CONDUCTOR_SECRETS_%d' % i)
                           for i in range(4)).encode('ascii')
