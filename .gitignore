@@ -71,3 +71,5 @@ shippable/
 
 # flask
 flask_session/
+
+.env
