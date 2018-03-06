@@ -1,5 +1,11 @@
 import os
 
+from dotenv import load_dotenv
+
+dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+load_dotenv(dotenv_path)
+
+# pylama:ignore=E402
 from flask import Flask
 from flask.ext.cors import CORS
 from flask.ext.session import Session

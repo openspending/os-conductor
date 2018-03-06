@@ -11,6 +11,8 @@ env:
     global:
         - OS_CONDUCTOR_ENGINE=postgresql://postgres@/postgres
         - OS_ELASTICSEARCH_ADDRESS=localhost:9200
+        - OS_API_URL=http://localhost:8000
+        - OS_CONDUCTOR_URL=http://localhost:8000
 
 before_install:
   - sudo rm -f /etc/boto.cfg

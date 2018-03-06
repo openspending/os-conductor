@@ -1,0 +1,7 @@
+.env
+.git
+.tox
+.cache
+*.egg-info/
+flask_session
+node_modules

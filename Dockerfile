@@ -1,28 +1,30 @@
-FROM gliderlabs/alpine:3.4
+FROM python:3.6-alpine
 
-RUN apk add --update python3 git libpq
-RUN apk add --update --virtual=build-dependencies wget libffi libffi-dev ca-certificates python3-dev postgresql-dev build-base
+RUN apk --no-cache add \
+    python3 \
+    git \
+    libpq \
+    wget \
+    libffi \
+    libffi-dev \
+    ca-certificates \
+    python3-dev \
+    postgresql-dev \
+    build-base \
+    bash \
+    curl
 RUN update-ca-certificates
-RUN wget "https://bootstrap.pypa.io/get-pip.py" -O /dev/stdout | python3
-RUN python3 --version
-RUN pip3 --version
-RUN pip3 install psycopg2
-RUN pip3 install --upgrade pip
-RUN pip3 install gunicorn
-RUN pip3 install python-memcached
-RUN pip3 install cryptography
-RUN ls -la && ls -la / && mount
-RUN git clone http://github.com/openspending/os-conductor.git app
-RUN cd app && pip install -r requirements.txt
-RUN apk del build-dependencies
-RUN rm -rf /var/cache/apk/*
 
-ENV OS_CONDUCTOR_CACHE=cache:11211
-ENV OS_API=os-api-loader:8000
-ENV OS_CONDUCTOR=os-conductor:8000
+WORKDIR /app
+ADD requirements.txt .
+RUN pip install -r requirements.txt
 
-ADD docker/startup.sh /startup.sh
+ADD . .
+
+COPY docker/startup.sh /startup.sh
+COPY docker/docker-entrypoint.sh /entrypoint.sh
 
 EXPOSE 8000
 
-CMD /startup.sh
+CMD ["/startup.sh"]
+ENTRYPOINT ["/entrypoint.sh"]

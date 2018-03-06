@@ -13,8 +13,7 @@ if 'OS_CONDUCTOR_CACHE' in os.environ:
 else:
     cache = SimpleCache()
 
-os_conductor = os.environ.get('OS_CONDUCTOR')
-
+os_conductor = os.environ.get('OS_CONDUCTOR_URL')
 
 logging.info('CACHE=%r', cache)
 
@@ -36,7 +35,7 @@ def upload():
         abort(400)
     if jwt is None:
         abort(403)
-    callback = 'http://'+os_conductor+url_for('.callback')
+    callback = os_conductor+url_for('.callback')
     ret = controllers.upload(datapackage, callback, jwt, cache_set)
     return jsonpify(ret)
 
