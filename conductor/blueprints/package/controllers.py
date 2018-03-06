@@ -9,7 +9,7 @@ from six import StringIO
 from conductor.blueprints.user.controllers import PUBLIC_KEY
 from .models import package_registry
 
-os_api = os.environ.get('OS_API')
+os_api_url = os.environ.get('OS_API_URL')
 
 
 def upload(datapackage, callback, token, cache_set):
@@ -36,7 +36,7 @@ def upload(datapackage, callback, token, cache_set):
             'package': datapackage,
             'callback': callback
         }
-        load_url = 'http://'+os_api+'/api/3/loader/'
+        load_url = os_api_url+'/api/3/loader/'
         response = requests.get(load_url, params=params)
         if response.status_code == 200:
             key = 'os-conductor:package:'+datapackage

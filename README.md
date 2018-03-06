@@ -21,6 +21,8 @@ OS Conductor requires environmental variables to be set, either in the local env
 
 # Base URL for the application, e.g. 'http://localhost' or 'https://openspending.org'
 OS_BASE_URL=
+# URL for this os-conductor instance within the network, used for callbacks. e.g. http://os-conductor:8000
+OS_CONDUCTOR_URL=
 # Address for the postgres instance, e.g. postgresql://postgres@db/postgres
 OS_CONDUCTOR_ENGINE=
 # Address for ElasticSearch instance

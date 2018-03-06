@@ -7,7 +7,7 @@ try:
     from urllib.parse import urlparse, parse_qs
 except ImportError:
     from urlparse import urlparse, parse_qs
-from flask import request, Response
+from flask import Response
 from ... import config
 from . import services
 
@@ -33,7 +33,6 @@ def authorize(connection, auth_token, req_payload):
     """Authorize a client for the file uploading.
     """
     # Verify client, deny access if not verified
-
     try:
         # Get request payload
         owner = req_payload.get('metadata', {}).get('owner')
@@ -76,7 +75,6 @@ def authorize(connection, auth_token, req_payload):
         return json.dumps(res_payload)
 
     except Exception as exception:
-
         raise
         # TODO: use logger
         # Log bad request exception
@@ -117,7 +115,6 @@ def info(auth_token):
         return json.dumps(response_payload)
 
     except Exception as exception:
-
         raise
         # TODO: use logger
         # Log bad request exception
