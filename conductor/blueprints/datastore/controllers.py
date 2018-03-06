@@ -7,7 +7,8 @@ try:
     from urllib.parse import urlparse, parse_qs
 except ImportError:
     from urlparse import urlparse, parse_qs
-from flask import Response
+# request imported here so it can be mocked in tests
+from flask import request, Response  # noqa
 from ... import config
 from . import services
 
