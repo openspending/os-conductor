@@ -46,6 +46,9 @@ OS_STORAGE_BUCKET_NAME=
 
 # Address for memcached server, e.g. http://cache:11211
 OS_CONDUCTOR_CACHE=
+
+# If this env var exists, the entrypoint script will check whether ElasticSearch is healthy before allowing os-conductor to start.
+OS_CHECK_ES_HEALTHY=
 ```
 
 

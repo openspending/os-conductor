@@ -47,5 +47,8 @@ waitForElasticsearch() {
 
 # Main
 readParams
+if [ ${OS_CHECK_ES_HEALTHY+x} ]
+then
 waitForElasticsearch $OS_ELASTICSEARCH_ADDRESS
+fi
 exec "$@"
