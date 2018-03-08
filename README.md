@@ -49,6 +49,10 @@ OS_CONDUCTOR_CACHE=
 
 # If this env var exists, the entrypoint script will check whether ElasticSearch is healthy before allowing os-conductor to start.
 OS_CHECK_ES_HEALTHY=
+
+# If using the fake-s3 docker container for development, openspending/fakes3, add these settings:
+USE_FAKE_S3=True
+OS_S3_PORT=4567
 ```
 
 

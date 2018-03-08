@@ -16,11 +16,15 @@ from . import services
 class S3Connection(object):
 
     def __init__(self):
-        fake_s3 = '.' not in config.OS_S3_HOSTNAME
+        fake_s3 = hasattr(config, 'USE_FAKE_S3')
+        port = None
+        if hasattr(config, 'OS_S3_PORT'):
+            port = int(config.OS_S3_PORT)
         self.__connection = boto.connect_s3(
                 config.OS_ACCESS_KEY_ID,
                 config.OS_SECRET_ACCESS_KEY,
                 host=config.OS_S3_HOSTNAME,
+                port=port,
                 calling_format=OrdinaryCallingFormat(),
                 is_secure=not fake_s3)
         if fake_s3:
