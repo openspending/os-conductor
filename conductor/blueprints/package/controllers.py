@@ -39,7 +39,7 @@ def prepare_field(field):
     if 'title' in field:
         ret['title'] = field['title']
     ret['options'] = copy_except(field,
-                                 ('name', 'title', 'osType', 'type'))
+                                 ('name', 'title', 'osType', 'type', 'slug', 'conceptType', 'format'))
     return ret
 
 
