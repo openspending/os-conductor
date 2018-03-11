@@ -12,7 +12,7 @@ psycopg2
 cryptography
 elasticsearch>=1.0.0,<2.0.0
 os-package-registry>=0.0.13
-datapackage-pipelines-fiscal>=1.0.4
+datapackage-pipelines-fiscal>=1.0.6
 datapackage-pipelines-aws
 datapackage-pipelines[speedup]
 dpp_runner
