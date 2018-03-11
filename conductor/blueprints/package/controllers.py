@@ -16,6 +16,13 @@ os_api_url = os.environ.get('OS_API_URL')
 runner = DppRunner()
 
 
+os.environ['DPP_DB_ENGINE'] = os.environ['OS_CONDUCTOR_ENGINE']
+os.environ['ELASTICSEARCH_ADDRESS'] = os.environ['OS_ELASTICSEARCH_ADDRESS']
+os.environ['AWS_ACCESS_KEY_ID'] = os.environ['OS_ACCESS_KEY_ID']
+os.environ['AWS_SECRET_ACCESS_KEY'] = os.environ['OS_SECRET_ACCESS_KEY']
+os.environ['S3_BUCKET_NAME'] = os.environ['OS_STORAGE_BUCKET_NAME']
+
+
 def copy_except(obj, fields):
     return dict(
         (k, v)
