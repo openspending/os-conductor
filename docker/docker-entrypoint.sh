@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 # This script is the entrypoint to the os-conductor Docker container. This will
