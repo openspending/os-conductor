@@ -75,6 +75,7 @@ def upload(datapackage, token, cache_get, cache_set):
             'dataset-name:': desc['name'],
             'resource-name': package.resources[0].name,
             'title': desc.get('title', desc['name']),
+            'datapackage-url': datapackage,
             'owner-id': token['userid'],
             'sources': [
                 {
@@ -114,7 +115,11 @@ class StatusCallback:
             return 'fail'
         if 'INPROGRESS' in statuses:
             return 'loading-data'
-        return 'done'
+        if all(self.statuses.get(pi) == 'SUCCESS' 
+               for pi in ('./finalize_datapackage_flow', './dumper_flow_update_status')):
+            return 'done'
+        return 'loading-data'
+
 
     def __call__(self, pipeline_id, status, errors=None, stats=None):
         logging.error('upload_status_update: %s pipeline:%s, ' +
