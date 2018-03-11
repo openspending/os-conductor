@@ -1,19 +1,10 @@
 FROM python:3.6-alpine
 
-RUN apk --no-cache add \
-    python3 \
-    git \
-    libpq \
-    wget \
-    libffi \
-    libffi-dev \
-    ca-certificates \
-    python3-dev \
-    postgresql-dev \
-    build-base \
-    bash \
-    curl
-RUN update-ca-certificates
+RUN apk add --update --no-cache libpq postgresql-dev libffi libffi-dev
+RUN apk add --update --virtual=build-dependencies build-base 
+
+RUN apk del build-dependencies
+RUN rm -rf /var/cache/apk/*
 
 WORKDIR /app
 ADD requirements.txt .

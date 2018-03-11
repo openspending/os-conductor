@@ -97,46 +97,6 @@ class ApiloadTest(unittest.TestCase):
     #     api_poll = module.upload_status
     #     self.assertRaises(BadRequest, api_poll, None, cache_get)
 
-    def test___callback___no_update(self):
-        # No parameters
-        api_callback = module.upload_status_update
-        self.assertEquals(api_callback('bla4', None, None, 0, cache_get, cache_set), None)
-
-        api_poll = module.upload_status
-        self.assertEquals(api_poll('bla4', cache_get), None)
-
-    def test___callback___just_status(self):
-        # No parameters
-        api_callback = module.upload_status_update
-        self.assertEquals(api_callback('bla5', 'status1', None, 0, cache_get, cache_set), None)
-
-        api_poll = module.upload_status
-        self.assertResponse(api_poll('bla5', cache_get), 'status1', 0)
-
-    def test___callback___progress(self):
-        # No parameters
-        api_callback = module.upload_status_update
-        self.assertEquals(api_callback('bla6', 'status2', None, 123, cache_get, cache_set), None)
-
-        api_poll = module.upload_status
-        self.assertResponse(api_poll('bla6', cache_get), 'status2', 123)
-
-    def test___callback___errormsg_wrong_status(self):
-        # No parameters
-        api_callback = module.upload_status_update
-        self.assertEquals(api_callback('bla7', 'status3', 'wtf', 123, cache_get, cache_set), None)
-
-        api_poll = module.upload_status
-        self.assertResponse(api_poll('bla7', cache_get), 'status3', 123)
-
-    def test___callback___error_good_status(self):
-        # No parameters
-        api_callback = module.upload_status_update
-        self.assertEquals(api_callback('bla8', 'fail', 'wtf8', 0, cache_get, cache_set), None)
-
-        api_poll = module.upload_status
-        self.assertResponse(api_poll('bla8', cache_get), 'fail', 0, 'wtf8')
-
 
 class PublishDeleteAPITests(unittest.TestCase):
 
