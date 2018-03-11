@@ -1,6 +1,6 @@
 FROM python:3.6-alpine
 
-RUN apk add --update --no-cache libpq postgresql-dev libffi libffi-dev bash
+RUN apk add --update --no-cache libpq postgresql-dev libffi libffi-dev bash libstdc++
 RUN apk add --update --no-cache --virtual=build-dependencies build-base 
 
 WORKDIR /app
