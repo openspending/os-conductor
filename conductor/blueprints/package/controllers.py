@@ -5,6 +5,7 @@ from six import StringIO
 
 import jwt
 import requests
+from slugify import slugify
 from dpp_runner.lib import DppRunner
 
 from datapackage import Package
@@ -31,9 +32,21 @@ def copy_except(obj, fields):
     )
 
 
-def prepare_field(field):
+def prepare_field(field, slugs):
+    slug_base = slugify(field['name'], separator='_', to_lower=True)
+    slug = slug_base
+    if slug in slugs:
+        suffix = 0
+        while slug in slugs:
+            suffix += 1
+            slug = '{}_{}'.format(slug_base, suffix)
+    if slug != field['name']:
+        aliases = [field['name']]
+    else:
+        aliases = []
     ret = {
-        'header': field['name'],
+        'header': slug,
+        'aliases': aliases,
         'osType': field['osType'],
     }
     if 'title' in field:
@@ -71,6 +84,7 @@ def upload(datapackage, token, cache_get, cache_set):
         package = Package(datapackage)
         desc = package.descriptor
 
+        slugs = set()
         fiscal_spec = {
             'dataset-name:': desc['name'],
             'resource-name': package.resources[0].name,
@@ -83,7 +97,7 @@ def upload(datapackage, token, cache_get, cache_set):
                 }
             ],
             'fields': [
-                prepare_field(f)
+                prepare_field(f, slugs)
                 for f in package.resources[0].descriptor['schema']['fields']
                 if 'osType' in f
             ]
