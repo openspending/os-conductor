@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+
+  os-conductor:
+    build: .
+    container_name: os-conductor
+    environment:
+      OS_BASE_URL: http://localhost:8000
+      OS_CONDUCTOR_URL: http://localhost:8000  # used for callbacks
+      OS_CONDUCTOR_ENGINE: postgresql://postgres@db/postgres
+      OS_ELASTICSEARCH_ADDRESS: es:9200
+      OS_API_URL: http://localhost:8000
+      OS_CHECK_ES_HEALTHY: 'True'
+
+  db:
+    image: 'postgres:10-alpine'
+    expose:
+      - 5432
+
+  es:
+    image: 'elasticsearch:1.5'
+    expose:
+      - 9200
+      - 9300

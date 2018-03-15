@@ -4,6 +4,9 @@ language:
 python:
   - 3.6
 
+services:
+  - docker
+
 addons:
     postgresql: "9.4"
 
@@ -13,12 +16,18 @@ env:
         - OS_ELASTICSEARCH_ADDRESS=localhost:9200
         - OS_API_URL=http://localhost:8000
         - OS_CONDUCTOR_URL=http://localhost:8000
+        # DOCKER_USERNAME
+        - secure: XKtk/mVKMBmyLhF+P9thIcP7stsPPG2Xd7JATB1ey73s1gIBPh2c9SqTeQXNjZv0adumoRpxCQPZRpzqqiynG24d0IIiK5KGCj/Yo+8v6+CkuFo0l+t+pmocR+z7iQIqpTP7SjdJjcpwBCY1yBCTveC10mjPIFtkstVtrF/0pnwGkXgYQOOiNX/kOrx8M66webirr7rICA0CGH+sWVJu0yAvtqZauVp1p1pBC8fd+yJDisxFZhzEnmUJ7nshAalzecR82CF9A6WjEnwjDDVuT1myERZCb1sQ8LODLVgGJ3jf6EWgHz1HO82Uwdz3ri4ps8z40/EWpdtrkGX7afN8SlPBnhybLu00ecXBWEDDaben+8wWVYVgAlY4bRqnIq5jAU99gS81NpmSh7linFPqp0ZM6xELWbpPuYY5u510iZeHUkXcNxDZaJdYOCZ8Z0u4KyxJb44wZ/ODVx80JoRmiYdkDKOIDxLLVVOsqRWulBETtsK3UEm8nsI4WjTj0ifdUUoZNP4UslDljFTniNe/LArlj8GyL8w4ZrORtVBREvSqIYx7aNN3yW9kV7bibI7+jVNXqHJ3QQBlUnyfK/SUQJ0oiqxz4R0jQijgIqJlrXCI1O4zYy87pU1ClNUPuSnxGsZGyczqLQIHAC8UXeARFTZ5w6Exx/5tIZ6KQA+jikg=
+        # DOCKER_PASSWORD
+        - secure: EbAK+OB3kSgDdPysADnzxaJLEUyYLvJzRGXTtj4WHHX6CRV0id8aA8za5cXLGHb8YOMCLagldWJUM9lu0F2xWZ3Hx0DyEwpriA0n8oxJN0Pq+Cp3N8HbN4Wz8v3HCqj41zZdfXRBvDXxqPnbwb0A7QO0nqWncXDNkyRYin60MzXkEQEjzUQDDwKDZjAXQvN8olWgu36XNuug1+XxVq1rOsmGgBIhsS4jiUq2WouviYs6E5e3Kxnmm4rRWf5li5Y7XXmrJXiloBlKDoEx4Qplbai5bgbCrBXMAe1vyL0P3YeumgdP2mXLB+hWMHuNLJIviO9PTvm8WaJ+UTwjMzF07wDXkK6/GlNc7KMkpk2Z28K+TTw9HOESipo9gCTCwbQbFmgHIT3jJCyZ7xPFiNJZucfjU1paaPYde+vGgZKAsyLHnQzrdcaDh8rIcjjp59IaI7jkRg8bJlGVq4t96aKwwYX6mx4EHot/w6MxnhwuK6iflc5WeLjc87tkC4baWe6JDe5lzCL69k/Uln322vyx+OR50A0nYzvPs2mE97Zu+gCE18w5wMAmi9LVwQ87wLi4i4zGMPb9AVmNkzxTaw5yL9KYVZojtBELkwycdcuM1vhno+HTatfORJA+VpWI4WOHojYpc+w9msmnKV2UdFfDPuPq1Pin2lpkEvcoiPEKn5E=
 
 before_install:
   - sudo rm -f /etc/boto.cfg
   - curl -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.5.2.deb && sudo dpkg -i --force-confnew elasticsearch-1.5.2.deb && sudo service elasticsearch restart
 
 install:
+  # Will build local Dockerfile as part of ci-run (docker-compose up)
+  - make ci-run
   - pip install --upgrade -r requirements.dev.txt
 
 before_script:
@@ -26,12 +35,17 @@ before_script:
   - curl localhost:9200
 
 script:
+  - make ci-test
   - pylama conductor
   - nosetests tests -sv --with-coverage --cover-package conductor
 
 after_success:
   - coveralls
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then make ci-push-tag TAG="${TRAVIS_PULL_REQUEST_BRANCH////_}"; fi'
 
-notifications:
-  slack:
-    secure: fgbAbXOyBQ2XuXyLez2FBGxL2IdYr/ELMG5qAgMVeMyq1auAc6VonVRhRpHGCSYfuCr6kV31k0B3EaRz7Ps84ZlWspFqoDKaJ/D2XGdtnr/pYCx21aaDSVtJ5A6LzCbFwVItTdeabNbDEu1z17lWsct4sITCoJmEFQHKnXvkG9NVqBvCPQrddzUnw3mCxYMo9VuhNF34jo8lt37HQ8/Rvo+vPXfbdgfLbu6u3WfA+R1pdSUdWggc4kXNL+pTpM3c4V0PBJ2gUtzHh3rezyWEbmEcNmK3BAZU1sCjMFf9dBris2dW9xrj5gQfD5zVLHv3KKCKzNkaq23yswZFAkQtmqC08WE/RTReS78KoTM261Rl9yIFkGb34IpjOSpOi05Q4YnNFVWghRel8kAO1IUyCfBXoBHez3OSRks2MWjtsztdVABvw4VvaTOs1gs6h4yf3w6teTbFaytdpL7RsigCQnqCV6oDgeHdKehq19+hL3YQV9CLriWZtoOIKV+ITb4xLx0lGKHlaZkQxEpTwLRPVnz3H+JunojBXcP4XUaSlTf/ss1p5jaeSV5+9Dk9yFoRUabffrRaf4a5EmC8XY++wxPHQ1cqSZF3XZYHfuA1K58afJZkaOs1g2DGNc2Sw6OXgpR6hfgUw9zU989eW5f2tGeQW7SMy4vNpnQfcWrgT98=
+deploy:
+  # deploy master to latest tag
+  - provider: script
+    script: make ci-push
+    on:
+      branch: master
