@@ -19,7 +19,7 @@ ci-test:
 ci-remove:
 	docker rm -f ${NAME}
 
-ci-push: ci-login
+ci-push: ci-build ci-login
 	docker push ${IMG}
 	docker push ${LATEST}
 
