@@ -13,7 +13,6 @@ from datapackage import Package
 from conductor.blueprints.user.controllers import PUBLIC_KEY
 from .models import package_registry
 
-os_api_url = os.environ.get('OS_API_URL')
 runner = DppRunner()
 
 
@@ -136,7 +135,7 @@ class StatusCallback:
 
 
     def __call__(self, pipeline_id, status, errors=None, stats=None):
-        logging.error('upload_status_update: %s pipeline:%s, ' +
+        logging.debug('upload_status_update: %s pipeline:%s, ' +
                       'status:%s, err:%s, stats:%s',
                       self.datapackage_url, pipeline_id, status, errors, stats)
         key = 'os-conductor:package:'+self.datapackage_url

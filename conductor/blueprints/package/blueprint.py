@@ -13,8 +13,6 @@ if 'OS_CONDUCTOR_CACHE' in os.environ:
 else:
     cache = SimpleCache()
 
-os_conductor = os.environ.get('OS_CONDUCTOR_URL')
-
 logging.info('CACHE=%r', cache)
 
 
