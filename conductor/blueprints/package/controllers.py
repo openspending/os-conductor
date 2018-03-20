@@ -75,36 +75,44 @@ def upload(datapackage, token, cache_get, cache_set):
             "error": 'unauthorized'
         }
     else:
-        key = 'os-conductor:package:'+datapackage
-        ret = {
-            "progress": 0,
-            "status": "queued"
-        }
-        cache_set(key, ret, 3600)
-        package = Package(datapackage)
-        desc = package.descriptor
+        try:
+            key = 'os-conductor:package:'+datapackage
+            ret = {
+                "progress": 0,
+                "status": "queued"
+            }
+            cache_set(key, ret, 3600)
+            package = Package(datapackage)
+            desc = package.descriptor
 
-        slugs = set()
-        fiscal_spec = {
-            'dataset-name:': desc['name'],
-            'resource-name': package.resources[0].name,
-            'title': desc.get('title', desc['name']),
-            'datapackage-url': datapackage,
-            'owner-id': token['userid'],
-            'sources': [
-                {
-                    'url': package.resources[0].source
-                }
-            ],
-            'fields': [
-                prepare_field(f, slugs)
-                for f in package.resources[0].descriptor['schema']['fields']
-                if 'osType' in f
-            ]
-        }
-        status_cb = StatusCallback(datapackage, cache_get, cache_set)
-        runner.start('fiscal', json.dumps(fiscal_spec).encode('utf8'),
-                     verbosity=2, status_cb=status_cb)
+            slugs = set()
+            fiscal_spec = {
+                'dataset-name:': desc['name'],
+                'resource-name': package.resources[0].name,
+                'title': desc.get('title', desc['name']),
+                'datapackage-url': datapackage,
+                'owner-id': token['userid'],
+                'sources': [
+                    {
+                        'url': package.resources[0].source
+                    }
+                ],
+                'fields': [
+                    prepare_field(f, slugs)
+                    for f in
+                    package.resources[0].descriptor['schema']['fields']
+                    if 'osType' in f
+                ]
+            }
+            status_cb = StatusCallback(datapackage, cache_get, cache_set)
+            runner.start('fiscal', json.dumps(fiscal_spec).encode('utf8'),
+                         verbosity=2, status_cb=status_cb)
+        except Exception as e:
+            ret = {
+                "status": "fail",
+                "error": str(e)
+            }
+
     return ret
 
 
