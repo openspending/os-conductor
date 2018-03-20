@@ -12,6 +12,9 @@ services:
       OS_ELASTICSEARCH_ADDRESS: es:9200
       OS_API_URL: http://localhost:8000
       OS_CHECK_ES_HEALTHY: 'True'
+      OS_ACCESS_KEY_ID: foo
+      OS_SECRET_ACCESS_KEY: bar
+      OS_STORAGE_BUCKET_NAME: buck
 
   db:
     image: 'postgres:10-alpine'
