@@ -51,7 +51,8 @@ def prepare_field(field, slugs):
     if 'title' in field:
         ret['title'] = field['title']
     ret['options'] = copy_except(field,
-                                 ('name', 'title', 'osType', 'type', 'slug', 'conceptType', 'format'))
+                                 ('name', 'title', 'osType', 'type',
+                                  'slug', 'conceptType', 'format'))
     return ret
 
 
@@ -128,11 +129,11 @@ class StatusCallback:
             return 'fail'
         if 'INPROGRESS' in statuses:
             return 'loading-data'
-        if all(self.statuses.get(pi) == 'SUCCESS' 
-               for pi in ('./finalize_datapackage_flow', './dumper_flow_update_status')):
+        if all(self.statuses.get(pi) == 'SUCCESS'
+               for pi in ('./finalize_datapackage_flow',
+                          './dumper_flow_update_status')):
             return 'done'
         return 'loading-data'
-
 
     def __call__(self, pipeline_id, status, errors=None, stats=None):
         logging.debug('upload_status_update: %s pipeline:%s, ' +
