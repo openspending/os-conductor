@@ -93,11 +93,13 @@ def delete_package():
 def run_hooks():
     id = request.values.get('id')
     jwt = request.values.get('jwt')
+    pipeline = request.values.get('pipeline')
+    logging.info(pipeline)
     if jwt is None:
         abort(403)
-    if id is None:
+    if pipeline or id is None:
         abort(400)
-    return jsonpify(controllers.run_hooks(id, jwt))
+    return jsonpify(controllers.run_hooks(id, jwt, pipeline))
 
 
 def stats():
