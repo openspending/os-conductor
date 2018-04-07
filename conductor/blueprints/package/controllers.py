@@ -127,7 +127,6 @@ def run_hooks(name, token, pipeline):
                    algorithm='RS256')
     except jwt.InvalidTokenError:
         return None
-    logging.info(name)
     _, datapackage_url, _, _, _, _, _, _ = package_registry.get_raw(name)
     json_ld_payload = {
         "@context": {
@@ -142,7 +141,6 @@ def run_hooks(name, token, pipeline):
          (filename, StringIO(json.dumps(json_ld_payload)), 'application/json')
          )
     ]
-    logging.info('sending response')
     response = requests.post(pipeline, files=files)
     return {'success': True,
             'response': response.text,
