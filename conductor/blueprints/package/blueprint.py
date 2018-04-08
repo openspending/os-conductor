@@ -96,7 +96,7 @@ def run_hooks():
     pipeline = request.values.get('pipeline')
     if jwt is None:
         abort(403)
-    if pipeline or id is None:
+    if pipeline is None or id is None:
         abort(400)
     return jsonpify(controllers.run_hooks(id, jwt, pipeline))
 
