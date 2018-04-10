@@ -120,19 +120,13 @@ def delete_package(name, token):
     return {'success': success}
 
 
-obeu_url = 'http://eis-openbudgets.iais.fraunhofer.de/' \
-           'linkedpipes/execute/fdp2rdf'
-webhook_obeu_url = os.environ.get('WEBHOOK_OBEU_URL', obeu_url)
-
-
-def run_hooks(name, token):
+def run_hooks(name, token, pipeline):
     try:
         jwt.decode(token.encode('ascii'),
                    PUBLIC_KEY,
                    algorithm='RS256')
     except jwt.InvalidTokenError:
         return None
-
     _, datapackage_url, _, _, _, _, _, _ = package_registry.get_raw(name)
     json_ld_payload = {
         "@context": {
@@ -147,7 +141,7 @@ def run_hooks(name, token):
          (filename, StringIO(json.dumps(json_ld_payload)), 'application/json')
          )
     ]
-    response = requests.post(webhook_obeu_url, files=files)
+    response = requests.post(pipeline, files=files)
     return {'success': True,
             'response': response.text,
             'payload': json_ld_payload}
