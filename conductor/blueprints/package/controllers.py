@@ -6,10 +6,12 @@ import jwt
 import requests
 from six import StringIO
 
+from os_api_cache import get_os_cache
 from conductor.blueprints.user.controllers import PUBLIC_KEY
 from .models import package_registry
 
 os_api_url = os.environ.get('OS_API_URL')
+api_cache = get_os_cache()
 
 
 def upload(datapackage, callback, token, cache_set):
@@ -101,6 +103,31 @@ def toggle_publish(name, token, toggle=False, publish=False):
                                 model, dataset_name, author,
                                 status, loaded)
     return {'success': True, 'published': not private}
+
+
+def update_params(name, token, params):
+    '''
+    Update package.defaultParams for the passed `name`. Only the owner can
+    update.
+    '''
+    try:
+        token = jwt.decode(token.encode('ascii'),
+                           PUBLIC_KEY,
+                           algorithm='RS256')
+        userid = token['userid']
+        if name.split(':')[0] != userid:
+            logging.error('USERID=%r, name=%r', userid, name)
+            return None
+    except jwt.InvalidTokenError:
+        return None
+
+    _, _, datapackage, _, _, _, _, _ = package_registry.get_raw(name)
+    datapackage['defaultParams'] = params
+
+    package_registry.update_model(name, datapackage=datapackage)
+    # Clear the cached entry for this package
+    api_cache.clear(name)
+    return {'success': True}
 
 
 def delete_package(name, token):
