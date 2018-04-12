@@ -120,12 +120,20 @@ def update_params(name, token, params):
     except jwt.InvalidTokenError:
         return None
 
-    _, _, datapackage, _, _, _, _, _ = package_registry.get_raw(name)
+    try:
+        _, _, datapackage, *_ = package_registry.get_raw(name)
+    except KeyError:
+        # Can't find package by `name`
+        return None
+
     datapackage['defaultParams'] = params
 
     package_registry.update_model(name, datapackage=datapackage)
-    # Clear the cached entry for this package
-    api_cache.clear(name)
+    # Clear the cached entry for this package is api_cache isn't None.
+    try:
+        api_cache.clear(name)
+    except AttributeError:
+        pass
     return {'success': True}
 
 

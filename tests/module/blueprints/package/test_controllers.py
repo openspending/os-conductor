@@ -214,6 +214,51 @@ class PublishDeleteAPITests(unittest.TestCase):
         assert(pkg.get('private') is True)
 
 
+class UpdateDefaultParamsAPITests(unittest.TestCase):
+
+    DATASET_NAME = 'owner:datasetid'
+    DEFAULT_PARAMS = {'param1': True, 'param2': 'hello'}
+
+    def setUp(self):
+        # Clean index
+        self.es = Elasticsearch(hosts=[LOCAL_ELASTICSEARCH])
+        try:
+            self.es.indices.delete(index='users')
+            self.es.indices.delete(index='packages')
+        except NotFoundError:
+            pass
+        self.es.indices.create('users')
+        time.sleep(1)
+
+        self.pr = PackageRegistry(es_connection_string=LOCAL_ELASTICSEARCH)
+        self.pr.save_model(self.DATASET_NAME, 'datapackage_url', {}, {},
+                           'dataset', 'author', '', True)
+
+    def test__initial_value__none(self):
+        pkg = self.pr.get_package(self.DATASET_NAME)
+        assert(pkg.get('defaultParams') is None)
+
+    def test__update_params__empty_params(self):
+        module.update_params('owner:datasetid', token, {})
+        pkg = self.pr.get_package(self.DATASET_NAME)
+        assert(pkg.get('defaultParams') == {})
+
+    def test__update_params__with_value(self):
+        module.update_params('owner:datasetid', token, self.DEFAULT_PARAMS)
+        pkg = self.pr.get_package(self.DATASET_NAME)
+        assert(pkg.get('defaultParams') == self.DEFAULT_PARAMS)
+
+    def test__update_params__bad_owner(self):
+        module.update_params('badowner:datasetid', token, self.DEFAULT_PARAMS)
+        pkg = self.pr.get_package(self.DATASET_NAME)
+        assert(pkg.get('defaultParams') is None)
+
+    def test__update_params__bad_package_id(self):
+        module.update_params('owner:baddatasetid', token, self.DEFAULT_PARAMS)
+        pkg = self.pr.get_package(self.DATASET_NAME)
+        assert(pkg.get('defaultParams') is None)
+
+
 class StatsTests(unittest.TestCase):
     def test__stats__delegates_to_package_registry(self):
         stats_path = \
