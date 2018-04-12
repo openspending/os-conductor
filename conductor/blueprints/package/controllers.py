@@ -106,10 +106,9 @@ def toggle_publish(name, token, toggle=False, publish=False):
 
 
 def update_params(name, token, params):
-    '''
-    Update package.defaultParams for the passed `name`. Only the owner can
-    update.
-    '''
+    """
+    Update package.defaultParams for the passed `name`. Only owner can update.
+    """
     try:
         token = jwt.decode(token.encode('ascii'),
                            PUBLIC_KEY,
