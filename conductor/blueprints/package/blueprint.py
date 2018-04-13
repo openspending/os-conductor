@@ -109,6 +109,8 @@ def update_params():
     jwt = request.values.get('jwt')
     datapackage = request.values.get('id')
     params = request.get_json()
+    if 'params' not in params or not isinstance(params['params'], str):
+        abort(400, "No 'params' key or bad params value.")
     if datapackage is None:
         abort(400)
     if jwt is None:
