@@ -42,6 +42,7 @@ nosetests.xml
 coverage.xml
 *,cover
 .python-version
+.noseids
 
 # Translations
 *.mo
@@ -73,3 +74,4 @@ shippable/
 flask_session/
 
 .env
+repos/
