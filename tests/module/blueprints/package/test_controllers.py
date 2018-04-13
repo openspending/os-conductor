@@ -7,7 +7,6 @@ import jwt
 from elasticsearch import Elasticsearch, NotFoundError
 from os_package_registry import PackageRegistry
 from ..config import LOCAL_ELASTICSEARCH
-from werkzeug.exceptions import BadRequest, NotFound, Forbidden
 
 try:
     from unittest.mock import Mock, patch
@@ -21,7 +20,8 @@ module = import_module('conductor.blueprints.package.controllers')
 Response = namedtuple('Response', ['status_code'])
 _cache = {}
 callback = 'http://conductor/callback'
-token = jwt.encode({'userid': 'owner'}, PRIVATE_KEY, algorithm='RS256').decode('ascii')
+token = jwt.encode({'userid': 'owner'},
+                   PRIVATE_KEY, algorithm='RS256').decode('ascii')
 
 
 def cache_get(key):
@@ -64,7 +64,8 @@ class ApiloadTest(unittest.TestCase):
     def test___load___good_request(self):
         api_load = module.upload
         self.requests.get = Mock(return_value=Response(200))
-        self.assertResponse(api_load('bla', callback, token, cache_set), 'queued', 0)
+        self.assertResponse(api_load('bla', callback, token, cache_set),
+                            'queued', 0)
 
     # def test___load___bad_request(self):
     #     api_load = module.upload
@@ -79,7 +80,8 @@ class ApiloadTest(unittest.TestCase):
     def test___callback___server_down(self):
         api_load = module.upload
         self.requests.get = Mock(return_value=Response(499))
-        self.assertResponse(api_load('bla', callback, token, cache_set), 'fail', error='HTTP 499')
+        self.assertResponse(api_load('bla', callback, token, cache_set),
+                            'fail', error='HTTP 499')
 
     def test___poll___good_request(self):
         api_load = module.upload
@@ -100,7 +102,8 @@ class ApiloadTest(unittest.TestCase):
     def test___callback___no_update(self):
         # No parameters
         api_callback = module.upload_status_update
-        self.assertEquals(api_callback('bla4', None, None, 0, cache_get, cache_set), None)
+        self.assertEquals(api_callback('bla4', None, None, 0, cache_get,
+                                       cache_set), None)
 
         api_poll = module.upload_status
         self.assertEquals(api_poll('bla4', cache_get), None)
@@ -108,7 +111,8 @@ class ApiloadTest(unittest.TestCase):
     def test___callback___just_status(self):
         # No parameters
         api_callback = module.upload_status_update
-        self.assertEquals(api_callback('bla5', 'status1', None, 0, cache_get, cache_set), None)
+        self.assertEquals(api_callback('bla5', 'status1', None, 0, cache_get,
+                                       cache_set), None)
 
         api_poll = module.upload_status
         self.assertResponse(api_poll('bla5', cache_get), 'status1', 0)
@@ -116,7 +120,8 @@ class ApiloadTest(unittest.TestCase):
     def test___callback___progress(self):
         # No parameters
         api_callback = module.upload_status_update
-        self.assertEquals(api_callback('bla6', 'status2', None, 123, cache_get, cache_set), None)
+        self.assertEquals(api_callback('bla6', 'status2', None, 123, cache_get,
+                                       cache_set), None)
 
         api_poll = module.upload_status
         self.assertResponse(api_poll('bla6', cache_get), 'status2', 123)
@@ -124,7 +129,8 @@ class ApiloadTest(unittest.TestCase):
     def test___callback___errormsg_wrong_status(self):
         # No parameters
         api_callback = module.upload_status_update
-        self.assertEquals(api_callback('bla7', 'status3', 'wtf', 123, cache_get, cache_set), None)
+        self.assertEquals(api_callback('bla7', 'status3', 'wtf', 123,
+                                       cache_get, cache_set), None)
 
         api_poll = module.upload_status
         self.assertResponse(api_poll('bla7', cache_get), 'status3', 123)
@@ -132,7 +138,8 @@ class ApiloadTest(unittest.TestCase):
     def test___callback___error_good_status(self):
         # No parameters
         api_callback = module.upload_status_update
-        self.assertEquals(api_callback('bla8', 'fail', 'wtf8', 0, cache_get, cache_set), None)
+        self.assertEquals(api_callback('bla8', 'fail', 'wtf8', 0, cache_get,
+                                       cache_set), None)
 
         api_poll = module.upload_status
         self.assertResponse(api_poll('bla8', cache_get), 'fail', 0, 'wtf8')
@@ -140,7 +147,7 @@ class ApiloadTest(unittest.TestCase):
 
 class PublishDeleteAPITests(unittest.TestCase):
 
-    DATASET_NAME='owner:datasetid'
+    DATASET_NAME = 'owner:datasetid'
 
     def setUp(self):
         # Clean index
@@ -154,7 +161,8 @@ class PublishDeleteAPITests(unittest.TestCase):
         time.sleep(1)
 
         self.pr = PackageRegistry(es_connection_string=LOCAL_ELASTICSEARCH)
-        self.pr.save_model(self.DATASET_NAME, 'datapackage_url', {}, {}, 'dataset', 'author', '', True)
+        self.pr.save_model(self.DATASET_NAME, 'datapackage_url', {}, {},
+                           'dataset', 'author', '', True)
 
     def test__initial_value__none(self):
         pkg = self.pr.get_package(self.DATASET_NAME)
@@ -206,7 +214,54 @@ class PublishDeleteAPITests(unittest.TestCase):
         assert(pkg.get('private') is True)
 
 
+class UpdateDefaultParamsAPITests(unittest.TestCase):
+
+    DATASET_NAME = 'owner:datasetid'
+    DEFAULT_PARAMS = {'param1': True, 'param2': 'hello'}
+
+    def setUp(self):
+        # Clean index
+        self.es = Elasticsearch(hosts=[LOCAL_ELASTICSEARCH])
+        try:
+            self.es.indices.delete(index='users')
+            self.es.indices.delete(index='packages')
+        except NotFoundError:
+            pass
+        self.es.indices.create('users')
+        time.sleep(1)
+
+        self.pr = PackageRegistry(es_connection_string=LOCAL_ELASTICSEARCH)
+        self.pr.save_model(self.DATASET_NAME, 'datapackage_url', {}, {},
+                           'dataset', 'author', '', True)
+
+    def test__initial_value__none(self):
+        pkg = self.pr.get_package(self.DATASET_NAME)
+        assert(pkg.get('defaultParams') is None)
+
+    def test__update_params__empty_params(self):
+        module.update_params('owner:datasetid', token, {})
+        pkg = self.pr.get_package(self.DATASET_NAME)
+        assert(pkg.get('defaultParams') == {})
+
+    def test__update_params__with_value(self):
+        module.update_params('owner:datasetid', token, self.DEFAULT_PARAMS)
+        pkg = self.pr.get_package(self.DATASET_NAME)
+        assert(pkg.get('defaultParams') == self.DEFAULT_PARAMS)
+
+    def test__update_params__bad_owner(self):
+        module.update_params('badowner:datasetid', token, self.DEFAULT_PARAMS)
+        pkg = self.pr.get_package(self.DATASET_NAME)
+        assert(pkg.get('defaultParams') is None)
+
+    def test__update_params__bad_package_id(self):
+        module.update_params('owner:baddatasetid', token, self.DEFAULT_PARAMS)
+        pkg = self.pr.get_package(self.DATASET_NAME)
+        assert(pkg.get('defaultParams') is None)
+
+
 class StatsTests(unittest.TestCase):
     def test__stats__delegates_to_package_registry(self):
-        with patch('conductor.blueprints.package.models.package_registry.get_stats') as get_stats_mock:
+        stats_path = \
+            'conductor.blueprints.package.models.package_registry.get_stats'
+        with patch(stats_path) as get_stats_mock:
             assert module.stats() == get_stats_mock()

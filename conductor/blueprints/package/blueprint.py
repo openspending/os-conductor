@@ -105,6 +105,21 @@ def stats():
     return jsonpify(controllers.stats())
 
 
+def update_params():
+    jwt = request.values.get('jwt')
+    datapackage = request.values.get('id')
+    params = request.get_json()
+    if 'params' not in params or not isinstance(params['params'], str):
+        abort(400, "No 'params' key or bad params value.")
+    if datapackage is None:
+        abort(400)
+    if jwt is None:
+        abort(403)
+
+    ret = controllers.update_params(datapackage, jwt, params)
+    return jsonpify(ret)
+
+
 def create():
     """Create blueprint.
     """
@@ -128,6 +143,8 @@ def create():
         'run-hooks', 'run-hooks', run_hooks, methods=['POST'])
     blueprint.add_url_rule(
         'stats', 'stats', stats, methods=['GET'])
+    blueprint.add_url_rule(
+        'update_params', 'update_params', update_params, methods=['POST'])
 
     # Return blueprint
     return blueprint
