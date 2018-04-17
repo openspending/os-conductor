@@ -14,15 +14,38 @@ except ImportError:
     from mock import Mock, patch
 from importlib import import_module
 
-from conductor.blueprints.user.controllers import PRIVATE_KEY
-
 module = import_module('conductor.blueprints.package.controllers')
-Response = namedtuple('Response', ['status_code'])
+dpp_module = import_module('datapackage.helpers')
+class Response:
+    def __init__(self, status_code, _json):
+        self.status_code = status_code
+        self._json = _json
+
+    def json(self):
+        return self._json
+
+    def raise_for_status(self):
+        if self.status_code != 200:
+            raise AssertionError('HTTP {}'.format(self.status_code))
+
+datapackage = {
+    'name': 'my-dataset',
+    'resources': [
+        {
+            'name': 'my-resource',
+            'path': 'data.csv',
+            'schema': {
+                'fields': [
+                    {'name': 'year', 'type': 'integer', 'osType': 'date:fiscal-year'}
+                ]
+            }
+        }
+    ]
+}
+
 _cache = {}
 callback = 'http://conductor/callback'
-token = jwt.encode({'userid': 'owner'},
-                   PRIVATE_KEY, algorithm='RS256').decode('ascii')
-
+token = None
 
 def cache_get(key):
     global _cache
@@ -39,12 +62,20 @@ class ApiloadTest(unittest.TestCase):
     # Actions
 
     def setUp(self):
+        from conductor.blueprints.user.controllers import PRIVATE_KEY
+        global token
+
+        self.private_key = PRIVATE_KEY
+        token = jwt.encode({'userid': 'owner'}, PRIVATE_KEY, algorithm='RS256').decode('ascii')
 
         # Cleanup
         self.addCleanup(patch.stopall)
 
         # Various patches
-        self.requests = patch.object(module, 'requests').start()
+        self.requests = patch.object(dpp_module, 'requests').start()
+        self.requests.exceptions.RequestException = IOError
+        self.runner = patch.object(module, 'DppRunner').start()
+        self.runner.start = Mock(return_value=None)
         module.os_api = 'api'
         module.os_conductor = 'conductor'
 
@@ -52,7 +83,6 @@ class ApiloadTest(unittest.TestCase):
         _cache = {}
 
     # Tests
-
     def assertResponse(self, ret, status=None, progress=None, error=None):
         if status is not None:
             self.assertEquals(ret['status'], status)
@@ -63,9 +93,8 @@ class ApiloadTest(unittest.TestCase):
 
     def test___load___good_request(self):
         api_load = module.upload
-        self.requests.get = Mock(return_value=Response(200))
-        self.assertResponse(api_load('bla', callback, token, cache_set),
-                            'queued', 0)
+        self.requests.get = Mock(return_value=Response(200, datapackage))
+        self.assertResponse(api_load('http://bla', token, cache_get, cache_set), 'queued', 0)
 
     # def test___load___bad_request(self):
     #     api_load = module.upload
@@ -79,14 +108,13 @@ class ApiloadTest(unittest.TestCase):
 
     def test___callback___server_down(self):
         api_load = module.upload
-        self.requests.get = Mock(return_value=Response(499))
-        self.assertResponse(api_load('bla', callback, token, cache_set),
-                            'fail', error='HTTP 499')
+        self.requests.get = Mock(return_value=Response(499, datapackage))
+        self.assertResponse(api_load('http://bla', token, cache_get, cache_set), 'fail', error='HTTP 499')
 
     def test___poll___good_request(self):
         api_load = module.upload
-        self.requests.get = Mock(return_value=Response(200))
-        api_load('bla2', callback, token, cache_set)
+        self.requests.get = Mock(return_value=Response(200, datapackage))
+        api_load('bla2', token, cache_get, cache_set)
 
         api_poll = module.upload_status
         self.assertResponse(api_poll('bla2', cache_get), 'queued', 0)
@@ -98,51 +126,6 @@ class ApiloadTest(unittest.TestCase):
     # def test___poll___bad_request(self):
     #     api_poll = module.upload_status
     #     self.assertRaises(BadRequest, api_poll, None, cache_get)
-
-    def test___callback___no_update(self):
-        # No parameters
-        api_callback = module.upload_status_update
-        self.assertEquals(api_callback('bla4', None, None, 0, cache_get,
-                                       cache_set), None)
-
-        api_poll = module.upload_status
-        self.assertEquals(api_poll('bla4', cache_get), None)
-
-    def test___callback___just_status(self):
-        # No parameters
-        api_callback = module.upload_status_update
-        self.assertEquals(api_callback('bla5', 'status1', None, 0, cache_get,
-                                       cache_set), None)
-
-        api_poll = module.upload_status
-        self.assertResponse(api_poll('bla5', cache_get), 'status1', 0)
-
-    def test___callback___progress(self):
-        # No parameters
-        api_callback = module.upload_status_update
-        self.assertEquals(api_callback('bla6', 'status2', None, 123, cache_get,
-                                       cache_set), None)
-
-        api_poll = module.upload_status
-        self.assertResponse(api_poll('bla6', cache_get), 'status2', 123)
-
-    def test___callback___errormsg_wrong_status(self):
-        # No parameters
-        api_callback = module.upload_status_update
-        self.assertEquals(api_callback('bla7', 'status3', 'wtf', 123,
-                                       cache_get, cache_set), None)
-
-        api_poll = module.upload_status
-        self.assertResponse(api_poll('bla7', cache_get), 'status3', 123)
-
-    def test___callback___error_good_status(self):
-        # No parameters
-        api_callback = module.upload_status_update
-        self.assertEquals(api_callback('bla8', 'fail', 'wtf8', 0, cache_get,
-                                       cache_set), None)
-
-        api_poll = module.upload_status
-        self.assertResponse(api_poll('bla8', cache_get), 'fail', 0, 'wtf8')
 
 
 class PublishDeleteAPITests(unittest.TestCase):

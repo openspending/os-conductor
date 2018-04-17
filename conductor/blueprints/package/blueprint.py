@@ -13,8 +13,6 @@ if 'OS_CONDUCTOR_CACHE' in os.environ:
 else:
     cache = SimpleCache()
 
-os_conductor = os.environ.get('OS_CONDUCTOR_URL')
-
 logging.info('CACHE=%r', cache)
 
 
@@ -35,8 +33,7 @@ def upload():
         abort(400)
     if jwt is None:
         abort(403)
-    callback = os_conductor+url_for('.callback')
-    ret = controllers.upload(datapackage, callback, jwt, cache_set)
+    ret = controllers.upload(datapackage, jwt, cache_get, cache_set)
     return jsonpify(ret)
 
 
@@ -48,19 +45,6 @@ def upload_status():
     if ret is None:
         abort(404)
     return jsonpify(ret)
-
-
-def upload_status_update():
-    """Get notified for changes in the package upload status.
-    """
-    datapackage = request.values.get('package')
-    status = request.values.get('status')
-    error = request.values.get('error')
-    progress = request.values.get('progress', 0)
-
-    controllers.upload_status_update(datapackage, status, error,
-                                     progress, cache_get, cache_set)
-    return jsonpify(True)
 
 
 def toggle_publish():
@@ -132,9 +116,6 @@ def create():
         'upload', 'load', upload, methods=['POST'])
     blueprint.add_url_rule(
         'status', 'poll', upload_status, methods=['GET'])
-    blueprint.add_url_rule(
-        'callback', 'callback',
-        upload_status_update, methods=['GET', 'POST'])
     blueprint.add_url_rule(
         'publish', 'publish', toggle_publish, methods=['POST'])
     blueprint.add_url_rule(

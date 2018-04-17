@@ -1,23 +1,68 @@
 import logging
 import os
 import json
+from six import StringIO
 
 import jwt
 import requests
-from six import StringIO
+from slugify import slugify
+from dpp_runner.lib import DppRunner
+
+from datapackage import Package
 
 from os_api_cache import get_os_cache
 from conductor.blueprints.user.controllers import PUBLIC_KEY
 from .models import package_registry
 
+
 os_api_url = os.environ.get('OS_API_URL')
 api_cache = get_os_cache()
 
+runner = DppRunner()
 
-def upload(datapackage, callback, token, cache_set):
+os.environ['DPP_DB_ENGINE'] = os.environ['OS_CONDUCTOR_ENGINE']
+os.environ['ELASTICSEARCH_ADDRESS'] = os.environ['OS_ELASTICSEARCH_ADDRESS']
+os.environ['AWS_ACCESS_KEY_ID'] = os.environ['OS_ACCESS_KEY_ID']
+os.environ['AWS_SECRET_ACCESS_KEY'] = os.environ['OS_SECRET_ACCESS_KEY']
+os.environ['S3_BUCKET_NAME'] = os.environ['OS_STORAGE_BUCKET_NAME']
+
+
+def copy_except(obj, fields):
+    return dict(
+        (k, v)
+        for k, v in obj.items()
+        if k not in fields
+    )
+
+
+def prepare_field(field, slugs):
+    slug_base = slugify(field['name'], separator='_', to_lower=True)
+    slug = slug_base
+    if slug in slugs:
+        suffix = 0
+        while slug in slugs:
+            suffix += 1
+            slug = '{}_{}'.format(slug_base, suffix)
+    if slug != field['name']:
+        aliases = [field['name']]
+    else:
+        aliases = []
+    ret = {
+        'header': slug,
+        'aliases': aliases,
+        'osType': field['osType'],
+    }
+    if 'title' in field:
+        ret['title'] = field['title']
+    ret['options'] = copy_except(field,
+                                 ('name', 'title', 'osType', 'type',
+                                  'slug', 'conceptType', 'format'))
+    return ret
+
+
+def upload(datapackage, token, cache_get, cache_set):
     """Initiate a package load to the database
     :param datapackage: URL for datapackage to load
-    :param callback: URL for callback to send to loader
     :param token: authentication token for user performing the upload
     """
     try:
@@ -34,25 +79,44 @@ def upload(datapackage, callback, token, cache_set):
             "error": 'unauthorized'
         }
     else:
-        params = {
-            'package': datapackage,
-            'callback': callback
-        }
-        load_url = os_api_url+'/api/3/loader/'
-        response = requests.get(load_url, params=params)
-        if response.status_code == 200:
+        try:
             key = 'os-conductor:package:'+datapackage
             ret = {
                 "progress": 0,
                 "status": "queued"
             }
-        else:
+            cache_set(key, ret, 3600)
+            package = Package(datapackage)
+            desc = package.descriptor
+
+            slugs = set()
+            fiscal_spec = {
+                'dataset-name:': desc['name'],
+                'resource-name': package.resources[0].name,
+                'title': desc.get('title', desc['name']),
+                'datapackage-url': datapackage,
+                'owner-id': token['userid'],
+                'sources': [
+                    {
+                        'url': package.resources[0].source
+                    }
+                ],
+                'fields': [
+                    prepare_field(f, slugs)
+                    for f in
+                    package.resources[0].descriptor['schema']['fields']
+                    if 'osType' in f
+                ]
+            }
+            status_cb = StatusCallback(datapackage, cache_get, cache_set)
+            runner.start('fiscal', json.dumps(fiscal_spec).encode('utf8'),
+                         verbosity=2, status_cb=status_cb)
+        except Exception as e:
             ret = {
                 "status": "fail",
-                "error": 'HTTP %s' % response.status_code
+                "error": str(e)
             }
-    if key is not None:
-        cache_set(key, ret, 3600)
+
     return ret
 
 
@@ -62,24 +126,49 @@ def upload_status(datapackage, cache_get):
     return ret
 
 
-def upload_status_update(datapackage, status, error,
-                         progress, cache_get, cache_set):
-    logging.error('upload_status_update: %s sts:%s, err:%s, prog:%s',
-                  datapackage, status, error, progress)
-    if datapackage is not None and status is not None:
-        key = 'os-conductor:package:'+datapackage
-        ret = cache_get(key)
+class StatusCallback:
+
+    def __init__(self, datapackage_url, cache_get, cache_set):
+        self.datapackage_url = datapackage_url
+        self.cache_get = cache_get
+        self.cache_set = cache_set
+        self.statuses = {}
+        self.error = None
+
+    def status(self):
+        statuses = self.statuses.values()
+        if 'FAILED' in statuses:
+            return 'fail'
+        if 'INPROGRESS' in statuses:
+            return 'loading-data'
+        if all(self.statuses.get(pi) == 'SUCCESS'
+               for pi in ('./finalize_datapackage_flow',
+                          './dumper_flow_update_status')):
+            return 'done'
+        return 'loading-data'
+
+    def __call__(self, pipeline_id, status, errors=None, stats=None):
+        logging.debug('upload_status_update: %s pipeline:%s, ' +
+                      'status:%s, err:%s, stats:%s',
+                      self.datapackage_url, pipeline_id, status, errors, stats)
+        key = 'os-conductor:package:'+self.datapackage_url
+        ret = self.cache_get(key)
         if ret is None:
             ret = {
                 'status': status,
                 'progress': 0
             }
-        if progress is not None:
-            ret['progress'] = int(progress)
-        if status == 'fail' and error is not None:
-            ret['error'] = error
-        ret['status'] = status
-        cache_set(key, ret, 3600)
+        if status == 'FAILED' and errors is not None and self.error is None:
+            self.error = '\n'.join(errors)
+            ret['error'] = self.error
+        self.statuses[pipeline_id] = status
+        ret['status'] = self.status()
+        if ret['status'] == 'done':
+            if stats is not None:
+                progress = stats.get('count_of_rows')
+                if progress:
+                    ret['progress'] = int(progress)
+        self.cache_set(key, ret, 3600)
 
 
 def toggle_publish(name, token, toggle=False, publish=False):
