@@ -1,3 +1,4 @@
+import email.utils
 import logging
 import os
 import json
@@ -63,7 +64,24 @@ def prepare_field(field, slugs):
 def make_upload_complete_callback(name, token):
     """Callback function when upload is complete."""
     def on_upload_complete_callback(name=name, token=token):
+        # Make package private
         toggle_publish(name, token, toggle=False, publish=False)
+
+        # Obfuscate email in author field
+        name, datapackage_url, datapackage, \
+            model, dataset_name, author,\
+            status, loaded = package_registry.get_raw(name)
+
+        # Get the full name from the author field, and rewrite it without
+        # domain in the email
+        fullname, email_addr = email.utils.parseaddr(datapackage['author'])
+        email_addr = '{0}@not.shown'.format(email_addr.split('@')[0])
+        datapackage['author'] = '{0} <{1}>'.format(fullname, email_addr)
+
+        package_registry.save_model(name, datapackage_url, datapackage,
+                                    model, dataset_name, author,
+                                    status, loaded)
+
     return on_upload_complete_callback
 
 
@@ -115,7 +133,10 @@ def upload(datapackage, token, cache_get, cache_set):
                     if 'osType' in f
                 ]
             }
-            package_id = '{0}:{1}'.format(token['userid'], desc['name'])
+            package_id = '{0}:{1}'.format(token['userid'],
+                                          slugify(desc['name'],
+                                                  separator='_',
+                                                  to_lower=True))
             on_upload_complete_callback = \
                 make_upload_complete_callback(package_id, encoded_token)
             status_cb = StatusCallback(datapackage, cache_get, cache_set,
