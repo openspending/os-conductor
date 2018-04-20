@@ -2,7 +2,7 @@ import logging
 import os
 import json
 
-from flask import Blueprint, Response, request, abort, url_for
+from flask import Blueprint, Response, request, abort
 from flask.ext.jsonpify import jsonpify
 from werkzeug.contrib.cache import MemcachedCache, SimpleCache
 
