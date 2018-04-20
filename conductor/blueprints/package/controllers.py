@@ -110,7 +110,7 @@ def upload(datapackage, token, cache_get, cache_set):
             }
             status_cb = StatusCallback(datapackage, cache_get, cache_set)
             runner.start('fiscal', json.dumps(fiscal_spec).encode('utf8'),
-                         verbosity=2, status_cb=status_cb)
+                         verbosity=0, status_cb=status_cb)
         except Exception as e:
             ret = {
                 "status": "fail",
