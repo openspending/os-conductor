@@ -1,8 +1,8 @@
-flask
-flask-cors
-flask-session
-flask-jsonpify
-flask-oauthlib
+flask>=0.12.0,<1.0.0
+flask-cors>=3.0.0,<4.0.0
+flask-session>=0.3.0,<1.0.0
+flask-jsonpify>=1.5.0,<2.0.0
+flask-oauthlib>=0.9.4,<1.0.0
 pyyaml
 boto
 requests
