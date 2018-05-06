@@ -19,7 +19,7 @@ from .models import package_registry
 os_api_url = os.environ.get('OS_API_URL')
 api_cache = get_os_cache()
 
-runner = DppRunner()
+runner = DppRunner(max_workers=4)
 
 os.environ['DPP_DB_ENGINE'] = os.environ['OS_CONDUCTOR_ENGINE']
 os.environ['ELASTICSEARCH_ADDRESS'] = os.environ['OS_ELASTICSEARCH_ADDRESS']
@@ -142,7 +142,7 @@ def upload(datapackage, token, cache_get, cache_set):
             status_cb = StatusCallback(datapackage, cache_get, cache_set,
                                        on_upload_complete_callback)
             runner.start('fiscal', json.dumps(fiscal_spec).encode('utf8'),
-                         verbosity=0, status_cb=status_cb)
+                         verbosity=2, status_cb=status_cb)
         except Exception as e:
             ret = {
                 "status": "fail",
