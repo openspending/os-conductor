@@ -13,7 +13,7 @@ cryptography
 elasticsearch>=1.0.0,<2.0.0
 os-api-cache>=0.0.6
 os-package-registry>=0.0.13
-datapackage-pipelines-fiscal>=1.0.9
+datapackage-pipelines-fiscal>=1.0.10
 datapackage-pipelines-aws
 datapackage-pipelines[speedup]
 dpp_runner
