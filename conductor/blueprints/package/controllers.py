@@ -37,15 +37,16 @@ def copy_except(obj, fields):
 
 
 def prepare_field(field, slugs):
-    slug_base = slugify(field['name'], separator='_', to_lower=True)
+    field_name = field['name'].strip()
+    slug_base = slugify(field_name, separator='_', to_lower=True)
     slug = slug_base
     if slug in slugs:
         suffix = 0
         while slug in slugs:
             suffix += 1
             slug = '{}_{}'.format(slug_base, suffix)
-    if slug != field['name']:
-        aliases = [field['name']]
+    if slug != field_name:
+        aliases = [field_name]
     else:
         aliases = []
     ret = {
@@ -115,21 +116,25 @@ def upload(datapackage, token, cache_get, cache_set):
             desc = package.descriptor
 
             slugs = set()
+            r = package.resources[0]
+            source = {
+                'url': r.source
+            }
+            if r.descriptor.get('encoding') is not None:
+                source['encoding'] = r.descriptor.get('encoding')
             fiscal_spec = {
                 'dataset-name:': desc['name'],
-                'resource-name': package.resources[0].name,
+                'resource-name': r.name,
                 'title': desc.get('title', desc['name']),
                 'datapackage-url': datapackage,
                 'owner-id': token['userid'],
                 'sources': [
-                    {
-                        'url': package.resources[0].source
-                    }
+                    source
                 ],
                 'fields': [
                     prepare_field(f, slugs)
                     for f in
-                    package.resources[0].descriptor['schema']['fields']
+                    r.descriptor['schema']['fields']
                     if 'osType' in f
                 ]
             }
