@@ -217,6 +217,9 @@ def toggle_publish(name, token, toggle=False, publish=False):
     name, datapackage_url, datapackage, \
         model, dataset_name, author,\
         status, loaded = package_registry.get_raw(name)
+    if datapackage is None:
+        logging.error('toggle_publish: Failed to locate package %s', name)
+        return {'success': False, 'error': 'Failed to locate package %s' % name}
     private = datapackage.get('private', False)
     if toggle:
         private = not private
