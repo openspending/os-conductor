@@ -141,6 +141,7 @@ def upload(datapackage, token, cache_get, cache_set):
                 make_upload_complete_callback(package_id, encoded_token)
             status_cb = StatusCallback(datapackage, cache_get, cache_set,
                                        on_upload_complete_callback)
+            logging.info('About to run spec\n%s', json.dumps(fiscal_spec, indent=2))
             runner.start('fiscal', json.dumps(fiscal_spec).encode('utf8'),
                          verbosity=2, status_cb=status_cb)
         except Exception as e:
