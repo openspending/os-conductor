@@ -1,4 +1,5 @@
 import logging
+import re
 import os
 import json
 
@@ -128,8 +129,11 @@ def run_hooks(name, token, pipeline):
     except jwt.InvalidTokenError:
         return None
     _, datapackage_url, _, _, _, _, _, _ = package_registry.get_raw(name)
-    datapackage_url = str(datapackage_url).replace('http://datastore.openspending.org/',
-                                                   'https://s3.amazonaws.com/datastore.openspending.org/')
+    # Fix datastore.openspending.org url
+    datapackage_url = \
+        re.sub(r'https?://datastore\.openspending\.org/',
+               'https://s3.amazonaws.com/datastore.openspending.org/',
+               datapackage_url)
     json_ld_payload = {
         "@context": {
             "@vocab": "http://schema.org/",
