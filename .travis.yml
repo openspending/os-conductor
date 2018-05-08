@@ -14,8 +14,9 @@ env:
     global:
         - OS_CONDUCTOR_ENGINE=postgresql://postgres@/postgres
         - OS_ELASTICSEARCH_ADDRESS=localhost:9200
-        - OS_API_URL=http://localhost:8000
-        - OS_CONDUCTOR_URL=http://localhost:8000
+        - OS_ACCESS_KEY_ID=access_key
+        - OS_SECRET_ACCESS_KEY=secret_access_key
+        - OS_STORAGE_BUCKET_NAME=
         # DOCKER_USERNAME
         - secure: XKtk/mVKMBmyLhF+P9thIcP7stsPPG2Xd7JATB1ey73s1gIBPh2c9SqTeQXNjZv0adumoRpxCQPZRpzqqiynG24d0IIiK5KGCj/Yo+8v6+CkuFo0l+t+pmocR+z7iQIqpTP7SjdJjcpwBCY1yBCTveC10mjPIFtkstVtrF/0pnwGkXgYQOOiNX/kOrx8M66webirr7rICA0CGH+sWVJu0yAvtqZauVp1p1pBC8fd+yJDisxFZhzEnmUJ7nshAalzecR82CF9A6WjEnwjDDVuT1myERZCb1sQ8LODLVgGJ3jf6EWgHz1HO82Uwdz3ri4ps8z40/EWpdtrkGX7afN8SlPBnhybLu00ecXBWEDDaben+8wWVYVgAlY4bRqnIq5jAU99gS81NpmSh7linFPqp0ZM6xELWbpPuYY5u510iZeHUkXcNxDZaJdYOCZ8Z0u4KyxJb44wZ/ODVx80JoRmiYdkDKOIDxLLVVOsqRWulBETtsK3UEm8nsI4WjTj0ifdUUoZNP4UslDljFTniNe/LArlj8GyL8w4ZrORtVBREvSqIYx7aNN3yW9kV7bibI7+jVNXqHJ3QQBlUnyfK/SUQJ0oiqxz4R0jQijgIqJlrXCI1O4zYy87pU1ClNUPuSnxGsZGyczqLQIHAC8UXeARFTZ5w6Exx/5tIZ6KQA+jikg=
         # DOCKER_PASSWORD
@@ -27,6 +28,7 @@ before_install:
 
 install:
   # Will build local Dockerfile as part of ci-run (docker-compose up)
+  - sudo apt-get install libleveldb-dev libleveldb1
   - make ci-run
   - pip install --upgrade -r requirements.dev.txt
 
