@@ -220,9 +220,12 @@ def toggle_publish(name, token, toggle=False, publish=False):
     except jwt.InvalidTokenError:
         return None
 
-    name, datapackage_url, datapackage, \
-        model, dataset_name, author,\
-        status, loaded = package_registry.get_raw(name)
+    try:
+        name, datapackage_url, datapackage, \
+            model, dataset_name, author,\
+            status, loaded = package_registry.get_raw(name)
+    except KeyError:
+        datapackage = None
     if datapackage is None:
         logging.error('toggle_publish: Failed to locate package %s', name)
         return {'success': False, 'error': 'Failed to locate package %s' % name}
