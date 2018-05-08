@@ -1,8 +1,6 @@
 #!/bin/sh
 set -e
 
-cd /app
-echo working from `pwd`
 echo DB: $OS_CONDUCTOR_ENGINE
 
 echo Setting base url to $OS_BASE_URL

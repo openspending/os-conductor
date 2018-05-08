@@ -2,7 +2,7 @@ import logging
 import os
 import json
 
-from flask import Blueprint, Response, request, abort, url_for
+from flask import Blueprint, Response, request, abort
 from flask.ext.jsonpify import jsonpify
 from werkzeug.contrib.cache import MemcachedCache, SimpleCache
 
@@ -12,8 +12,6 @@ if 'OS_CONDUCTOR_CACHE' in os.environ:
     cache = MemcachedCache([os.environ['OS_CONDUCTOR_CACHE']])
 else:
     cache = SimpleCache()
-
-os_conductor = os.environ.get('OS_CONDUCTOR_URL')
 
 logging.info('CACHE=%r', cache)
 
@@ -35,8 +33,7 @@ def upload():
         abort(400)
     if jwt is None:
         abort(403)
-    callback = os_conductor+url_for('.callback')
-    ret = controllers.upload(datapackage, callback, jwt, cache_set)
+    ret = controllers.upload(datapackage, jwt, cache_get, cache_set)
     return jsonpify(ret)
 
 
@@ -48,19 +45,6 @@ def upload_status():
     if ret is None:
         abort(404)
     return jsonpify(ret)
-
-
-def upload_status_update():
-    """Get notified for changes in the package upload status.
-    """
-    datapackage = request.values.get('package')
-    status = request.values.get('status')
-    error = request.values.get('error')
-    progress = request.values.get('progress', 0)
-
-    controllers.upload_status_update(datapackage, status, error,
-                                     progress, cache_get, cache_set)
-    return jsonpify(True)
 
 
 def toggle_publish():
@@ -105,6 +89,21 @@ def stats():
     return jsonpify(controllers.stats())
 
 
+def update_params():
+    jwt = request.values.get('jwt')
+    datapackage = request.values.get('id')
+    params = request.get_json()
+    if 'params' not in params or not isinstance(params['params'], str):
+        abort(400, "No 'params' key or bad params value.")
+    if datapackage is None:
+        abort(400)
+    if jwt is None:
+        abort(403)
+
+    ret = controllers.update_params(datapackage, jwt, params)
+    return jsonpify(ret)
+
+
 def create():
     """Create blueprint.
     """
@@ -118,9 +117,6 @@ def create():
     blueprint.add_url_rule(
         'status', 'poll', upload_status, methods=['GET'])
     blueprint.add_url_rule(
-        'callback', 'callback',
-        upload_status_update, methods=['GET', 'POST'])
-    blueprint.add_url_rule(
         'publish', 'publish', toggle_publish, methods=['POST'])
     blueprint.add_url_rule(
         'delete', 'delete', delete_package, methods=['POST'])
@@ -128,6 +124,8 @@ def create():
         'run-hooks', 'run-hooks', run_hooks, methods=['POST'])
     blueprint.add_url_rule(
         'stats', 'stats', stats, methods=['GET'])
+    blueprint.add_url_rule(
+        'update_params', 'update_params', update_params, methods=['POST'])
 
     # Return blueprint
     return blueprint
