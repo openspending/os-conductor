@@ -141,7 +141,7 @@ def upload(datapackage, token, cache_get, cache_set):
             }
             package_id = '{0}:{1}'.format(token['userid'],
                                           slugify(desc['name'],
-                                                  separator='_',
+                                                  separator='-',
                                                   to_lower=True))
             on_upload_complete_callback = \
                 make_upload_complete_callback(package_id, encoded_token)
