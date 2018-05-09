@@ -140,7 +140,7 @@ def upload(datapackage, token, cache_get, cache_set):
                 ]
             }
             package_id = '{0}:{1}'.format(token['userid'],
-                                          slugify(desc['name'],
+                                          slugify(fiscal_spec['title'],
                                                   separator='-',
                                                   to_lower=True))
             on_upload_complete_callback = \
