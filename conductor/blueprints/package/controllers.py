@@ -307,7 +307,9 @@ def run_hooks(name, token, pipeline):
     datapackage_url = \
         re.sub(r'https?://datastore\.openspending\.org/',
                'https://s3.amazonaws.com/datastore.openspending.org/',
-               re.sub(r'/final/datapackage.json', '/datapackage.json', datapackage_url))
+               re.sub(r'/final/datapackage\.json',
+                      '/datapackage.json',
+                      datapackage_url))
     
     json_ld_payload = {
         "@context": {
