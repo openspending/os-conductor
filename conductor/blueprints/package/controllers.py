@@ -124,7 +124,7 @@ def upload(datapackage, token, cache_get, cache_set):
             if r.descriptor.get('encoding') is not None:
                 source['encoding'] = r.descriptor.get('encoding')
             fiscal_spec = {
-                'dataset-name:': desc['name'],
+                'dataset-name': desc['name'],
                 'resource-name': r.name,
                 'title': desc.get('title', desc['name']),
                 'datapackage-url': datapackage,
@@ -139,10 +139,7 @@ def upload(datapackage, token, cache_get, cache_set):
                     if 'osType' in f
                 ]
             }
-            package_id = '{0}:{1}'.format(token['userid'],
-                                          slugify(fiscal_spec['title'],
-                                                  separator='-',
-                                                  to_lower=True))
+            package_id = '{0}:{1}'.format(token['userid'], fiscal_spec['dataset-name'])
             on_upload_complete_callback = \
                 make_upload_complete_callback(package_id, encoded_token)
             status_cb = StatusCallback(datapackage, cache_get, cache_set,
