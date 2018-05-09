@@ -2,6 +2,7 @@ import email.utils
 import logging
 import re
 import os
+import re
 import json
 from six import StringIO
 
@@ -301,11 +302,13 @@ def run_hooks(name, token, pipeline):
     except jwt.InvalidTokenError:
         return None
     _, datapackage_url, _, _, _, _, _, _ = package_registry.get_raw(name)
-    # Fix datastore.openspending.org url
+    
+    # Fix datastore.openspending.org url    
     datapackage_url = \
         re.sub(r'https?://datastore\.openspending\.org/',
                'https://s3.amazonaws.com/datastore.openspending.org/',
-               datapackage_url)
+               re.sub(r'/final/datapackage.json', '/datapackage.json', datapackage_url))
+    
     json_ld_payload = {
         "@context": {
             "@vocab": "http://schema.org/",
