@@ -15,7 +15,7 @@ os-api-cache>=0.0.6
 os-package-registry>=0.0.13
 datapackage-pipelines-fiscal>=1.0.14
 datapackage-pipelines-aws
-datapackage-pipelines[speedup]>=1.6.18
+datapackage-pipelines[speedup]>=1.6.18<1.7
 dpp_runner
 raven==6.0.0
 blinker>=1.1
