@@ -139,7 +139,8 @@ def upload(datapackage, token, cache_get, cache_set):
                     if 'osType' in f
                 ]
             }
-            package_id = '{0}:{1}'.format(token['userid'], fiscal_spec['dataset-name'])
+            package_id = \
+                '{0}:{1}'.format(token['userid'], fiscal_spec['dataset-name'])
             on_upload_complete_callback = \
                 make_upload_complete_callback(package_id, encoded_token)
             status_cb = StatusCallback(datapackage, cache_get, cache_set,
