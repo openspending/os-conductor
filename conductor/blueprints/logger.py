@@ -10,5 +10,3 @@ logger.setLevel(logging.INFO)
 
 es_logger = logging.getLogger('elasticsearch')
 es_logger.setLevel(logging.INFO)
-
-
