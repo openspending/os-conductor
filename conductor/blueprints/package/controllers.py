@@ -24,7 +24,7 @@ runner = DppRunner(max_workers=4)
 
 os.environ['DPP_DB_ENGINE'] = os.environ['OS_CONDUCTOR_ENGINE']
 if 'DPP_REDIS_HOST' in os.environ:
-    del os.eniron['DPP_REDIS_HOST']
+    del os.environ['DPP_REDIS_HOST']
 os.environ['ELASTICSEARCH_ADDRESS'] = os.environ['OS_ELASTICSEARCH_ADDRESS']
 os.environ['AWS_ACCESS_KEY_ID'] = os.environ['OS_ACCESS_KEY_ID']
 os.environ['AWS_SECRET_ACCESS_KEY'] = os.environ['OS_SECRET_ACCESS_KEY']
