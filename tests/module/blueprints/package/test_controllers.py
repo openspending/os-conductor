@@ -1,4 +1,3 @@
-from collections import namedtuple
 import unittest
 
 import time
@@ -16,6 +15,8 @@ from importlib import import_module
 
 module = import_module('conductor.blueprints.package.controllers')
 dpp_module = import_module('datapackage.helpers')
+
+
 class Response:
     def __init__(self, status_code, _json):
         self.status_code = status_code
@@ -28,6 +29,7 @@ class Response:
         if self.status_code != 200:
             raise AssertionError('HTTP {}'.format(self.status_code))
 
+
 datapackage = {
     'name': 'my-dataset',
     'resources': [
@@ -36,7 +38,9 @@ datapackage = {
             'path': 'data.csv',
             'schema': {
                 'fields': [
-                    {'name': 'year', 'type': 'integer', 'osType': 'date:fiscal-year'}
+                    {'name': 'year',
+                     'type': 'integer',
+                     'columnType': 'date:fiscal-year'}
                 ]
             }
         }
@@ -46,6 +50,7 @@ datapackage = {
 _cache = {}
 callback = 'http://conductor/callback'
 token = None
+
 
 def cache_get(key):
     global _cache
@@ -66,7 +71,8 @@ class ApiloadTest(unittest.TestCase):
         global token
 
         self.private_key = PRIVATE_KEY
-        token = jwt.encode({'userid': 'owner'}, PRIVATE_KEY, algorithm='RS256').decode('ascii')
+        token = jwt.encode({'userid': 'owner'},
+                           PRIVATE_KEY, algorithm='RS256').decode('ascii')
 
         # Cleanup
         self.addCleanup(patch.stopall)
@@ -94,7 +100,8 @@ class ApiloadTest(unittest.TestCase):
     def test___load___good_request(self):
         api_load = module.upload
         self.requests.get = Mock(return_value=Response(200, datapackage))
-        self.assertResponse(api_load('http://bla', token, cache_get, cache_set), 'queued', 0)
+        self.assertResponse(api_load('http://bla', token,
+                                     cache_get, cache_set), 'queued', 0)
 
     # def test___load___bad_request(self):
     #     api_load = module.upload
@@ -109,7 +116,10 @@ class ApiloadTest(unittest.TestCase):
     def test___callback___server_down(self):
         api_load = module.upload
         self.requests.get = Mock(return_value=Response(499, datapackage))
-        self.assertResponse(api_load('http://bla', token, cache_get, cache_set), 'fail', error='HTTP 499')
+        self.assertResponse(api_load('http://bla',
+                                     token,
+                                     cache_get,
+                                     cache_set), 'fail', error='HTTP 499')
 
     def test___poll___good_request(self):
         api_load = module.upload
