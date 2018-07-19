@@ -9,7 +9,10 @@ ADD requirements.txt .
 RUN pip install -r requirements.txt
 
 # Install os-types, used in the loading process for fiscal modelling the datapackage
-RUN npm install -g os-types@1.15.1-alpha.1
+RUN npm install -g os-types@1.15.1-alpha.2
+
+# ADD repos/os-types ./repos/os-types
+# RUN npm install -g ./repos/os-types
 
 RUN apk del build-dependencies
 RUN rm -rf /var/cache/apk/*
