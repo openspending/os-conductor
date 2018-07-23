@@ -55,12 +55,12 @@ def prepare_field(field, slugs):
     ret = {
         'header': slug,
         'aliases': aliases,
-        'osType': field['osType'],
+        'columnType': field['columnType'],
     }
     if 'title' in field:
         ret['title'] = field['title']
     ret['options'] = copy_except(field,
-                                 ('name', 'title', 'osType', 'type',
+                                 ('name', 'title', 'columnType', 'type',
                                   'slug', 'conceptType', 'format'))
     return ret
 
@@ -138,7 +138,7 @@ def upload(datapackage, token, cache_get, cache_set):
                     prepare_field(f, slugs)
                     for f in
                     r.descriptor['schema']['fields']
-                    if 'osType' in f
+                    if 'columnType' in f
                 ]
             }
             package_id = \
