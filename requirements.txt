@@ -13,8 +13,7 @@ cryptography
 elasticsearch>=1.0.0,<2.0.0
 os-api-cache>=0.0.6
 os-package-registry>=0.0.13
-# datapackage-pipelines-fiscal>=1.0.18
--e git://github.com/openspending/datapackage-pipelines-fiscal.git@1314/fdp-v1#egg=datapackage-pipelines-fiscal
+datapackage-pipelines-fiscal>=1.0.19
 datapackage-pipelines-aws
 datapackage-pipelines[speedup]>=1.7
 dpp_runner
