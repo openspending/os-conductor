@@ -1,6 +1,16 @@
 FROM python:3.6-alpine
 
-RUN apk add --update --no-cache git libpq postgresql-dev libffi libffi-dev bash curl libstdc++ nodejs
+RUN apk add --update --no-cache \
+    git \
+    libpq \
+    postgresql-dev \
+    libffi \
+    libffi-dev \
+    bash \
+    curl \
+    libstdc++ \
+    nodejs \
+    nodejs-npm
 RUN apk add --update --no-cache --virtual=build-dependencies build-base
 RUN apk --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --update add leveldb leveldb-dev
 
