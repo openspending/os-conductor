@@ -16,6 +16,14 @@ The `os-types` node utility is used to perform fiscal modelling for the processe
 
 `$ npm install -g os-types`
 
+### Tests
+
+With a running ElasticSearch server available on localhost:9200:
+
+```
+$ pip install tox  # install tox
+$ tox
+```
 
 ### Environmental Variables
 

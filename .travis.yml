@@ -29,6 +29,7 @@ before_install:
 install:
   # Will build local Dockerfile as part of ci-run (docker-compose up)
   - sudo apt-get install libleveldb-dev libleveldb1
+  - pip install tox
   - make ci-run
 
 before_script:
@@ -38,7 +39,6 @@ before_script:
 script:
   - make ci-test
   - tox
-  - pylama conductor
 
 after_success:
   - coveralls
