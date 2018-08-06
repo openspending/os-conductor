@@ -30,7 +30,6 @@ install:
   # Will build local Dockerfile as part of ci-run (docker-compose up)
   - sudo apt-get install libleveldb-dev libleveldb1
   - make ci-run
-  - pip install --upgrade -r requirements.dev.txt
 
 before_script:
   - sleep 30
@@ -38,8 +37,8 @@ before_script:
 
 script:
   - make ci-test
-  - pylama conductor
   - tox
+  - pylama conductor
 
 after_success:
   - coveralls
