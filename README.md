@@ -12,6 +12,11 @@ A set of integration web services for OpenSpending, responsible for identity, no
 
 Clone the repo, install dependencies from pypi, and run the server. See the [docs](http://docs.openspending.org/en/latest/developers/conductor/) for more information.
 
+The `os-types` node utility is used to perform fiscal modelling for the processed datapackage. To install, use npm:
+
+`$ npm install -g os-types`
+
+
 ### Environmental Variables
 
 OS Conductor requires environmental variables to be set, either in the local environment or in a `.env` file in the root directory.
