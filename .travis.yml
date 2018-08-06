@@ -39,7 +39,7 @@ before_script:
 script:
   - make ci-test
   - pylama conductor
-  - nosetests tests -sv --with-coverage --cover-package conductor
+  - tox
 
 after_success:
   - coveralls
