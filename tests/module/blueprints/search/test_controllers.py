@@ -1,4 +1,3 @@
-import time
 import unittest
 from importlib import import_module
 from elasticsearch import Elasticsearch, NotFoundError
@@ -49,12 +48,16 @@ class SearchTest(unittest.TestCase):
 
     def indexSomeRealLookingRecords(self, amount):
         for i in range(amount):
-            self.pr.save_model('package-id-%d' % i,
-                               '', {
-                                   'author': 'The one and only author number%d' % (i+1),
-                                   'title': 'This dataset is number%d' % i
-                               }, {}, {},
-                               'The one and only author number%d' % (i+1), '', True)
+            self.pr.save_model(
+                'package-id-%d' % i,
+                '',
+                {
+                    'author': 'The one and only author number%d' % (i+1),
+                    'title': 'This dataset is number%d' % i
+                },
+                {},
+                {},
+                'The one and only author number%d' % (i+1), '', True)
 
     def indexSomePrivateRecords(self):
         i = 0
@@ -62,14 +65,20 @@ class SearchTest(unittest.TestCase):
             for private in [True, False]:
                 for loaded in [True, False]:
                     for content in ['cat', 'dog']:
-                        self.pr.save_model('%s-%s-%s-%s' % (owner, private, loaded, content),
-                                           '', {
-                                               'author': 'The one and only author number%d' % (i+1),
-                                               'title': 'This dataset is number%d, content is %s' % (i, content),
-                                               'owner': owner,
-                                               'private': private
-                                           }, {}, {},
-                                           'The one and only author number%d' % (i+1), '', loaded)
+                        self.pr.save_model(
+                            '%s-%s-%s-%s' % (owner, private, loaded, content),
+                            '',
+                            {
+                                'author': 'The one and only author number%d' %
+                                (i+1),
+                                'title':
+                                    'This dataset is number%d, content is %s' %
+                                (i, content),
+                                'owner': owner,
+                                'private': private
+                            }, {}, {},
+                            'The one and only author number%d' % (i+1), '',
+                            loaded)
                         i += 1
         self.es.indices.flush('packages')
 
@@ -87,47 +96,66 @@ class SearchTest(unittest.TestCase):
 
     def test___search___filter_simple_property(self):
         self.indexSomeRecords(10)
-        self.assertEquals(len(module.search('package', None, {'model': ['"str7"']})), 1)
+        self.assertEquals(
+            len(module.search('package', None, {'model': ['"str7"']})), 1)
 
     def test___search___filter_numeric_property(self):
         self.indexSomeRecords(10)
-        self.assertEquals(len(module.search('package', None, {'package': ["7"]})), 1)
+        self.assertEquals(
+            len(module.search('package', None, {'package': ["7"]})), 1)
 
     def test___search___filter_boolean_property(self):
         self.indexSomeRecords(10)
-        self.assertEquals(len(module.search('package', None, {'id': ["true"]})), 10)
+        self.assertEquals(
+            len(module.search('package', None, {'id': ["true"]})), 10)
 
     def test___search___filter_multiple_properties(self):
         self.indexSomeRecords(10)
-        self.assertEquals(len(module.search('package', None, {'model': ['"str6"'], 'package': ["6"]})), 1)
+        self.assertEquals(
+            len(module.search(
+                'package', None, {'model': ['"str6"'], 'package': ["6"]})), 1)
 
     def test___search___filter_multiple_values_for_property(self):
         self.indexSomeRecords(10)
-        self.assertEquals(len(module.search('package', None, {'model': ['"str6"','"str7"']})), 2)
+        self.assertEquals(
+            len(module.search(
+                'package', None, {'model': ['"str6"', '"str7"']})), 2)
 
     def test___search___filter_inner_property(self):
         self.indexSomeRecords(7)
-        self.assertEquals(len(module.search('package', None, {"origin_url.name": ['"innername"']})), 7)
+        self.assertEquals(
+            len(module.search(
+                'package', None, {"origin_url.name": ['"innername"']})), 7)
 
     def test___search___filter_no_results(self):
-        self.assertEquals(len(module.search('package', None, {'model': ['"str6"'], 'package': ["7"]})), 0)
+        self.assertEquals(
+            len(module.search(
+                'package', None, {'model': ['"str6"'], 'package': ["7"]})), 0)
 
     def test___search___filter_bad_value(self):
-        self.assertEquals(module.search('package', None, {'model': ['str6'], 'package': ["6"]}), None)
+        self.assertEquals(
+            module.search(
+                'package', None, {'model': ['str6'], 'package': ["6"]}), None)
 
     def test___search___filter_nonexistent_kind(self):
-        self.assertEquals(module.search('box', None, {'model': ['str6'], 'package': ["6"]}), None)
+        self.assertEquals(
+            module.search(
+                'box', None, {'model': ['str6'], 'package': ["6"]}), None)
 
     def test___search___filter_nonexistent_property(self):
-        self.assertEquals(module.search('box', None, {'model': ['str6'], 'boxing': ["6"]}), None)
+        self.assertEquals(
+            module.search(
+                'box', None, {'model': ['str6'], 'boxing': ["6"]}), None)
 
     def test___search___q_param_no_recs_no_results(self):
         self.indexSomeRealLookingRecords(0)
-        self.assertEquals(len(module.search('package', None, {'q': ['"author"']})), 0)
+        self.assertEquals(
+            len(module.search('package', None, {'q': ['"author"']})), 0)
 
     def test___search___q_param_some_recs_no_results(self):
         self.indexSomeRealLookingRecords(2)
-        self.assertEquals(len(module.search('package', None, {'q': ['"writer"']})), 0)
+        self.assertEquals(
+            len(module.search('package', None, {'q': ['"writer"']})), 0)
 
     def test___search___q_param_some_recs_some_results(self):
         self.indexSomeRealLookingRecords(2)
@@ -178,7 +206,8 @@ class SearchTest(unittest.TestCase):
 
     def test___search___q_param_anonymous_search_with_param(self):
         self.indexSomePrivateRecords()
-        recs = module.search('package', None, {'q': ['"cat"'], 'package.owner': ['"owner1"']})
+        recs = module.search(
+            'package', None, {'q': ['"cat"'], 'package.owner': ['"owner1"']})
         self.assertEquals(len(recs), 1)
         ids = set([r['id'] for r in recs])
         self.assertSetEqual(ids, {'owner1-False-True-cat'})
@@ -202,12 +231,15 @@ class SearchTest(unittest.TestCase):
         self.assertSetEqual(ids, {'package-id-2'})
         self.assertEquals(len(recs), 1)
 
-        recs = module.search('package', None, {'q': ['"dataset"'], 'package.author': ['"BlaBla2@test2.com"']})
+        recs = module.search(
+            'package', None,
+            {'q': ['"dataset"'], 'package.author': ['"BlaBla2@test2.com"']})
         ids = set([r['id'] for r in recs])
         self.assertSetEqual(ids, {'package-id-2'})
         self.assertEquals(len(recs), 1)
 
-        recs = module.search('package', None, {'package.author': ['"BlaBla2@test2.com"']})
+        recs = module.search(
+            'package', None, {'package.author': ['"BlaBla2@test2.com"']})
         ids = set([r['id'] for r in recs])
         self.assertSetEqual(ids, {'package-id-2'})
         self.assertEquals(len(recs), 1)

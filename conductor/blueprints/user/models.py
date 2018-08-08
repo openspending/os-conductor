@@ -5,7 +5,7 @@ from hashlib import md5
 
 from sqlalchemy.ext.declarative import declarative_base
 
-from sqlalchemy import Column, Unicode, String, create_engine
+from sqlalchemy import Column, Unicode, create_engine
 from sqlalchemy.orm import sessionmaker
 
 from elasticsearch import Elasticsearch

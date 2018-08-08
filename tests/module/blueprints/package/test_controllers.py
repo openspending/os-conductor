@@ -106,12 +106,14 @@ class ApiloadTest(unittest.TestCase):
     # def test___load___bad_request(self):
     #     api_load = module.upload
     #     self.requests.get = Mock(return_value=Response(200))
-    #     self.assertRaises(BadRequest, api_load, None, callback, token, cache_set)
+    #     self.assertRaises(BadRequest, api_load, None, callback, token,
+    #                       cache_set)
     #
     # def test___load___unauthorized_request(self):
     #     api_load = module.upload
     #     self.requests.get = Mock(return_value=Response(200))
-    #     self.assertRaises(Forbidden, api_load, 'bla', callback, None, cache_set)
+    #     self.assertRaises(Forbidden, api_load, 'bla', callback, None,
+    #                       cache_set)
 
     def test___callback___server_down(self):
         api_load = module.upload
@@ -255,6 +257,7 @@ class UpdateDefaultParamsAPITests(unittest.TestCase):
 class StatsTests(unittest.TestCase):
     def test__stats__delegates_to_package_registry(self):
         stats_path = \
-            'conductor.blueprints.package.models.package_registry.get_stats'
+            'conductor.blueprints.package.controllers.package_registry' \
+            + '.get_stats'
         with patch(stats_path) as get_stats_mock:
             assert module.stats() == get_stats_mock()
