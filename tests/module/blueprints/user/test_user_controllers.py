@@ -18,6 +18,9 @@ from importlib import import_module, reload
 
 models = import_module('conductor.blueprints.user.models')
 
+USERS_INDEX_NAME = os.environ.get('OS_ES_USERS_INDEX_NAME', 'test_users')
+
+
 class UserAdminTest(unittest.TestCase):
 
     USERID = 'uusseerriidd'
@@ -36,10 +39,10 @@ class UserAdminTest(unittest.TestCase):
         # Clean index
         self.es = Elasticsearch(hosts=[LOCAL_ELASTICSEARCH])
         try:
-            self.es.indices.delete(index='users')
+            self.es.indices.delete(index=USERS_INDEX_NAME)
         except NotFoundError:
             pass
-        self.es.indices.create('users')
+        self.es.indices.create(USERS_INDEX_NAME)
         time.sleep(1)
 
     def test___create_user___success(self):
