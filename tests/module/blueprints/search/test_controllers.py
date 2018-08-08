@@ -1,3 +1,4 @@
+import os
 import unittest
 from importlib import import_module
 from elasticsearch import Elasticsearch, NotFoundError
@@ -7,6 +8,9 @@ from tests.module.blueprints.config import LOCAL_ELASTICSEARCH
 from os_package_registry import PackageRegistry
 
 module = import_module('conductor.blueprints.search.controllers')
+
+PACKAGES_INDEX_NAME = os.environ.get('OS_ES_PACKAGES_INDEX_NAME',
+                                     'test_packages')
 
 
 class SearchTest(unittest.TestCase):
@@ -18,13 +22,14 @@ class SearchTest(unittest.TestCase):
         # Clean index
         self.es = Elasticsearch(hosts=[LOCAL_ELASTICSEARCH])
         try:
-            self.es.indices.delete(index='packages')
+            self.es.indices.delete(index=PACKAGES_INDEX_NAME)
         except NotFoundError:
             pass
-        self.pr = PackageRegistry(es_instance=self.es)
+        self.pr = PackageRegistry(es_instance=self.es,
+                                  index_name=PACKAGES_INDEX_NAME)
 
     def indexSomeRecords(self, amount):
-        self.es.indices.delete(index='packages')
+        self.es.indices.delete(index=PACKAGES_INDEX_NAME)
         for i in range(amount):
             body = {
                 'id': True,
@@ -34,8 +39,8 @@ class SearchTest(unittest.TestCase):
                     'name': 'innername'
                 }
             }
-            self.es.index('packages', 'package', body)
-        self.es.indices.flush('packages')
+            self.es.index(PACKAGES_INDEX_NAME, 'package', body)
+        self.es.indices.flush(PACKAGES_INDEX_NAME)
 
     def indexSomeRecordsToTestMapping(self):
         for i in range(3):
@@ -80,7 +85,7 @@ class SearchTest(unittest.TestCase):
                             'The one and only author number%d' % (i+1), '',
                             loaded)
                         i += 1
-        self.es.indices.flush('packages')
+        self.es.indices.flush(PACKAGES_INDEX_NAME)
 
     # Tests
     def test___search___all_values_and_empty(self):

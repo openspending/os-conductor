@@ -7,6 +7,8 @@ from elasticsearch.exceptions import NotFoundError
 
 _engine = None
 
+PACKAGES_INDEX_NAME = os.environ.get('OS_ES_PACKAGES_INDEX_NAME', 'packages')
+
 ENABLED_SEARCHES = {
     # 'user': {
     #     'index': 'users',
@@ -15,7 +17,7 @@ ENABLED_SEARCHES = {
     #     'q_fields': ['name']
     # },
     'package': {
-        'index': 'packages',
+        'index': PACKAGES_INDEX_NAME,
         'doc_type': 'package',
         '_source': ['id', 'model', 'package',
                     'origin_url', 'loaded', 'last_update'],

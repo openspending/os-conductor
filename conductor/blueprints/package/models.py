@@ -16,5 +16,5 @@ def _get_es_engine():
     return _es_engine
 
 
-# Package Registry
-package_registry = PackageRegistry(es_instance=_get_es_engine())
+def get_package_registry(es_instance=_get_es_engine(), index_name='packages'):
+    return PackageRegistry(es_instance=es_instance, index_name=index_name)

@@ -148,14 +148,15 @@ class PublishDeleteAPITests(unittest.TestCase):
         # Clean index
         self.es = Elasticsearch(hosts=[LOCAL_ELASTICSEARCH])
         try:
-            self.es.indices.delete(index='users')
-            self.es.indices.delete(index='packages')
+            self.es.indices.delete(index='test_users')
+            self.es.indices.delete(index='test_packages')
         except NotFoundError:
             pass
-        self.es.indices.create('users')
+        self.es.indices.create('test_users')
         time.sleep(1)
 
-        self.pr = PackageRegistry(es_connection_string=LOCAL_ELASTICSEARCH)
+        self.pr = PackageRegistry(es_connection_string=LOCAL_ELASTICSEARCH,
+                                  index_name='test_packages')
         self.pr.save_model(self.DATASET_NAME, 'datapackage_url', {}, {},
                            'dataset', 'author', '', True)
 
@@ -218,14 +219,15 @@ class UpdateDefaultParamsAPITests(unittest.TestCase):
         # Clean index
         self.es = Elasticsearch(hosts=[LOCAL_ELASTICSEARCH])
         try:
-            self.es.indices.delete(index='users')
-            self.es.indices.delete(index='packages')
+            self.es.indices.delete(index='test_users')
+            self.es.indices.delete(index='test_packages')
         except NotFoundError:
             pass
-        self.es.indices.create('users')
+        self.es.indices.create('test_users')
         time.sleep(1)
 
-        self.pr = PackageRegistry(es_connection_string=LOCAL_ELASTICSEARCH)
+        self.pr = PackageRegistry(es_connection_string=LOCAL_ELASTICSEARCH,
+                                  index_name='test_packages')
         self.pr.save_model(self.DATASET_NAME, 'datapackage_url', {}, {},
                            'dataset', 'author', '', True)
 

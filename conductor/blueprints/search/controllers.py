@@ -1,5 +1,3 @@
-import os
-
 # from werkzeug.contrib.cache import MemcachedCache, SimpleCache
 import elasticsearch
 
