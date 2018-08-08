@@ -14,9 +14,8 @@ from datapackage import Package
 
 from os_api_cache import get_os_cache
 from conductor.blueprints.user.controllers import PUBLIC_KEY
-from .models import get_package_registry
+from .models import package_registry
 
-package_registry = get_package_registry()
 os_api_url = os.environ.get('OS_API_URL')
 api_cache = get_os_cache()
 

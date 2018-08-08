@@ -1,7 +1,6 @@
+import os
 import unittest
-
 import time
-
 import jwt
 from elasticsearch import Elasticsearch, NotFoundError
 from os_package_registry import PackageRegistry
@@ -15,6 +14,10 @@ from importlib import import_module
 
 module = import_module('conductor.blueprints.package.controllers')
 dpp_module = import_module('datapackage.helpers')
+
+PACKAGES_INDEX_NAME = os.environ.get('OS_ES_PACKAGES_INDEX_NAME',
+                                     'test_packages')
+USERS_INDEX_NAME = os.environ.get('OS_ES_USERS_INDEX_NAME', 'test_users')
 
 
 class Response:
@@ -148,15 +151,15 @@ class PublishDeleteAPITests(unittest.TestCase):
         # Clean index
         self.es = Elasticsearch(hosts=[LOCAL_ELASTICSEARCH])
         try:
-            self.es.indices.delete(index='test_users')
-            self.es.indices.delete(index='test_packages')
+            self.es.indices.delete(index=USERS_INDEX_NAME)
+            self.es.indices.delete(index=PACKAGES_INDEX_NAME)
         except NotFoundError:
             pass
-        self.es.indices.create('test_users')
+        self.es.indices.create(USERS_INDEX_NAME)
         time.sleep(1)
 
         self.pr = PackageRegistry(es_connection_string=LOCAL_ELASTICSEARCH,
-                                  index_name='test_packages')
+                                  index_name=PACKAGES_INDEX_NAME)
         self.pr.save_model(self.DATASET_NAME, 'datapackage_url', {}, {},
                            'dataset', 'author', '', True)
 
@@ -219,15 +222,15 @@ class UpdateDefaultParamsAPITests(unittest.TestCase):
         # Clean index
         self.es = Elasticsearch(hosts=[LOCAL_ELASTICSEARCH])
         try:
-            self.es.indices.delete(index='test_users')
-            self.es.indices.delete(index='test_packages')
+            self.es.indices.delete(index=USERS_INDEX_NAME)
+            self.es.indices.delete(index=PACKAGES_INDEX_NAME)
         except NotFoundError:
             pass
-        self.es.indices.create('test_users')
+        self.es.indices.create(USERS_INDEX_NAME)
         time.sleep(1)
 
         self.pr = PackageRegistry(es_connection_string=LOCAL_ELASTICSEARCH,
-                                  index_name='test_packages')
+                                  index_name=PACKAGES_INDEX_NAME)
         self.pr.save_model(self.DATASET_NAME, 'datapackage_url', {}, {},
                            'dataset', 'author', '', True)
 

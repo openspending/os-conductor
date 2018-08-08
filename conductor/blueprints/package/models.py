@@ -7,6 +7,8 @@ from os_package_registry import PackageRegistry
 # ## ElasticSearch
 _es_engine = None
 
+PACKAGES_INDEX_NAME = os.environ.get('OS_ES_PACKAGES_INDEX_NAME', 'packages')
+
 
 def _get_es_engine():
     global _es_engine
@@ -16,5 +18,5 @@ def _get_es_engine():
     return _es_engine
 
 
-def get_package_registry(es_instance=_get_es_engine(), index_name='packages'):
-    return PackageRegistry(es_instance=es_instance, index_name=index_name)
+package_registry = PackageRegistry(es_instance=_get_es_engine(),
+                                   index_name=PACKAGES_INDEX_NAME)
