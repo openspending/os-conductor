@@ -50,7 +50,9 @@ class DataStoreTest(unittest.TestCase):
     def test___call___not_authorized(self):
         authorize = module.authorize
         self.services.verify = Mock(return_value=False)
-        self.assertEqual(authorize(module.S3Connection(), AUTH_TOKEN, PAYLOAD).status, '401 UNAUTHORIZED')
+        self.assertEqual(authorize(module.S3Connection(),
+                                   AUTH_TOKEN,
+                                   PAYLOAD).status, '401 UNAUTHORIZED')
 
     def test___call___bad_request(self):
         authorize = module.authorize
@@ -62,7 +64,7 @@ class DataStoreTest(unittest.TestCase):
         self.services.verify = Mock(return_value=True)
         authorize = module.authorize
         ret = authorize(module.S3Connection(), AUTH_TOKEN, PAYLOAD)
-        self.assertIs(type(ret),str)
+        self.assertIs(type(ret), str)
         self.assertEqual(json.loads(ret), {
             'filedata': {
                 'data/file1': {

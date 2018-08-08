@@ -5,7 +5,7 @@ from hashlib import md5
 
 from sqlalchemy.ext.declarative import declarative_base
 
-from sqlalchemy import Column, Unicode, String, create_engine
+from sqlalchemy import Column, Unicode, create_engine
 from sqlalchemy.orm import sessionmaker
 
 from elasticsearch import Elasticsearch
@@ -44,10 +44,13 @@ def _session():
 USER_FIELDS = ['id', 'name', 'email', 'avatar_url',
                'datasets', 'idhash', 'username', 'join_date']
 
+USERS_INDEX_NAME = os.environ.get('OS_ES_USERS_INDEX_NAME', 'users')
+
 
 def get_user(idhash):
     try:
-        ret = _get_es_engine().get(index="users", doc_type="user_profile",
+        ret = _get_es_engine().get(index=USERS_INDEX_NAME,
+                                   doc_type="user_profile",
                                    id=idhash, _source=USER_FIELDS)
         if ret['found']:
             return ret['_source']
@@ -62,9 +65,10 @@ def hash_email(email):
 
 def save_user(user):
     idhash = user['idhash']
-    _get_es_engine().index(index="users", doc_type="user_profile",
+    _get_es_engine().index(index=USERS_INDEX_NAME,
+                           doc_type="user_profile",
                            id=idhash, body=user)
-    _get_es_engine().indices.flush(index="users")
+    _get_es_engine().indices.flush(index=USERS_INDEX_NAME)
 
 
 def create_or_get_user(userid, name, email, avatar_url):

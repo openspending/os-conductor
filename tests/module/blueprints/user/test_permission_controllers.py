@@ -20,15 +20,15 @@ class AuthorizationTest(unittest.TestCase):
         # Cleanup
         self.addCleanup(patch.stopall)
 
-        goog_provider = namedtuple("resp",['headers'])({'Location':'google'})
+        goog_provider = namedtuple("resp", ['headers'])({'Location': 'google'})
         oauth_response = {
             'access_token': 'access_token'
         }
         module.google_remote_app = Mock(
             return_value=namedtuple('google_remote_app',
                                     ['authorize', 'authorized_response'])
-            (authorize=lambda **kwargs:goog_provider,
-             authorized_response=lambda **kwargs:oauth_response)
+            (authorize=lambda **kwargs: goog_provider,
+             authorized_response=lambda **kwargs: oauth_response)
         )
 
     # Tests
@@ -52,4 +52,4 @@ class AuthorizationTest(unittest.TestCase):
         client_token = jwt.encode(token, module.PRIVATE_KEY)
         ret = module.authorize(client_token, 'os.datastore')
         self.assertEquals(ret.get('service'), 'os.datastore')
-        self.assertGreater(len(ret.get('permissions',{})), 0)
+        self.assertGreater(len(ret.get('permissions', {})), 0)
