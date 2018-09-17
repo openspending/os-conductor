@@ -81,3 +81,10 @@ $ python ./to_env_vars.py
 4. Copy the generated env var key/values into your local environment or `.env` file in the root directory.
 
 
+### Admin tools
+
+Various admin tools are available in the `/tools` directory. Some tools require dependencies to be installed from `/tools/requirements.txt`.
+
+#### `remove_package.py`
+
+Remove a named package (or packages) from the ElasticSearch index, and hence from searches and discovery within OpenSpending. Removing a package from the index won't remove it from the AWS datastore.
