@@ -10,6 +10,9 @@ from .models import query
 # else:
 #     cache = SimpleCache()
 
+import logging
+log = logging.getLogger(__name__)
+
 
 def search(kind, userid, args={}):
     """Initiate an elasticsearch query
@@ -17,5 +20,6 @@ def search(kind, userid, args={}):
     try:
         hits = query(kind, userid, **args)
         return hits
-    except elasticsearch.exceptions.ElasticsearchException:
+    except elasticsearch.exceptions.ElasticsearchException as e:
+        log.error(e)
         return []

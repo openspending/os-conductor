@@ -39,7 +39,6 @@ def _get_engine():
     if _engine is None:
         es_host = os.environ['OS_ELASTICSEARCH_ADDRESS']
         _engine = Elasticsearch(hosts=[es_host], use_ssl='https' in es_host)
-
     return _engine
 
 
@@ -49,9 +48,13 @@ def build_dsl(kind_params, userid, kw):
     all_datasets = {
         'bool': {
             'should': [{'match': {kind_params['private']: False}},
-                       {'filtered':
-                        {'filter': {'missing': {'field':
-                                                kind_params['private']}}}},
+                       {'bool': {
+                            'must_not': {
+                                'exists': {
+                                    'field': kind_params['private']
+                                }
+                            }
+                        }},
                        ],
             'must_not': {'match': {'loaded': False}},
             'minimum_should_match': 1
@@ -113,7 +116,6 @@ def query(kind, userid, size=100, **kw):
             ('size', int(size)),
             ('_source', kind_params['_source'])
         ])
-
         body = build_dsl(kind_params, userid, kw)
         api_params['body'] = json.dumps(body)
         ret = _get_engine().search(**api_params)
