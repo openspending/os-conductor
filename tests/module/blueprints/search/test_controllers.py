@@ -48,7 +48,7 @@ class SearchTest(unittest.TestCase):
                                '', {
                                    'author': 'BlaBla%d@test2.com' % i,
                                    'title': 'This dataset is number test%d' % i
-                               }, {}, {},
+                               }, {}, 'dataset-name-%s' % i,
                                'BlaBla%d@test2.com' % (i+1), '', True)
 
     def indexSomeRealLookingRecords(self, amount):
@@ -61,7 +61,7 @@ class SearchTest(unittest.TestCase):
                     'title': 'This dataset is number%d' % i
                 },
                 {},
-                {},
+                'dataset-name-%s' % i,
                 'The one and only author number%d' % (i+1), '', True)
 
     def indexSomePrivateRecords(self):
@@ -81,7 +81,7 @@ class SearchTest(unittest.TestCase):
                                 (i, content),
                                 'owner': owner,
                                 'private': private
-                            }, {}, {},
+                            }, {}, 'dataset-name-%s' % content,
                             'The one and only author number%d' % (i+1), '',
                             loaded)
                         i += 1
