@@ -113,7 +113,7 @@ def upload(datapackage, token, cache_get, cache_set):
                 "progress": 0,
                 "status": "queued"
             }
-            cache_set(key, ret, 3600)
+            cache_set(key, ret, 180)
             package = Package(datapackage)
             desc = package.descriptor
 
@@ -210,7 +210,7 @@ class StatusCallback:
                 if progress:
                     ret['progress'] = int(progress)
             self.on_complete_callback()
-        self.cache_set(key, ret, 3600)
+        self.cache_set(key, ret, 180)
 
 
 def toggle_publish(name, token, toggle=False, publish=False):
