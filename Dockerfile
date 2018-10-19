@@ -24,10 +24,15 @@ RUN npm install -g os-types@1.15.1
 RUN apk del build-dependencies
 RUN rm -rf /var/cache/apk/*
 
-ADD . .
+COPY config.yml config.yml
 
 COPY docker/startup.sh /startup.sh
 COPY docker/docker-entrypoint.sh /entrypoint.sh
+
+COPY conductor conductor
+
+# ADD repos/dpp-runner repos/dpp-runner
+# RUN pip install -e repos/dpp-runner
 
 EXPOSE 8000
 
