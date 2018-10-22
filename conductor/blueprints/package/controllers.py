@@ -130,6 +130,9 @@ def upload(datapackage, token, cache_get, cache_set):
                 'title': desc.get('title', desc['name']),
                 'datapackage-url': datapackage,
                 'owner-id': token['userid'],
+                # OS compatible package already created on datastore, don't
+                # create another one with ddp-fiscal.
+                'suppress-os': True,
                 'sources': [
                     source
                 ],
