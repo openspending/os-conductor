@@ -23,7 +23,7 @@ click==6.7                # via datapackage, datapackage-pipelines, flask, table
 contextlib2==0.5.5        # via raven
 cryptography==2.3
 datapackage-pipelines-aws==0.0.23
-datapackage-pipelines-fiscal==1.1.1
+datapackage-pipelines-fiscal==1.1.2
 datapackage-pipelines[speedup]==1.7.1
 datapackage==1.3.2        # via datapackage-pipelines, datapackage-pipelines-fiscal
 docutils==0.14            # via botocore
