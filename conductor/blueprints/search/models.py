@@ -71,6 +71,8 @@ def build_dsl(kind_params, userid, kw):
     # Query parameters
     q = kw.get('q')
     if q is not None:
+        if not isinstance(q, list):
+            q = [q]
         dsl['bool']['must'].append({
                 'multi_match': {
                     'query': json.loads(q[0]),
