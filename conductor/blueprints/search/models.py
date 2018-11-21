@@ -79,6 +79,8 @@ def build_dsl(kind_params, userid, kw):
             })
     for k, v_arr in kw.items():
         if k.split('.')[0] in kind_params['_source']:
+            if not isinstance(v_arr, list):
+                v_arr = [v_arr]
             dsl['bool']['must'].append({
                     'bool': {
                         'should': [{'match': {k: json.loads(v)}}
