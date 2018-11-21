@@ -6,9 +6,10 @@
 #
 amqp==2.3.2               # via kombu
 asn1crypto==0.24.0        # via cryptography
-awesome-slugify==1.6.5    # via datapackage-pipelines
+awesome-slugify==1.6.5    # via dataflows, datapackage-pipelines
 billiard==3.5.0.4         # via celery
 bitarray==0.8.3           # via pybloom-live
+blessings==1.7            # via inquirer
 blinker==1.4
 boto3==1.7.70             # via datapackage-pipelines-aws
 boto==2.49.0
@@ -19,13 +20,14 @@ celery==4.2.1             # via datapackage-pipelines
 certifi==2018.4.16        # via requests
 cffi==1.11.5              # via cryptography
 chardet==3.0.4            # via requests
-click==6.7                # via datapackage, datapackage-pipelines, flask, tableschema, tabulator
+click==6.7                # via dataflows, datapackage, datapackage-pipelines, flask, tableschema, tabulator
 contextlib2==0.5.5        # via raven
 cryptography==2.3
+dataflows==0.0.33         # via datapackage-pipelines
 datapackage-pipelines-aws==0.0.23
-datapackage-pipelines-fiscal==1.1.4
-datapackage-pipelines[speedup]==1.7.1
-datapackage==1.3.2        # via datapackage-pipelines, datapackage-pipelines-fiscal
+datapackage-pipelines-fiscal==1.2.0
+datapackage-pipelines[speedup]==2.0.0
+datapackage==1.5.1        # via dataflows, datapackage-pipelines, datapackage-pipelines-fiscal
 docutils==0.14            # via botocore
 dpp-runner==0.0.9
 elasticsearch==5.5.3
@@ -39,15 +41,17 @@ flask==0.12.4
 gunicorn==19.9.0
 idna==2.7                 # via cryptography, requests
 ijson==2.3                # via tabulator
-isodate==0.6.0            # via tableschema
+inquirer==2.5.1           # via dataflows
+isodate==0.6.0            # via kvfile, tableschema
 itsdangerous==0.24        # via flask
 jdcal==1.4                # via openpyxl
-jinja2==2.10              # via flask
+jinja2==2.10              # via dataflows, flask
 jmespath==0.9.3           # via boto3, botocore
 jsonlines==1.2.0          # via tabulator
 jsonpointer==1.14         # via datapackage
 jsonschema==2.6.0         # via datapackage, tableschema
 kombu==4.2.1              # via celery
+kvfile==0.0.6             # via dataflows
 linear-tsv==1.1.0         # via tabulator
 markupsafe==1.0           # via jinja2
 mistune==0.8.3            # via datapackage-pipelines
@@ -55,7 +59,6 @@ oauthlib==2.1.0           # via flask-oauthlib, requests-oauthlib
 openpyxl==2.4.11          # via tabulator
 os-api-cache==0.0.7
 os-package-registry==0.0.17
-plyvel==0.9               # via datapackage-pipelines
 psycopg2==2.7.5
 pybloom-live==2.3.2       # via tableschema-sql
 pycparser==2.18           # via cffi
@@ -66,16 +69,18 @@ python-memcached==1.59
 pytz==2018.5              # via celery
 pyyaml==3.13
 raven==6.0.0
+readchar==2.0.1           # via inquirer
 redis==2.10.6             # via datapackage-pipelines, os-api-cache
 regex==2018.7.11          # via awesome-slugify
 requests-oauthlib==1.0.0  # via flask-oauthlib
 requests==2.19.1
 rfc3986==1.1.0            # via tableschema
 s3transfer==0.1.13        # via boto3
-six==1.11.0               # via cryptography, datapackage, datapackage-pipelines-fiscal, flask-cors, isodate, jsonlines, linear-tsv, python-dateutil, python-memcached, tableschema, tableschema-sql, tabulator
+six==1.11.0               # via blessings, cryptography, datapackage, datapackage-pipelines-fiscal, flask-cors, isodate, jsonlines, linear-tsv, python-dateutil, python-memcached, tableschema, tableschema-sql, tabulator
 sqlalchemy==1.2.10
-tableschema-sql==0.10.4   # via datapackage-pipelines
-tableschema==1.1.0        # via datapackage, datapackage-pipelines, tableschema-sql
+tableschema-sql==0.10.4   # via dataflows, datapackage-pipelines
+tableschema==1.2.5        # via datapackage, datapackage-pipelines, tableschema-sql
+tabulate==0.8.2           # via dataflows
 tabulator==1.14.2         # via datapackage, datapackage-pipelines, tableschema, tableschema-sql
 ujson==1.35               # via datapackage-pipelines
 unicodecsv==0.14.1        # via datapackage, tableschema, tabulator
@@ -84,3 +89,4 @@ urllib3==1.23             # via elasticsearch, requests
 vine==1.1.4               # via amqp
 werkzeug==0.14.1          # via flask
 xlrd==1.1.0               # via tabulator
+xmljson==0.1.9            # via dataflows

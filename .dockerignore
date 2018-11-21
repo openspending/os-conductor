@@ -5,3 +5,4 @@
 *.egg-info/
 flask_session
 node_modules
+repos/
