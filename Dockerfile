@@ -1,7 +1,8 @@
 FROM python:3.6-alpine
 
+WORKDIR /app
+
 RUN apk add --update --no-cache \
-    git \
     libpq \
     postgresql-dev \
     libffi \
@@ -10,29 +11,25 @@ RUN apk add --update --no-cache \
     curl \
     libstdc++ \
     nodejs \
-    nodejs-npm
-RUN apk add --update --no-cache --virtual=build-dependencies build-base
-RUN apk --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --update add leveldb leveldb-dev
+    && apk --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --update add \
+    leveldb \
+    leveldb-dev
 
-WORKDIR /app
-ADD requirements.txt .
-RUN pip install -r requirements.txt
+COPY requirements.txt .
 
-# Install os-types, used in the loading process for fiscal modelling the datapackage
-RUN npm install -g os-types@1.15.1
-
-RUN apk del build-dependencies
-RUN rm -rf /var/cache/apk/*
+RUN apk add --update --no-cache --virtual=build-dependencies \
+    build-base \
+    git \
+    nodejs-npm \
+    && pip install -r requirements.txt \
+    && npm install -g os-types@1.15.1 \
+    && apk del build-dependencies \
+    && rm -rf /var/cache/apk/*
 
 COPY config.yml config.yml
-
 COPY docker/startup.sh /startup.sh
 COPY docker/docker-entrypoint.sh /entrypoint.sh
-
 COPY conductor conductor
-
-# ADD repos/dpp-runner repos/dpp-runner
-# RUN pip install -e repos/dpp-runner
 
 EXPOSE 8000
 
