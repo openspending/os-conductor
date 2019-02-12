@@ -16,7 +16,7 @@ os-package-registry>=0.0.17
 datapackage-pipelines-aws
 datapackage-pipelines[speedup]>=2,<3
 datapackage-pipelines-fiscal>=1.2.0
-dpp_runner
+os-dpp-runner>=0.1.0
 raven==6.0.0
 blinker>=1.1
 python-dotenv

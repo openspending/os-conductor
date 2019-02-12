@@ -152,6 +152,7 @@ def upload(datapackage, token, cache_get, cache_set):
                                        on_upload_complete_callback)
             logging.info('About to run spec\n%s',
                          json.dumps(fiscal_spec, indent=2))
+
             runner.start('fiscal', json.dumps(fiscal_spec).encode('utf8'),
                          verbosity=2, status_cb=status_cb)
         except Exception as e:
@@ -179,6 +180,7 @@ class StatusCallback:
         self.statuses = {}
         self.error = None
         self.on_complete_callback = complete_callback
+        self.total_steps = 10
 
     def status(self):
         statuses = self.statuses.values()
@@ -192,18 +194,17 @@ class StatusCallback:
             return 'done'
         return 'loading-data'
 
+    def init_progress(self, specs):
+        '''Initialise the `total_steps` property, used to determine progress'''
+        self.total_steps = len(specs)
+
     def progress(self):
         '''Report the portion of step completed. This is the number of statuses
         that report as 'SUCCESS' '''
 
-        # Nasty hard-coded value alert! This is the total number of steps
-        # performed by the dpp-fiscal lib.
-        HOW_MANY_STEPS = 9
-
         cnt = Counter(self.statuses.values())
-        # total = sum(cnt.values())
         successes = cnt['SUCCESS']
-        return successes/HOW_MANY_STEPS
+        return successes / self.total_steps
 
     def __call__(self, pipeline_id, status, errors=None, stats=None):
         logging.debug('upload_status_update: %s pipeline:%s, ' +
@@ -223,10 +224,6 @@ class StatusCallback:
         ret['status'] = self.status()
         ret['progress'] = self.progress()
 
-        # if stats is not None:
-        #     progress = stats.get('count_of_rows')
-        #     if progress:
-        #         ret['progress'] = int(progress)
         if ret['status'] == 'done':
             self.on_complete_callback()
         self.cache_set(key, ret, 60*60*24)

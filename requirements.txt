@@ -29,7 +29,6 @@ datapackage-pipelines-fiscal==1.2.0
 datapackage-pipelines[speedup]==2.0.0
 datapackage==1.5.1        # via dataflows, datapackage-pipelines, datapackage-pipelines-fiscal
 docutils==0.14            # via botocore
-dpp-runner==0.0.9
 elasticsearch==5.5.3
 et-xmlfile==1.0.1         # via openpyxl
 flask-basicauth==0.2.0    # via datapackage-pipelines
@@ -58,6 +57,7 @@ mistune==0.8.3            # via datapackage-pipelines
 oauthlib==2.1.0           # via flask-oauthlib, requests-oauthlib
 openpyxl==2.4.11          # via tabulator
 os-api-cache==0.0.7
+os-dpp-runner==0.1.0
 os-package-registry==0.0.17
 psycopg2==2.7.5
 pybloom-live==2.3.2       # via tableschema-sql
