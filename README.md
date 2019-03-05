@@ -6,7 +6,12 @@
 [![Issues](https://img.shields.io/badge/issue-tracker-orange.svg)](https://github.com/openspending/openspending/issues)
 [![Docs](https://img.shields.io/badge/docs-latest-blue.svg)](http://docs.openspending.org/en/latest/developers/conductor/)
 
-A set of integration web services for OpenSpending, responsible for identity, notification, and access control.
+Web services for OpenSpending, responsible for:
+
+- user authentication, identity and access control
+- package upload, management, and status
+- package search of os-package-registry
+- upload to the S3 datastore
 
 ## Quick start for development
 
@@ -55,6 +60,9 @@ OS_STORAGE_BUCKET_NAME=
 
 # Address for memcached server, e.g. http://cache:11211
 OS_CONDUCTOR_CACHE=
+
+# Address for the redis os-api-cache server, e.g. redis
+OS_API_CACHE=
 
 # If this env var exists, the entrypoint script will check whether ElasticSearch is healthy before allowing os-conductor to start.
 OS_CHECK_ES_HEALTHY=
