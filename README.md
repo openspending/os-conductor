@@ -13,6 +13,8 @@ Web services for OpenSpending, responsible for:
 - package search of os-package-registry
 - upload to the S3 datastore
 
+os-conductor uses [Flask](http://flask.pocoo.org/) web framework.
+
 ## Quick start for development
 
 Clone the repo, install dependencies from pypi, and run the server. See the [docs](http://docs.openspending.org/en/latest/developers/conductor/) for more information.
