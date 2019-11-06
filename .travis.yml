@@ -1,54 +1,42 @@
-language:
-  python
-
+language: python
 python:
-  - 3.6
-
+- 3.6
 services:
-  - docker
-
+- docker
 addons:
-    postgresql: "9.4"
-
+  postgresql: '9.4'
 env:
-    global:
-        - OS_ES_USERS_INDEX_NAME=test_users
-        - OS_ES_PACKAGES_INDEX_NAME=test_packages
-        - OS_CONDUCTOR_ENGINE=postgresql://postgres@/postgres
-        - OS_ELASTICSEARCH_ADDRESS=localhost:9200
-        - OS_ACCESS_KEY_ID=access_key
-        - OS_SECRET_ACCESS_KEY=secret_access_key
-        - OS_STORAGE_BUCKET_NAME=
-        # DOCKER_USERNAME
-        - secure: XKtk/mVKMBmyLhF+P9thIcP7stsPPG2Xd7JATB1ey73s1gIBPh2c9SqTeQXNjZv0adumoRpxCQPZRpzqqiynG24d0IIiK5KGCj/Yo+8v6+CkuFo0l+t+pmocR+z7iQIqpTP7SjdJjcpwBCY1yBCTveC10mjPIFtkstVtrF/0pnwGkXgYQOOiNX/kOrx8M66webirr7rICA0CGH+sWVJu0yAvtqZauVp1p1pBC8fd+yJDisxFZhzEnmUJ7nshAalzecR82CF9A6WjEnwjDDVuT1myERZCb1sQ8LODLVgGJ3jf6EWgHz1HO82Uwdz3ri4ps8z40/EWpdtrkGX7afN8SlPBnhybLu00ecXBWEDDaben+8wWVYVgAlY4bRqnIq5jAU99gS81NpmSh7linFPqp0ZM6xELWbpPuYY5u510iZeHUkXcNxDZaJdYOCZ8Z0u4KyxJb44wZ/ODVx80JoRmiYdkDKOIDxLLVVOsqRWulBETtsK3UEm8nsI4WjTj0ifdUUoZNP4UslDljFTniNe/LArlj8GyL8w4ZrORtVBREvSqIYx7aNN3yW9kV7bibI7+jVNXqHJ3QQBlUnyfK/SUQJ0oiqxz4R0jQijgIqJlrXCI1O4zYy87pU1ClNUPuSnxGsZGyczqLQIHAC8UXeARFTZ5w6Exx/5tIZ6KQA+jikg=
-        # DOCKER_PASSWORD
-        - secure: EbAK+OB3kSgDdPysADnzxaJLEUyYLvJzRGXTtj4WHHX6CRV0id8aA8za5cXLGHb8YOMCLagldWJUM9lu0F2xWZ3Hx0DyEwpriA0n8oxJN0Pq+Cp3N8HbN4Wz8v3HCqj41zZdfXRBvDXxqPnbwb0A7QO0nqWncXDNkyRYin60MzXkEQEjzUQDDwKDZjAXQvN8olWgu36XNuug1+XxVq1rOsmGgBIhsS4jiUq2WouviYs6E5e3Kxnmm4rRWf5li5Y7XXmrJXiloBlKDoEx4Qplbai5bgbCrBXMAe1vyL0P3YeumgdP2mXLB+hWMHuNLJIviO9PTvm8WaJ+UTwjMzF07wDXkK6/GlNc7KMkpk2Z28K+TTw9HOESipo9gCTCwbQbFmgHIT3jJCyZ7xPFiNJZucfjU1paaPYde+vGgZKAsyLHnQzrdcaDh8rIcjjp59IaI7jkRg8bJlGVq4t96aKwwYX6mx4EHot/w6MxnhwuK6iflc5WeLjc87tkC4baWe6JDe5lzCL69k/Uln322vyx+OR50A0nYzvPs2mE97Zu+gCE18w5wMAmi9LVwQ87wLi4i4zGMPb9AVmNkzxTaw5yL9KYVZojtBELkwycdcuM1vhno+HTatfORJA+VpWI4WOHojYpc+w9msmnKV2UdFfDPuPq1Pin2lpkEvcoiPEKn5E=
-
+  global:
+  - OS_ES_USERS_INDEX_NAME=test_users
+  - OS_ES_PACKAGES_INDEX_NAME=test_packages
+  - OS_CONDUCTOR_ENGINE=postgresql://postgres@/postgres
+  - OS_ELASTICSEARCH_ADDRESS=localhost:9200
+  - OS_ACCESS_KEY_ID=access_key
+  - OS_SECRET_ACCESS_KEY=secret_access_key
+  - OS_STORAGE_BUCKET_NAME=
+  - secure: ODGCoD6/LwGuKw+YiwjxlYOEgS/SxH1HKglWmM7c1EHennxt+UuVuz9ItL8LKh+hw+cmm6K0XepA0l+W/9t/S4o3Mhj5CEhQzOXMT4bBoRLry9o+dJkdacMo386gx2MsRq+hG6ks55nYKXsaJ/C8PmYG3dIbbHiAWUXZuVaQA5beDDQ4zZToBBfvXtOLPaVVAuy6z4Ohw0zQwDrpPN+aqEd4rY3tukSp0Y0GET69VEwJtuFS2cQ9LXyOVKG6dE+U8K7o6OkBfLapdIc9ML2rgkBNKQMJEDiv1cQmNHzcYUoJIC2x/RoBNbMc6xe/pEnW9EEdFAVxYyxn1A85D+DzJ9x3OyG8Y/jdLgqZICKIaKVyRS+6IVDhWhOpGNnwj61Y+tvzb+EW5hFB96gJz2iIV4bjCLE1uR1w+UzbYLLiSlkR2zpHPrsBLsoeTpeB5eSXrriSbfg+J62jOE7H+s6vRv/Pi2vFUMUOVvZoIH828I3WbcBpYOSaTd5FFj4ldxvATDgJi9uUJfJujUFGbkNueXdlNZyxmTYRU1gFfQhzK1QZ2dNlok1hM16/PS12p3+9VsU9dFONEjwCuE8YaRgAqViZL7jLldNTdKLoWHc5oe+g3p9qyT8PxJ7kySRJeiDGgbnHgSd4NcVoAJfNGy/bRCI7oYxcIMK2pr4/nD+bwP4=
+  - secure: Ngku3jW4GYa4Kp3Y7nYsPFPDC5XQvLJ947EHdgb+Dr2IFIITfNIBQ6wZSqP+KBYYIaDwMR13ilV4zouzLoa9sKG9y5caVbqgx64TG4Z9K12jxUrdu6AO1ZSWtB/I6+LDGYTkxxY8c69amlraDvSZ2VBxxhELP2Ws2ysE11bnEBjLnY/H4B+PYXK0BdtnpVDmXtFQweZDGYUgTRrztNvdaB269uB5Up6hbGhqghWALlILnylOR+/7Cxnz4C59Ui83hZPqy9TAvMtMd+f6Z0s3/2//yGdoNvSi1SbqZngV7lsQMuQcEmX8rM9Db3pKQH4z3ev2zPA7fxLnWVnamMDapEFlFzS8S3ZtuiQ2Wj20HQzort+5vMVf/h/Di8v0nRqrtN9B51j1d/o49QS59z9TsDnRUnuZaHpgtTV54AnnfjcAKxSCOKG3brJsQ4ZBF/9bWYI2KFAnHROYBIEkDqfa93A0ZmcyK256dKzClMFqrkHEZ5VItWz9grch8B9piaUgL1dAs8osaEPok5EojSZ/SjEJqRj3GJ4Kfo7MEZfWnpNDoVLtnVRnfqCnlDxrXwDFEHOR0i/NPj1QBuslRk1WB5ZWbLWgUmo2orUQz0w95Enew2b39ns+4OSE7SVph+Fj0Ffw2LB/oYvMjVzeuYW/BvwbDq0wjdtwB/64M3vbHLs=
 before_install:
-  - sudo rm -f /etc/boto.cfg
-  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.11.deb && sudo dpkg -i --force-confnew elasticsearch-5.6.11.deb && sudo service elasticsearch restart
-
+- sudo rm -f /etc/boto.cfg
+- curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.11.deb
+  && sudo dpkg -i --force-confnew elasticsearch-5.6.11.deb && sudo service elasticsearch
+  restart
 install:
-  # Will build local Dockerfile as part of ci-run (docker-compose up)
-  - sudo apt-get install libleveldb-dev libleveldb1v5
-  - pip install tox
-  - make ci-run
-
+- sudo apt-get install libleveldb-dev libleveldb1v5
+- pip install tox
+- make ci-run
 before_script:
-  - sleep 30
-  - curl localhost:9200
-
+- sleep 30
+- curl localhost:9200
 script:
-  - make ci-test
-  - tox
-
+- make ci-test
+- tox
 after_success:
-  - coveralls
-  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then make ci-push-tag TAG="${TRAVIS_PULL_REQUEST_BRANCH////_}"; fi'
-
+- coveralls
+- if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then make ci-push-tag TAG="${TRAVIS_PULL_REQUEST_BRANCH////_}";
+  fi
 deploy:
-  # deploy master to latest tag
-  - provider: script
-    script: make ci-push
-    on:
-      branch: master
+- provider: script
+  script: make ci-push
+  on:
+    branch: master
