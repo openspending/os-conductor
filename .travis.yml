@@ -30,7 +30,7 @@ before_install:
 
 install:
   # Will build local Dockerfile as part of ci-run (docker-compose up)
-  - sudo apt-get install libleveldb-dev libleveldb1
+  - sudo apt-get install libleveldb-dev libleveldb1v5
   - pip install tox
   - make ci-run
 
