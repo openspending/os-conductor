@@ -58,7 +58,7 @@ oauthlib==2.1.0           # via flask-oauthlib, requests-oauthlib
 openpyxl==2.4.11          # via tabulator
 os-api-cache==0.0.7
 os-dpp-runner==0.1.0
-os-package-registry==0.0.19
+os-package-registry==0.0.20
 psycopg2==2.7.5
 pybloom-live==2.3.2       # via tableschema-sql
 pycparser==2.18           # via cffi
