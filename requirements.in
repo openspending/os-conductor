@@ -12,7 +12,7 @@ psycopg2
 cryptography
 elasticsearch>=5.0.0,<6.0.0
 os-api-cache>=0.0.7
-os-package-registry>=0.0.20
+os-package-registry>=0.0.21
 datapackage-pipelines-aws
 datapackage-pipelines[speedup]>=2,<3
 datapackage-pipelines-fiscal>=1.2.6
