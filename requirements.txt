@@ -87,6 +87,6 @@ unicodecsv==0.14.1        # via datapackage, tableschema, tabulator
 unidecode==0.4.21         # via awesome-slugify
 urllib3==1.23             # via elasticsearch, requests
 vine==1.1.4               # via amqp
-werkzeug==0.14.1          # via flask
+werkzeug==0.15.3          # via flask
 xlrd==1.1.0               # via tabulator
 xmljson==0.1.9            # via dataflows
