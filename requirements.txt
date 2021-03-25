@@ -4,89 +4,278 @@
 #
 #    pip-compile
 #
-amqp==2.3.2               # via kombu
-asn1crypto==0.24.0        # via cryptography
-awesome-slugify==1.6.5    # via dataflows, datapackage-pipelines
-billiard==3.5.0.4         # via celery
-bitarray==0.8.3           # via pybloom-live
-blessings==1.7            # via inquirer
+amqp==2.3.2
+    # via kombu
+asn1crypto==0.24.0
+    # via cryptography
+awesome-slugify==1.6.5
+    # via
+    #   dataflows
+    #   datapackage-pipelines
+billiard==3.5.0.4
+    # via celery
+bitarray==0.8.3
+    # via pybloom-live
+blessings==1.7
+    # via inquirer
 blinker==1.4
-boto3==1.7.70             # via datapackage-pipelines-aws
+    # via -r requirements.in
+boto3==1.7.70
+    # via datapackage-pipelines-aws
 boto==2.49.0
-botocore==1.10.70         # via boto3, s3transfer
-cachetools==2.1.0         # via datapackage-pipelines
-cchardet==1.1.3           # via datapackage, tabulator
-celery==4.2.1             # via datapackage-pipelines
-certifi==2018.4.16        # via requests
-cffi==1.11.5              # via cryptography
-chardet==3.0.4            # via requests
-click==6.7                # via dataflows, datapackage, datapackage-pipelines, flask, tableschema, tabulator
-contextlib2==0.5.5        # via raven
+    # via -r requirements.in
+botocore==1.10.70
+    # via
+    #   boto3
+    #   s3transfer
+cachetools==2.1.0
+    # via datapackage-pipelines
+cchardet==1.1.3
+    # via
+    #   datapackage
+    #   tabulator
+celery==4.2.1
+    # via datapackage-pipelines
+certifi==2018.4.16
+    # via requests
+cffi==1.11.5
+    # via cryptography
+chardet==3.0.4
+    # via requests
+click==6.7
+    # via
+    #   dataflows
+    #   datapackage
+    #   datapackage-pipelines
+    #   flask
+    #   tableschema
+    #   tabulator
+contextlib2==0.5.5
+    # via raven
 cryptography==2.3
-dataflows==0.0.33         # via datapackage-pipelines
+    # via -r requirements.in
+dataflows==0.0.33
+    # via datapackage-pipelines
 datapackage-pipelines-aws==0.0.23
+    # via
+    #   -r requirements.in
+    #   datapackage-pipelines-fiscal
 datapackage-pipelines-fiscal==1.2.6
+    # via -r requirements.in
 datapackage-pipelines[speedup]==2.0.0
-datapackage==1.5.1        # via dataflows, datapackage-pipelines, datapackage-pipelines-fiscal
-docutils==0.14            # via botocore
+    # via
+    #   -r requirements.in
+    #   datapackage-pipelines-aws
+    #   datapackage-pipelines-fiscal
+    #   os-dpp-runner
+datapackage==1.5.1
+    # via
+    #   dataflows
+    #   datapackage-pipelines
+    #   datapackage-pipelines-fiscal
+docutils==0.14
+    # via botocore
 elasticsearch==5.5.3
-et-xmlfile==1.0.1         # via openpyxl
-flask-basicauth==0.2.0    # via datapackage-pipelines
+    # via
+    #   -r requirements.in
+    #   os-package-registry
+enum34==1.1.10
+    # via cryptography
+et-xmlfile==1.0.1
+    # via openpyxl
+flask-basicauth==0.2.0
+    # via datapackage-pipelines
 flask-cors==3.0.6
+    # via
+    #   -r requirements.in
+    #   datapackage-pipelines
+    #   os-dpp-runner
 flask-jsonpify==1.5.0
+    # via
+    #   -r requirements.in
+    #   datapackage-pipelines
+    #   os-dpp-runner
 flask-oauthlib==0.9.5
+    # via -r requirements.in
 flask-session==0.3.1
+    # via -r requirements.in
 flask==0.12.4
+    # via
+    #   -r requirements.in
+    #   datapackage-pipelines
+    #   flask-basicauth
+    #   flask-cors
+    #   flask-jsonpify
+    #   flask-oauthlib
+    #   flask-session
+    #   os-dpp-runner
+functools32==3.2.3.post2
+    # via jsonschema
+futures==3.3.0
+    # via s3transfer
 gunicorn==19.9.0
-idna==2.7                 # via cryptography, requests
-ijson==2.3                # via tabulator
-inquirer==2.5.1           # via dataflows
-isodate==0.6.0            # via kvfile, tableschema
-itsdangerous==0.24        # via flask
-jdcal==1.4                # via openpyxl
-jinja2==2.10              # via dataflows, flask
-jmespath==0.9.3           # via boto3, botocore
-jsonlines==1.2.0          # via tabulator
-jsonpointer==1.14         # via datapackage
-jsonschema==2.6.0         # via datapackage, tableschema
-kombu==4.2.1              # via celery
-kvfile==0.0.6             # via dataflows
-linear-tsv==1.1.0         # via tabulator
-markupsafe==1.0           # via jinja2
-mistune==0.8.3            # via datapackage-pipelines
-oauthlib==2.1.0           # via flask-oauthlib, requests-oauthlib
-openpyxl==2.4.11          # via tabulator
+    # via -r requirements.in
+idna==2.7
+    # via
+    #   cryptography
+    #   requests
+ijson==2.3
+    # via tabulator
+inquirer==2.5.1
+    # via dataflows
+ipaddress==1.0.23
+    # via cryptography
+isodate==0.6.0
+    # via
+    #   kvfile
+    #   tableschema
+itsdangerous==0.24
+    # via flask
+jdcal==1.4
+    # via openpyxl
+jinja2==2.10
+    # via
+    #   dataflows
+    #   flask
+jmespath==0.9.3
+    # via
+    #   boto3
+    #   botocore
+jsonlines==1.2.0
+    # via tabulator
+jsonpointer==1.14
+    # via datapackage
+jsonschema==2.6.0
+    # via
+    #   datapackage
+    #   tableschema
+kombu==4.2.1
+    # via celery
+kvfile==0.0.6
+    # via dataflows
+linear-tsv==1.1.0
+    # via tabulator
+markupsafe==1.0
+    # via jinja2
+mistune==0.8.3
+    # via datapackage-pipelines
+oauthlib==2.1.0
+    # via
+    #   flask-oauthlib
+    #   requests-oauthlib
+openpyxl==2.4.11
+    # via tabulator
 os-api-cache==0.0.7
+    # via
+    #   -r requirements.in
+    #   os-package-registry
 os-dpp-runner==0.1.0
+    # via -r requirements.in
 os-package-registry==0.0.21
+    # via
+    #   -r requirements.in
+    #   datapackage-pipelines-fiscal
 psycopg2==2.7.5
-pybloom-live==2.3.2       # via tableschema-sql
-pycparser==2.18           # via cffi
+    # via -r requirements.in
+pybloom-live==2.3.2
+    # via tableschema-sql
+pycparser==2.18
+    # via cffi
 pyjwt==1.6.4
-python-dateutil==2.7.3    # via botocore, tableschema
+    # via -r requirements.in
+python-dateutil==2.7.3
+    # via
+    #   botocore
+    #   tableschema
 python-dotenv==0.9.1
+    # via -r requirements.in
 python-memcached==1.59
-pytz==2018.5              # via celery
-pyyaml==3.13
+    # via -r requirements.in
+pytz==2018.5
+    # via celery
+pyyaml==5.4
+    # via
+    #   -r requirements.in
+    #   datapackage-pipelines
 raven==6.0.0
-readchar==2.0.1           # via inquirer
-redis==2.10.6             # via datapackage-pipelines, os-api-cache
-regex==2018.7.11          # via awesome-slugify
-requests-oauthlib==1.0.0  # via flask-oauthlib
+    # via -r requirements.in
+readchar==2.0.1
+    # via inquirer
+redis==2.10.6
+    # via
+    #   datapackage-pipelines
+    #   os-api-cache
+regex==2018.7.11
+    # via awesome-slugify
+requests-oauthlib==1.0.0
+    # via flask-oauthlib
 requests==2.19.1
-rfc3986==1.1.0            # via tableschema
-s3transfer==0.1.13        # via boto3
-six==1.11.0               # via blessings, cryptography, datapackage, datapackage-pipelines-fiscal, flask-cors, isodate, jsonlines, linear-tsv, python-dateutil, python-memcached, tableschema, tableschema-sql, tabulator
+    # via
+    #   -r requirements.in
+    #   datapackage
+    #   datapackage-pipelines
+    #   requests-oauthlib
+    #   tableschema
+    #   tabulator
+rfc3986==1.1.0
+    # via tableschema
+s3transfer==0.1.13
+    # via boto3
+six==1.11.0
+    # via
+    #   blessings
+    #   cryptography
+    #   datapackage
+    #   datapackage-pipelines-fiscal
+    #   flask-cors
+    #   isodate
+    #   jsonlines
+    #   linear-tsv
+    #   python-dateutil
+    #   python-memcached
+    #   tableschema
+    #   tableschema-sql
+    #   tabulator
 sqlalchemy==1.2.10
-tableschema-sql==0.10.4   # via dataflows, datapackage-pipelines
-tableschema==1.2.5        # via datapackage, datapackage-pipelines, tableschema-sql
-tabulate==0.8.2           # via dataflows
-tabulator==1.14.2         # via datapackage, datapackage-pipelines, tableschema, tableschema-sql
-ujson==1.35               # via datapackage-pipelines
-unicodecsv==0.14.1        # via datapackage, tableschema, tabulator
-unidecode==0.4.21         # via awesome-slugify
-urllib3==1.23             # via elasticsearch, requests
-vine==1.1.4               # via amqp
-werkzeug==0.14.1          # via flask
-xlrd==1.1.0               # via tabulator
-xmljson==0.1.9            # via dataflows
+    # via
+    #   -r requirements.in
+    #   tableschema-sql
+    #   tabulator
+tableschema-sql==0.10.4
+    # via
+    #   dataflows
+    #   datapackage-pipelines
+tableschema==1.2.5
+    # via
+    #   datapackage
+    #   datapackage-pipelines
+    #   tableschema-sql
+tabulate==0.8.2
+    # via dataflows
+tabulator==1.14.2
+    # via
+    #   datapackage
+    #   datapackage-pipelines
+    #   tableschema
+    #   tableschema-sql
+ujson==1.35
+    # via datapackage-pipelines
+unicodecsv==0.14.1
+    # via
+    #   datapackage
+    #   tableschema
+    #   tabulator
+unidecode==0.4.21
+    # via awesome-slugify
+urllib3==1.23
+    # via
+    #   elasticsearch
+    #   requests
+vine==1.1.4
+    # via amqp
+werkzeug==0.14.1
+    # via flask
+xlrd==1.1.0
+    # via tabulator
+xmljson==0.1.9
+    # via dataflows
